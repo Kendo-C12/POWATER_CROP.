@@ -8,3 +8,4 @@
 # Build & Dependencies
 node_modules/
 *.autosave
+test_screenshot.png
