@@ -12,8 +12,10 @@ res_map = {r.get('name'): r for r in res_list}
 assets = [
     ('House.png', 'assets/House.png'),
     ('Power.png', 'assets/Power.png'),
+    ('Solar.png', 'assets/Solar.png'),
     ('Blue barrel.png', 'assets/Blue barrel.png'),
     ('Orange barrel.png', 'assets/Orange barrel.png'),
+    ('AirFilter.png', 'assets/AirFilter.png'),
 ]
 for name, file_path in assets:
     if name not in res_map:
@@ -32,12 +34,73 @@ project['resources']['resources'] = [r for r in project['resources']['resources'
 # 2. Layout & Objects
 layout = project['layouts'][0]
 objects = layout['objects']
+existing_objs = {o['name']: o for o in objects}
+
+def make_sprite_object(name, image_file, w, h):
+    return {
+        'adaptCollisionMaskAutomatically': True,
+        'assetStoreId': '',
+        'name': name,
+        'persistentUuid': f'uuid-{name}',
+        'type': 'Sprite',
+        'updateIfNotVisible': False,
+        'variables': [],
+        'effects': [],
+        'behaviors': [],
+        'animations': [
+            {
+                'name': '',
+                'useMultipleDirections': False,
+                'directions': [
+                    {
+                        'looping': True,
+                        'timeBetweenFrames': 0.025,
+                        'sprites': [
+                            {
+                                'hasCustomCollisionMask': False,
+                                'image': image_file,
+                                'points': [
+                                    {
+                                        'name': 'Point',
+                                        'x': w / 2.0,
+                                        'y': -10.0
+                                    }
+                                ],
+                                'originPoint': {
+                                    'name': 'origine',
+                                    'x': 0.0,
+                                    'y': 0.0
+                                },
+                                'centerPoint': {
+                                    'automatic': True,
+                                    'name': 'centre',
+                                    'x': w / 2.0,
+                                    'y': h / 2.0
+                                },
+                                'customCollisionMask': []
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+
+buildings = [
+    ('generator', 'Power.png', 140, 140),
+    ('solar', 'Solar.png', 140, 140),
+    ('water_pump', 'Blue barrel.png', 140, 140),
+    ('waste_filter', 'Orange barrel.png', 140, 140),
+    ('air_filter', 'AirFilter.png', 140, 140)
+]
+
+for bname, bimg, bw, bh in buildings:
+    if bname not in existing_objs:
+        objects.append(make_sprite_object(bname, bimg, bw, bh))
 
 # Remove WirePainter and text objects from layout objects
 objects = [obj for obj in objects if obj.get('name') not in ['WirePainter', 'Water', 'Electricity']]
 layout['objects'] = objects
-
-# Remove instances
 layout['instances'] = []
 
 for obj in objects:
@@ -88,24 +151,41 @@ for obj in objects:
                 'value': False
             })
 
-# 3. Read main script from wiring.js
-with open(r'c:\Users\user\Desktop\Folder\GDEV_POWATER\scripts\wiring.js', 'r', encoding='utf-8') as f:
-    wiring_code = f.read()
+# 3. Concatenate modular scripts
+scripts_order = [
+    'config.js',
+    'audio.js',
+    'map.js',
+    'entities.js',
+    'engine.js',
+    'ui.js',
+    'main.js'
+]
 
-main_js_source = """// [MAIN SCRIPT - Real Main Active Script]
-// POWATER CORP - Interactive Wiring & House Network
-
-""" + wiring_code + """
-
-if (!runtimeScene._powaterWiringInstance) {
-  runtimeScene._powaterWiringInstance = new POWATER.WiringManager();
-}
-runtimeScene._powaterWiringInstance.update(runtimeScene);
+combined_source = """// POWATER CORP. - Singleplayer Infrastructure & Environmental Strategy Game
+// Auto-compiled bundle of modular scripts
 """
 
-main_code_lines = main_js_source.split('\n')
+for sname in scripts_order:
+    spath = os.path.join(r'c:\Users\user\Desktop\Folder\GDEV_POWATER\scripts', sname)
+    with open(spath, 'r', encoding='utf-8') as sf:
+        combined_source += f"\n\n// ===== MODULE: {sname} =====\n"
+        combined_source += sf.read()
 
-# 4. Clean Events (No text creation, no text updating)
+combined_source += """
+
+// Main Game Controller invocation
+if (typeof POWATER !== 'undefined' && POWATER.GameController) {
+  if (!globalThis._powaterControllerInstance) {
+    globalThis._powaterControllerInstance = new POWATER.GameController();
+  }
+  globalThis._powaterControllerInstance.update(runtimeScene);
+}
+"""
+
+main_code_lines = combined_source.split('\n')
+
+# 4. Clean Events (Single master JS execution event)
 layout['events'] = [
     {
         'type': 'BuiltinCommonInstructions::Standard',
@@ -115,14 +195,7 @@ layout['events'] = [
                 'parameters': ['']
             }
         ],
-        'actions': [
-            {'type': {'value': 'ResetTimer'}, 'parameters': ['', '"spawn"']},
-            {'type': {'value': 'ResetTimer'}, 'parameters': ['', '"1sec"']},
-            # Spawn 3 houses cleanly
-            {'type': {'value': 'Create'}, 'parameters': ['', 'house', '240', '260', '']},
-            {'type': {'value': 'Create'}, 'parameters': ['', 'house', '880', '220', '']},
-            {'type': {'value': 'Create'}, 'parameters': ['', 'house', '560', '480', '']}
-        ]
+        'actions': []
     },
     {
         # THE BACKUP SCRIPT (Disabled)
@@ -138,41 +211,13 @@ layout['events'] = [
         'eventsSheetExpanded': False
     },
     {
-        # THE DUPLICATE SCRIPT (The Real Main File being edited)
+        # THE MAIN SCRIPT
         'disabled': False,
         'type': 'BuiltinCommonInstructions::JsCode',
         'inlineCode': main_code_lines,
         'parameterObjects': '',
         'useStrict': True,
         'eventsSheetExpanded': True
-    },
-    {
-        'type': 'BuiltinCommonInstructions::Standard',
-        'conditions': [
-            {
-                'type': {'value': 'CompareTimer'},
-                'parameters': ['', '"1sec"', '>=', '1']
-            }
-        ],
-        'actions': [
-            {'type': {'value': 'SetNumberObjectVariable'}, 'parameters': ['house', 'Water', '+', '1']},
-            {'type': {'value': 'SetNumberObjectVariable'}, 'parameters': ['house', 'Electricity', '+', '1']},
-            {'type': {'value': 'SetNumberVariable'}, 'parameters': ['Pollution_total', '+', 'Polltution_per_second']},
-            {'type': {'value': 'ResetTimer'}, 'parameters': ['', '"1sec"']}
-        ]
-    },
-    {
-        'type': 'BuiltinCommonInstructions::Standard',
-        'conditions': [
-            {
-                'type': {'value': 'CompareTimer'},
-                'parameters': ['', '"spawn"', '>', '25']
-            }
-        ],
-        'actions': [
-            {'type': {'value': 'Create'}, 'parameters': ['', 'house', 'RandomInRange(80,1100)', 'RandomInRange(80,580)', '']},
-            {'type': {'value': 'ResetTimer'}, 'parameters': ['', '"spawn"']}
-        ]
     }
 ]
 
@@ -180,4 +225,4 @@ layout['events'] = [
 with open(project_path, 'w', encoding='utf-8') as f:
     json.dump(project, f, indent=2, ensure_ascii=False)
 
-print('SUCCESS: Project updated cleanly without floating text!')
+print('SUCCESS: POWATER CORP complete project synced and compiled!')
