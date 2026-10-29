@@ -1,0 +1,6 @@
+# Private files & secrets
+.env
+.env.*
+*.secret
+*credentials*
+*password*
