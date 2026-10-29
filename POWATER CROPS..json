@@ -214,104 +214,6 @@
               ]
             }
           ]
-        },
-        {
-          "assetStoreId": "",
-          "bold": false,
-          "italic": false,
-          "name": "Water",
-          "persistentUuid": "37ffcdc3-1eb6-42b1-835c-39197674eaa3",
-          "smoothed": true,
-          "type": "TextObject::Text",
-          "underlined": false,
-          "variables": [],
-          "effects": [],
-          "behaviors": [
-            {
-              "name": "Text",
-              "type": "TextContainerCapability::TextContainerBehavior"
-            }
-          ],
-          "string": "",
-          "font": "",
-          "textAlignment": "left",
-          "characterSize": 20,
-          "color": {
-            "b": 0,
-            "g": 0,
-            "r": 0
-          },
-          "content": {
-            "bold": false,
-            "isOutlineEnabled": false,
-            "isShadowEnabled": false,
-            "italic": false,
-            "outlineColor": "255;255;255",
-            "outlineThickness": 2,
-            "shadowAngle": 90,
-            "shadowBlurRadius": 2,
-            "shadowColor": "0;0;0",
-            "shadowDistance": 4,
-            "shadowOpacity": 127,
-            "smoothed": true,
-            "underlined": false,
-            "text": "",
-            "font": "",
-            "textAlignment": "left",
-            "verticalTextAlignment": "top",
-            "characterSize": 20,
-            "lineHeight": 0,
-            "color": "0;0;0"
-          }
-        },
-        {
-          "assetStoreId": "",
-          "bold": false,
-          "italic": false,
-          "name": "Electricity",
-          "persistentUuid": "a1a25fa5-d82b-4352-8a3a-0982d2ac00fc",
-          "smoothed": true,
-          "type": "TextObject::Text",
-          "underlined": false,
-          "variables": [],
-          "effects": [],
-          "behaviors": [
-            {
-              "name": "Text",
-              "type": "TextContainerCapability::TextContainerBehavior"
-            }
-          ],
-          "string": "",
-          "font": "",
-          "textAlignment": "left",
-          "characterSize": 20,
-          "color": {
-            "b": 0,
-            "g": 0,
-            "r": 0
-          },
-          "content": {
-            "bold": false,
-            "isOutlineEnabled": false,
-            "isShadowEnabled": false,
-            "italic": false,
-            "outlineColor": "255;255;255",
-            "outlineThickness": 2,
-            "shadowAngle": 90,
-            "shadowBlurRadius": 2,
-            "shadowColor": "0;0;0",
-            "shadowDistance": 4,
-            "shadowOpacity": 127,
-            "smoothed": true,
-            "underlined": false,
-            "text": "",
-            "font": "",
-            "textAlignment": "left",
-            "verticalTextAlignment": "top",
-            "characterSize": 20,
-            "lineHeight": 0,
-            "color": "0;0;0"
-          }
         }
       ],
       "objectsFolderStructure": {
@@ -378,50 +280,6 @@
               },
               "parameters": [
                 "",
-                "Water",
-                "house.PointX(\"Point\")",
-                "house.PointY(\"Point\") - 20",
-                ""
-              ]
-            },
-            {
-              "type": {
-                "value": "Create"
-              },
-              "parameters": [
-                "",
-                "Electricity",
-                "house.PointX(\"Point\")",
-                "house.PointY(\"Point\")",
-                ""
-              ]
-            },
-            {
-              "type": {
-                "value": "LinkedObjects::LinkObjects"
-              },
-              "parameters": [
-                "",
-                "house",
-                "Water"
-              ]
-            },
-            {
-              "type": {
-                "value": "LinkedObjects::LinkObjects"
-              },
-              "parameters": [
-                "",
-                "house",
-                "Electricity"
-              ]
-            },
-            {
-              "type": {
-                "value": "Create"
-              },
-              "parameters": [
-                "",
                 "house",
                 "880",
                 "220",
@@ -434,98 +292,10 @@
               },
               "parameters": [
                 "",
-                "Water",
-                "house.PointX(\"Point\")",
-                "house.PointY(\"Point\") - 20",
-                ""
-              ]
-            },
-            {
-              "type": {
-                "value": "Create"
-              },
-              "parameters": [
-                "",
-                "Electricity",
-                "house.PointX(\"Point\")",
-                "house.PointY(\"Point\")",
-                ""
-              ]
-            },
-            {
-              "type": {
-                "value": "LinkedObjects::LinkObjects"
-              },
-              "parameters": [
-                "",
-                "house",
-                "Water"
-              ]
-            },
-            {
-              "type": {
-                "value": "LinkedObjects::LinkObjects"
-              },
-              "parameters": [
-                "",
-                "house",
-                "Electricity"
-              ]
-            },
-            {
-              "type": {
-                "value": "Create"
-              },
-              "parameters": [
-                "",
                 "house",
                 "560",
                 "480",
                 ""
-              ]
-            },
-            {
-              "type": {
-                "value": "Create"
-              },
-              "parameters": [
-                "",
-                "Water",
-                "house.PointX(\"Point\")",
-                "house.PointY(\"Point\") - 20",
-                ""
-              ]
-            },
-            {
-              "type": {
-                "value": "Create"
-              },
-              "parameters": [
-                "",
-                "Electricity",
-                "house.PointX(\"Point\")",
-                "house.PointY(\"Point\")",
-                ""
-              ]
-            },
-            {
-              "type": {
-                "value": "LinkedObjects::LinkObjects"
-              },
-              "parameters": [
-                "",
-                "house",
-                "Water"
-              ]
-            },
-            {
-              "type": {
-                "value": "LinkedObjects::LinkObjects"
-              },
-              "parameters": [
-                "",
-                "house",
-                "Electricity"
               ]
             }
           ]
@@ -887,28 +657,6 @@
             },
             {
               "type": {
-                "value": "TextContainerCapability::TextContainerBehavior::SetValue"
-              },
-              "parameters": [
-                "Water",
-                "Text",
-                "=",
-                "\"Water: \" + house.Water"
-              ]
-            },
-            {
-              "type": {
-                "value": "TextContainerCapability::TextContainerBehavior::SetValue"
-              },
-              "parameters": [
-                "Electricity",
-                "Text",
-                "=",
-                "\"Elec: \" + house.Electricity"
-              ]
-            },
-            {
-              "type": {
                 "value": "SetNumberVariable"
               },
               "parameters": [
@@ -954,50 +702,6 @@
                 "RandomInRange(80,1100)",
                 "RandomInRange(80,580)",
                 ""
-              ]
-            },
-            {
-              "type": {
-                "value": "Create"
-              },
-              "parameters": [
-                "",
-                "Water",
-                "house.PointX(\"Point\")",
-                "house.PointY(\"Point\") - 20",
-                ""
-              ]
-            },
-            {
-              "type": {
-                "value": "Create"
-              },
-              "parameters": [
-                "",
-                "Electricity",
-                "house.PointX(\"Point\")",
-                "house.PointY(\"Point\")",
-                ""
-              ]
-            },
-            {
-              "type": {
-                "value": "LinkedObjects::LinkObjects"
-              },
-              "parameters": [
-                "",
-                "house",
-                "Water"
-              ]
-            },
-            {
-              "type": {
-                "value": "LinkedObjects::LinkObjects"
-              },
-              "parameters": [
-                "",
-                "house",
-                "Electricity"
               ]
             },
             {

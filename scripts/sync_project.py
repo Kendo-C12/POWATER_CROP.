@@ -2,7 +2,6 @@ import json
 import os
 
 project_path = r'c:\Users\user\Desktop\Folder\GDEV_POWATER\POWATER CROPS..json'
-autosave_path = r'c:\Users\user\Desktop\Folder\GDEV_POWATER\POWATER CROPS..json.autosave'
 
 with open(project_path, 'r', encoding='utf-8') as f:
     project = json.load(f)
@@ -27,18 +26,19 @@ for name, file_path in assets:
             'userAdded': True
         })
 
+# Clean out any old missing resource references
+project['resources']['resources'] = [r for r in project['resources']['resources'] if 'Red house' not in r['name']]
+
 # 2. Layout & Objects
 layout = project['layouts'][0]
 objects = layout['objects']
 
-# Remove WirePainter from objects if present
-objects = [obj for obj in objects if obj.get('name') != 'WirePainter']
+# Remove WirePainter and text objects from layout objects
+objects = [obj for obj in objects if obj.get('name') not in ['WirePainter', 'Water', 'Electricity']]
 layout['objects'] = objects
 
-# Remove WirePainter from instances if present
-instances = layout.get('instances', [])
-instances = [inst for inst in instances if inst.get('name') != 'WirePainter']
-layout['instances'] = instances
+# Remove instances
+layout['instances'] = []
 
 for obj in objects:
     if obj.get('name') == 'house':
@@ -105,7 +105,7 @@ runtimeScene._powaterWiringInstance.update(runtimeScene);
 
 main_code_lines = main_js_source.split('\n')
 
-# 4. Events
+# 4. Clean Events (No text creation, no text updating)
 layout['events'] = [
     {
         'type': 'BuiltinCommonInstructions::Standard',
@@ -118,24 +118,10 @@ layout['events'] = [
         'actions': [
             {'type': {'value': 'ResetTimer'}, 'parameters': ['', '"spawn"']},
             {'type': {'value': 'ResetTimer'}, 'parameters': ['', '"1sec"']},
-            # House 1
+            # Spawn 3 houses cleanly
             {'type': {'value': 'Create'}, 'parameters': ['', 'house', '240', '260', '']},
-            {'type': {'value': 'Create'}, 'parameters': ['', 'Water', 'house.PointX("Point")', 'house.PointY("Point") - 20', '']},
-            {'type': {'value': 'Create'}, 'parameters': ['', 'Electricity', 'house.PointX("Point")', 'house.PointY("Point")', '']},
-            {'type': {'value': 'LinkedObjects::LinkObjects'}, 'parameters': ['', 'house', 'Water']},
-            {'type': {'value': 'LinkedObjects::LinkObjects'}, 'parameters': ['', 'house', 'Electricity']},
-            # House 2
             {'type': {'value': 'Create'}, 'parameters': ['', 'house', '880', '220', '']},
-            {'type': {'value': 'Create'}, 'parameters': ['', 'Water', 'house.PointX("Point")', 'house.PointY("Point") - 20', '']},
-            {'type': {'value': 'Create'}, 'parameters': ['', 'Electricity', 'house.PointX("Point")', 'house.PointY("Point")', '']},
-            {'type': {'value': 'LinkedObjects::LinkObjects'}, 'parameters': ['', 'house', 'Water']},
-            {'type': {'value': 'LinkedObjects::LinkObjects'}, 'parameters': ['', 'house', 'Electricity']},
-            # House 3
-            {'type': {'value': 'Create'}, 'parameters': ['', 'house', '560', '480', '']},
-            {'type': {'value': 'Create'}, 'parameters': ['', 'Water', 'house.PointX("Point")', 'house.PointY("Point") - 20', '']},
-            {'type': {'value': 'Create'}, 'parameters': ['', 'Electricity', 'house.PointX("Point")', 'house.PointY("Point")', '']},
-            {'type': {'value': 'LinkedObjects::LinkObjects'}, 'parameters': ['', 'house', 'Water']},
-            {'type': {'value': 'LinkedObjects::LinkObjects'}, 'parameters': ['', 'house', 'Electricity']},
+            {'type': {'value': 'Create'}, 'parameters': ['', 'house', '560', '480', '']}
         ]
     },
     {
@@ -171,8 +157,6 @@ layout['events'] = [
         'actions': [
             {'type': {'value': 'SetNumberObjectVariable'}, 'parameters': ['house', 'Water', '+', '1']},
             {'type': {'value': 'SetNumberObjectVariable'}, 'parameters': ['house', 'Electricity', '+', '1']},
-            {'type': {'value': 'TextContainerCapability::TextContainerBehavior::SetValue'}, 'parameters': ['Water', 'Text', '=', '"Water: " + house.Water']},
-            {'type': {'value': 'TextContainerCapability::TextContainerBehavior::SetValue'}, 'parameters': ['Electricity', 'Text', '=', '"Elec: " + house.Electricity']},
             {'type': {'value': 'SetNumberVariable'}, 'parameters': ['Pollution_total', '+', 'Polltution_per_second']},
             {'type': {'value': 'ResetTimer'}, 'parameters': ['', '"1sec"']}
         ]
@@ -187,20 +171,13 @@ layout['events'] = [
         ],
         'actions': [
             {'type': {'value': 'Create'}, 'parameters': ['', 'house', 'RandomInRange(80,1100)', 'RandomInRange(80,580)', '']},
-            {'type': {'value': 'Create'}, 'parameters': ['', 'Water', 'house.PointX("Point")', 'house.PointY("Point") - 20', '']},
-            {'type': {'value': 'Create'}, 'parameters': ['', 'Electricity', 'house.PointX("Point")', 'house.PointY("Point")', '']},
-            {'type': {'value': 'LinkedObjects::LinkObjects'}, 'parameters': ['', 'house', 'Water']},
-            {'type': {'value': 'LinkedObjects::LinkObjects'}, 'parameters': ['', 'house', 'Electricity']},
             {'type': {'value': 'ResetTimer'}, 'parameters': ['', '"spawn"']}
         ]
     }
 ]
 
-# Write to both project file and autosave file
+# Write to project file
 with open(project_path, 'w', encoding='utf-8') as f:
     json.dump(project, f, indent=2, ensure_ascii=False)
 
-with open(autosave_path, 'w', encoding='utf-8') as f:
-    json.dump(project, f, indent=2, ensure_ascii=False)
-
-print('SUCCESS: Both project and autosave updated without WirePainter dependency!')
+print('SUCCESS: Project updated cleanly without floating text!')

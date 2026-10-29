@@ -14,41 +14,7 @@
     spawnHouse(runtimeScene, x, y) {
       const house = runtimeScene.createObject("house");
       if (!house) return null;
-
       house.setPosition(x, y);
-
-      // Link Water text if available
-      try {
-        const waterObj = runtimeScene.createObject("Water");
-        if (waterObj) {
-          const ptX = house.getPointX ? house.getPointX("Point") : (x + 75);
-          const ptY = house.getPointY ? house.getPointY("Point") : (y - 10);
-          waterObj.setPosition(ptX, ptY - 20);
-
-          if (typeof gdjs !== 'undefined' && gdjs.LinksManager && gdjs.LinksManager.getManager) {
-            gdjs.LinksManager.getManager(runtimeScene).linkObjects(house, waterObj);
-          }
-        }
-      } catch (err) {
-        // Safe link catch
-      }
-
-      // Link Electricity text if available
-      try {
-        const elecObj = runtimeScene.createObject("Electricity");
-        if (elecObj) {
-          const ptX = house.getPointX ? house.getPointX("Point") : (x + 75);
-          const ptY = house.getPointY ? house.getPointY("Point") : (y - 10);
-          elecObj.setPosition(ptX, ptY);
-
-          if (typeof gdjs !== 'undefined' && gdjs.LinksManager && gdjs.LinksManager.getManager) {
-            gdjs.LinksManager.getManager(runtimeScene).linkObjects(house, elecObj);
-          }
-        }
-      } catch (err) {
-        // Safe link catch
-      }
-
       return house;
     }
 
