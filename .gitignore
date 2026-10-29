@@ -4,3 +4,7 @@
 *.secret
 *credentials*
 *password*
+
+# Build & Dependencies
+node_modules/
+*.autosave

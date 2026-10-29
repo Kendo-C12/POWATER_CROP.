@@ -27,10 +27,10 @@
     getEndpoints() {
       if (!this.fromHouse || !this.toHouse) return null;
       return {
-        x1: this.fromHouse.getCenterX(),
-        y1: this.fromHouse.getCenterY(),
-        x2: this.toHouse.getCenterX(),
-        y2: this.toHouse.getCenterY()
+        x1: this.fromHouse.getX() + this.fromHouse.getWidth() / 2,
+        y1: this.fromHouse.getY() + this.fromHouse.getHeight() / 2,
+        x2: this.toHouse.getX() + this.toHouse.getWidth() / 2,
+        y2: this.toHouse.getY() + this.toHouse.getHeight() / 2
       };
     }
   }
@@ -122,6 +122,9 @@
     }
 
     update(runtimeScene) {
+      if (typeof window !== 'undefined') {
+        window.gdjsCurrentScene = runtimeScene;
+      }
       this.pulseTime += 0.05;
       const inputManager = runtimeScene.getGame().getInputManager();
       const mouseX = inputManager.getMouseX(runtimeScene);
@@ -227,8 +230,8 @@
 
         // 2. Draw live dragging preview wire
         if (this.isDragging && this.dragStartHouse) {
-          const x1 = this.dragStartHouse.getCenterX();
-          const y1 = this.dragStartHouse.getCenterY();
+          const x1 = this.dragStartHouse.getX() + this.dragStartHouse.getWidth() / 2;
+          const y1 = this.dragStartHouse.getY() + this.dragStartHouse.getHeight() / 2;
           const x2 = this.currentMouseX;
           const y2 = this.currentMouseY;
 
@@ -257,8 +260,8 @@
             this.hoveredHouse &&
             this.hoveredHouse.id !== this.dragStartHouse.id
           ) {
-            const tx = this.hoveredHouse.getCenterX();
-            const ty = this.hoveredHouse.getCenterY();
+            const tx = this.hoveredHouse.getX() + this.hoveredHouse.getWidth() / 2;
+            const ty = this.hoveredHouse.getY() + this.hoveredHouse.getHeight() / 2;
             const ringR = 55 + Math.sin(this.pulseTime * 6) * 4;
             gfx.lineStyle(3, 0x50ffa0, 0.9);
             gfx.drawCircle(tx, ty, ringR);
