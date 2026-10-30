@@ -18,7 +18,7 @@
 
     // Revenue & Costs
     REVENUE_PER_HAPPY_HOUSE_SEC: 2.0, // Fully supplied house generates $2/s
-    MIN_HOUSE_DISTANCE: 110, // Minimum distance between houses
+    MIN_HOUSE_DISTANCE: 160, // Minimum distance between houses (plenty of breathing room)
 
     POLLUTION_RATES: {
       ELECTRIC_GENERATOR: 0.3, // Coal generator = +0.3/s
@@ -42,8 +42,8 @@
         clean: false,
         color: '#ffb703',
         icon: '⚡',
-        width: 60,
-        height: 60,
+        width: 56,
+        height: 56,
         desc: 'จ่ายกระแสไฟฟ้าได้ไม่จำกัด ปล่อยมลภาวะ 0.3 หน่วย/วินาที'
       },
       GENERATOR_SOLAR: {
@@ -58,8 +58,8 @@
         clean: true,
         color: '#ffd166',
         icon: '☀️',
-        width: 60,
-        height: 60,
+        width: 56,
+        height: 56,
         desc: 'พลังงานสะอาด 0% มลภาวะ ไม่เพิ่มมลพิษจากการใช้ไฟ (SDG 7)'
       },
       WATER_PUMP: {
@@ -74,8 +74,8 @@
         mustBeNearWater: true,
         color: '#00b4d8',
         icon: '💧',
-        width: 55,
-        height: 55,
+        width: 56,
+        height: 56,
         desc: 'สูบน้ำสะอาดได้ 15 หลังคาเรือน (ต้องวางริมแม่น้ำ)'
       },
       WASTE_FILTER: {
@@ -90,8 +90,8 @@
         mustBeNearWater: true,
         color: '#7209b7',
         icon: '🧪',
-        width: 55,
-        height: 55,
+        width: 56,
+        height: 56,
         desc: 'จุดปล่อยและระบายน้ำเสียริมแม่น้ำ ลากท่อระบายน้ำจากบ้านมาปล่อยที่นี่ (SDG 6)'
       },
       AIR_FILTER: {
@@ -106,8 +106,8 @@
         mustBeNearWater: false,
         color: '#2ec4b6',
         icon: '🍃',
-        width: 55,
-        height: 55,
+        width: 56,
+        height: 56,
         desc: 'เครื่องฟอกอากาศ ช่วยดูดซับมลพิษในเมือง ลดมลภาวะ -0.2 หน่วย/วินาที (SDG 11 & 13)'
       }
     },
@@ -121,7 +121,7 @@
         color: '#ffb703',
         glowColor: '#ffd166',
         lineWidth: 3,
-        offset: -5
+        offset: -6
       },
       WATER: {
         id: 'water',
@@ -130,7 +130,7 @@
         cost: 0, // Free
         color: '#00b4d8',
         glowColor: '#90e0ef',
-        lineWidth: 4,
+        lineWidth: 3,
         offset: 0
       },
       SEWAGE: {
@@ -140,8 +140,8 @@
         cost: 0, // Free
         color: '#9d4edd',
         glowColor: '#c77dff',
-        lineWidth: 4,
-        offset: 5
+        lineWidth: 3,
+        offset: 6
       }
     },
 

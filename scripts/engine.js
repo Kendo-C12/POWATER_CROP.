@@ -89,6 +89,20 @@
       this.gracePeriodWarningShown = false;
       this.pollutionStartedNotified = false;
 
+      // Clean existing runtime objects if any
+      if (this.runtimeScene) {
+        this.buildings.forEach(b => {
+          if (b.runtimeObject) {
+            try { b.runtimeObject.deleteFromScene(this.runtimeScene); } catch (e) {}
+          }
+        });
+        this.houses.forEach(h => {
+          if (h.runtimeObject) {
+            try { h.runtimeObject.deleteFromScene(this.runtimeScene); } catch (e) {}
+          }
+        });
+      }
+
       this.houses = [];
       this.buildings = [];
       this.connections = [];
@@ -104,33 +118,35 @@
     }
 
     setupStartingCity() {
-      const riverX = this.map.getRiverCenterAtY(360);
+      // 1. Initial Water Pump along river
+      this.createBuilding('water_pump', 680, 270);
 
-      // 1. Initial Generator on Bangkok side (right)
-      this.createBuilding('generator_coal', riverX + 180, 240);
+      // 2. Initial Wastewater Outlet along river (200px below Water Pump)
+      this.createBuilding('waste_filter', 740, 470);
 
-      // 2. Initial Water Pump along river
-      this.createBuilding('water_pump', riverX + 55, 360);
+      // 3. Initial Electricity Generator (Power Tower) on Bangkok side
+      this.createBuilding('generator_coal', 860, 270);
 
-      // 3. Initial Wastewater Outlet along river
-      this.createBuilding('waste_filter', riverX + 55, 490);
-
-      // 4. Initial 3 Houses (2 right, 1 left across river)
-      this.spawnHouse('right', riverX + 170, 120);
-      this.spawnHouse('right', riverX + 290, 360);
-      this.spawnHouse('left', riverX - 190, 250);
+      // 4. Initial 3 Houses (Spacious, zero overlaps)
+      this.spawnHouse('right', 860, 110); // Bangkok North
+      this.spawnHouse('right', 920, 460); // Bangkok South
+      this.spawnHouse('left', 350, 320);  // Thonburi West across river
     }
 
-    createBuilding(typeKey, x, y) {
+    createBuilding(typeKey, centerX, centerY) {
       const buildCfg = CONFIG.BUILDINGS[typeKey.toUpperCase()];
       if (!buildCfg) return null;
+
+      const w = buildCfg.width || 56;
+      const h = buildCfg.height || 56;
 
       let runtimeObj = null;
       if (this.runtimeScene && buildCfg.objectName) {
         try {
           const objs = this.runtimeScene.createObject(buildCfg.objectName);
           if (objs) {
-            objs.setPosition(x - (buildCfg.width || 55) / 2, y - (buildCfg.height || 55) / 2);
+            if (objs.setSize) objs.setSize(w, h);
+            objs.setPosition(centerX - w / 2, centerY - h / 2);
             objs.setZOrder(4);
             runtimeObj = objs;
           }
@@ -143,8 +159,8 @@
         `b_${this.nextEntityId++}`,
         buildCfg,
         runtimeObj,
-        x,
-        y
+        centerX,
+        centerY
       );
       this.buildings.push(building);
       return building;
@@ -158,7 +174,7 @@
         const sideChoice = side || (Math.random() < 0.5 ? 'left' : 'right');
         let valid = false;
         let attempts = 0;
-        const minDist = CONFIG.MIN_HOUSE_DISTANCE || 110;
+        const minDist = CONFIG.MIN_HOUSE_DISTANCE || 160;
 
         while (!valid && attempts < 100) {
           attempts++;
@@ -166,13 +182,16 @@
           const riverCenterX = this.map.getRiverCenterAtY(y);
 
           if (sideChoice === 'left') {
-            x = 70 + Math.random() * (riverCenterX - 70 - this.map.riverWidth / 2 - 30);
+            x = 80 + Math.random() * (riverCenterX - 80 - this.map.riverWidth / 2 - 40);
           } else {
             const startX = riverCenterX + this.map.riverWidth / 2 + 50;
             x = startX + Math.random() * (CONFIG.CANVAS_WIDTH - startX - 90);
           }
 
-          const tooClose = [...this.houses, ...this.buildings].some(e => Math.hypot(e.x - x, e.y - y) < minDist);
+          const tooClose = [...this.houses, ...this.buildings].some(e => {
+            const c = e.getCenter ? e.getCenter() : { x: e.centerX, y: e.centerY };
+            return Math.hypot(c.x - x, c.y - y) < minDist;
+          });
           const inRiver = this.map.isPointInRiver(x, y);
 
           if (!tooClose && !inRiver) {
@@ -184,12 +203,15 @@
         if (!valid) return null;
       }
 
+      const w = 84;
+      const h = 56;
       let runtimeObj = null;
       if (this.runtimeScene) {
         try {
           const objs = this.runtimeScene.createObject('house');
           if (objs) {
-            objs.setPosition(x - 37.5, y - 25);
+            if (objs.setSize) objs.setSize(w, h);
+            objs.setPosition(x - w / 2, y - h / 2);
             objs.setZOrder(3);
             runtimeObj = objs;
           }
@@ -487,7 +509,7 @@
         time: `${this.dayNames[this.dayIndex]} Day ${this.totalDaysPassed + 1}`
       });
 
-      this.addFloatingText(`⚠️ ร้องเรียน: ${reason} (${this.complaints}/${CONFIG.MAX_COMPLAINTS})`, house.x, house.y - 25, '#e63946');
+      this.addFloatingText(`⚠️ ร้องเรียน: ${reason} (${this.complaints}/${CONFIG.MAX_COMPLAINTS})`, house.centerX, house.centerY - 25, '#e63946');
       if (POWATER.soundManager) POWATER.soundManager.playComplaint();
 
       if (this.complaints >= CONFIG.MAX_COMPLAINTS) {
@@ -547,7 +569,10 @@
         return false;
       }
 
-      const collided = [...this.buildings, ...this.houses].some(e => Math.hypot(e.x - x, e.y - y) < 45);
+      const collided = [...this.buildings, ...this.houses].some(e => {
+        const c = e.getCenter ? e.getCenter() : { x: e.centerX, y: e.centerY };
+        return Math.hypot(c.x - x, c.y - y) < 65;
+      });
       if (collided) {
         this.addFloatingText('พื้นที่ถูกใช้งานแล้ว!', x, y - 20, '#e63946');
         return false;
@@ -565,7 +590,7 @@
       if (!nodeA || !nodeB || nodeA.id === nodeB.id) return false;
 
       if ((nodeA.config && nodeA.config.type === 'air_filter') || (nodeB.config && nodeB.config.type === 'air_filter')) {
-        this.addFloatingText('เครื่องฟอกอากาศทำงานอัตโนมัติ ไม่ต้องต่อสาย!', (nodeA.x + nodeB.x) / 2, (nodeA.y + nodeB.y) / 2 - 20, '#2ec4b6');
+        this.addFloatingText('เครื่องฟอกอากาศทำงานอัตโนมัติ ไม่ต้องต่อสาย!', (nodeA.getCenter().x + nodeB.getCenter().x) / 2, (nodeA.getCenter().y + nodeB.getCenter().y) / 2 - 20, '#2ec4b6');
         return false;
       }
 
@@ -587,7 +612,7 @@
           const missing = types.find(t => !hasConn(t));
           if (missing) actualType = missing;
           else {
-            this.addFloatingText('เชื่อมครบทั้ง 3 ระบบแล้ว!', (nodeA.x + nodeB.x) / 2, (nodeA.y + nodeB.y) / 2 - 20, '#06d6a0');
+            this.addFloatingText('เชื่อมครบทั้ง 3 ระบบแล้ว!', (nodeA.getCenter().x + nodeB.getCenter().x) / 2, (nodeA.getCenter().y + nodeB.getCenter().y) / 2 - 20, '#06d6a0');
             return false;
           }
         }
@@ -638,7 +663,10 @@
       }
 
       // 2. Delete building near clicked point (refund 50%)
-      const bIdx = this.buildings.findIndex(b => Math.hypot(b.x - x, b.y - y) < 32);
+      const bIdx = this.buildings.findIndex(b => {
+        const c = b.getCenter();
+        return Math.hypot(c.x - x, c.y - y) <= 40;
+      });
       if (bIdx !== -1) {
         const b = this.buildings[bIdx];
         const refund = Math.round(b.config.cost * 0.5);
@@ -671,13 +699,24 @@
     }
 
     getNodeAt(x, y) {
-      const b = this.buildings.find(b => Math.hypot(b.x - x, b.y - y) < 34);
-      if (b) return b;
-      const h = this.houses.find(h => {
+      // 1. Check buildings (radius 42px generously covers 56x56 footprint)
+      for (let i = 0; i < this.buildings.length; i++) {
+        const b = this.buildings[i];
+        const c = b.getCenter();
+        if (Math.hypot(c.x - x, c.y - y) <= 42) {
+          return b;
+        }
+      }
+
+      // 2. Check houses (radius 56px covers 84x56 sprite + pins at 52px)
+      for (let i = 0; i < this.houses.length; i++) {
+        const h = this.houses[i];
         const c = h.getCenter();
-        return Math.hypot(c.x - x, c.y - y) < 34;
-      });
-      if (h) return h;
+        if (Math.hypot(c.x - x, c.y - y) <= 56) {
+          return h;
+        }
+      }
+
       return null;
     }
 

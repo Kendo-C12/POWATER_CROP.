@@ -1,5 +1,5 @@
 // POWATER CORP. - Main Game Controller & GDevelop RuntimeScene Integration
-// Coordinates GameEngine, PixiJS Scene Rendering, User Input, and UI Overlay
+// Coordinates GameEngine, Dual-Layer PixiJS Scene Rendering, User Input, and UI Overlay
 
 (function (global) {
   'use strict';
@@ -10,12 +10,16 @@
     constructor() {
       this.game = null;
       this.ui = null;
-      this.pixiGfx = null;
+      this.pixiGfxWires = null;
+      this.pixiGfxOverlay = null;
       this.initialized = false;
       this.wasMouseDown = false;
       this.wasRightDown = false;
       this.dragStartNode = null;
+      this.selectedNode = null;
       this.isDragging = false;
+      this.dragStartX = 0;
+      this.dragStartY = 0;
       this.currentMouseX = 0;
       this.currentMouseY = 0;
       this.pulseTime = 0;
@@ -45,14 +49,14 @@
       this.game.startLevel(0);
       this.ui.showLevelBriefing(this.game.currentLevel);
 
-      // 5. Initialize PixiJS Graphics Layer in GDevelop
-      this.setupPixiLayer(runtimeScene);
+      // 5. Initialize Dual PixiJS Graphics Layers
+      this.setupPixiLayers(runtimeScene);
 
       this.initialized = true;
       this.lastTime = performance.now();
     }
 
-    setupPixiLayer(runtimeScene) {
+    setupPixiLayers(runtimeScene) {
       try {
         const layer = runtimeScene.getLayer('');
         if (layer && layer.getRenderer) {
@@ -60,18 +64,29 @@
           const container = renderer.getRendererObject ? renderer.getRendererObject() : null;
 
           if (container && typeof PIXI !== 'undefined' && PIXI.Graphics) {
-            const gfx = new PIXI.Graphics();
+            // Layer 1: Wires & River (Z=2, beneath buildings and houses)
+            const gfxWires = new PIXI.Graphics();
             if (renderer.addRendererObject) {
-              renderer.addRendererObject(gfx, 2);
+              renderer.addRendererObject(gfxWires, 2);
             } else {
-              container.addChild(gfx);
+              container.addChild(gfxWires);
             }
-            this.pixiGfx = gfx;
-            runtimeScene._powaterPixiGfx = gfx;
+            this.pixiGfxWires = gfxWires;
+            runtimeScene._powaterPixiGfxWires = gfxWires;
+
+            // Layer 2: Status Rings, Pins, Hover Rings & Live Drag Wire (Z=6, above buildings and houses)
+            const gfxOverlay = new PIXI.Graphics();
+            if (renderer.addRendererObject) {
+              renderer.addRendererObject(gfxOverlay, 6);
+            } else {
+              container.addChild(gfxOverlay);
+            }
+            this.pixiGfxOverlay = gfxOverlay;
+            runtimeScene._powaterPixiGfxOverlay = gfxOverlay;
           }
         }
       } catch (e) {
-        console.error('Error initializing Pixi layer:', e);
+        console.error('Error initializing Pixi layers:', e);
       }
     }
 
@@ -85,10 +100,19 @@
       this.lastTime = now;
       this.pulseTime += dt * 3.0;
 
-      // 1. Input Processing
+      // 1. Input Coordinates (Layer-converted world coordinates)
       const inputManager = runtimeScene.getGame().getInputManager();
-      const mouseX = inputManager.getMouseX(runtimeScene);
-      const mouseY = inputManager.getMouseY(runtimeScene);
+      let mouseX = 0;
+      let mouseY = 0;
+
+      if (typeof gdjs !== 'undefined' && gdjs.evtTools && gdjs.evtTools.input) {
+        mouseX = gdjs.evtTools.input.getMouseX(runtimeScene, '');
+        mouseY = gdjs.evtTools.input.getMouseY(runtimeScene, '');
+      } else {
+        mouseX = inputManager.getCursorX();
+        mouseY = inputManager.getCursorY();
+      }
+
       const isMouseDown = inputManager.isMouseButtonPressed(0);
       const isRightDown = inputManager.isMouseButtonPressed(1);
 
@@ -101,6 +125,9 @@
 
       // Right-click quick delete
       if (isRightDown && !this.wasRightDown) {
+        this.selectedNode = null;
+        this.dragStartNode = null;
+        this.isDragging = false;
         this.game.deleteAt(mouseX, mouseY);
         this.ui.updateHUD();
       }
@@ -115,67 +142,73 @@
           this.game.deleteAt(mouseX, mouseY);
           this.ui.updateHUD();
         }
-        // 2. Clicked on a Node: Smart Auto-drag!
+        // 2. Clicked on a Node: Start drag or click-to-connect!
         else if (hitNode) {
-          if (hitNode.config && hitNode.config.type === 'generator') {
-            this.ui.selectTool('power');
-            this.dragStartNode = hitNode;
-            this.isDragging = true;
-          } else if (hitNode.config && hitNode.config.type === 'water_pump') {
-            this.ui.selectTool('water');
-            this.dragStartNode = hitNode;
-            this.isDragging = true;
-          } else if (hitNode.config && hitNode.config.type === 'waste_filter') {
-            this.ui.selectTool('sewage');
-            this.dragStartNode = hitNode;
-            this.isDragging = true;
-          } else if (hitNode.config && hitNode.config.type === 'air_filter') {
-            this.game.addFloatingText('🍃 เครื่องฟอกอากาศ: ลดมลภาวะ -0.2/วิ', hitNode.x, hitNode.y - 20, '#2ec4b6');
-          } else if (hitNode instanceof POWATER.HouseEntity) {
-            // Dragging from house
-            if (!['power', 'water', 'sewage'].includes(this.game.activeTool)) {
-              if (hitNode.hasWater && !hitNode.hasDrainage) this.ui.selectTool('sewage');
-              else if (!hitNode.hasPower) this.ui.selectTool('power');
-              else if (!hitNode.hasWater) this.ui.selectTool('water');
-              else this.ui.selectTool('power');
+          // If we already had a selected node from a previous click, connect them!
+          if (this.selectedNode && this.selectedNode.id !== hitNode.id) {
+            this.handleConnect(this.selectedNode, hitNode);
+            this.selectedNode = null;
+            this.dragStartNode = null;
+            this.isDragging = false;
+          } else {
+            // Auto-select corresponding tool
+            if (hitNode.config && hitNode.config.type === 'generator') {
+              this.ui.selectTool('power');
+            } else if (hitNode.config && hitNode.config.type === 'water_pump') {
+              this.ui.selectTool('water');
+            } else if (hitNode.config && hitNode.config.type === 'waste_filter') {
+              this.ui.selectTool('sewage');
+            } else if (hitNode.config && hitNode.config.type === 'air_filter') {
+              this.game.addFloatingText('🍃 เครื่องฟอกอากาศ: ลดมลภาวะ -0.2/วิ', hitNode.getCenter().x, hitNode.getCenter().y - 20, '#2ec4b6');
+            } else if (hitNode instanceof POWATER.HouseEntity) {
+              if (!['power', 'water', 'sewage'].includes(this.game.activeTool)) {
+                if (hitNode.hasWater && !hitNode.hasDrainage) this.ui.selectTool('sewage');
+                else if (!hitNode.hasPower) this.ui.selectTool('power');
+                else if (!hitNode.hasWater) this.ui.selectTool('water');
+                else this.ui.selectTool('power');
+              }
             }
+
             this.dragStartNode = hitNode;
+            this.selectedNode = hitNode;
             this.isDragging = true;
+            this.dragStartX = mouseX;
+            this.dragStartY = mouseY;
           }
         }
-        // 3. Clicked on empty terrain with building placement tool
-        else if (this.game.activeTool.startsWith('build_')) {
-          let typeKey = '';
-          if (this.game.activeTool === 'build_gen') typeKey = 'generator_coal';
-          else if (this.game.activeTool === 'build_solar') typeKey = 'generator_solar';
-          else if (this.game.activeTool === 'build_pump') typeKey = 'water_pump';
-          else if (this.game.activeTool === 'build_filter') typeKey = 'waste_filter';
-          else if (this.game.activeTool === 'build_air_filter') typeKey = 'air_filter';
+        // 3. Clicked on empty terrain:
+        else {
+          this.selectedNode = null;
+          this.dragStartNode = null;
+          this.isDragging = false;
 
-          if (typeKey) {
-            this.game.placeBuilding(typeKey, mouseX, mouseY);
-            this.ui.updateHUD();
+          if (this.game.activeTool.startsWith('build_')) {
+            let typeKey = '';
+            if (this.game.activeTool === 'build_gen') typeKey = 'generator_coal';
+            else if (this.game.activeTool === 'build_solar') typeKey = 'generator_solar';
+            else if (this.game.activeTool === 'build_pump') typeKey = 'water_pump';
+            else if (this.game.activeTool === 'build_filter') typeKey = 'waste_filter';
+            else if (this.game.activeTool === 'build_air_filter') typeKey = 'air_filter';
+
+            if (typeKey) {
+              this.game.placeBuilding(typeKey, mouseX, mouseY);
+              this.ui.updateHUD();
+            }
           }
         }
       }
       // Left-click up (release)
       else if (!isMouseDown && this.wasMouseDown) {
         if (this.isDragging && this.dragStartNode) {
+          const dragDist = Math.hypot(mouseX - this.dragStartX, mouseY - this.dragStartY);
           const endNode = this.game.getNodeAt(mouseX, mouseY);
-          if (endNode && endNode.id !== this.dragStartNode.id) {
-            let connectType = this.game.activeTool;
-            if ((this.dragStartNode.config && this.dragStartNode.config.type === 'generator') || (endNode.config && endNode.config.type === 'generator')) {
-              connectType = 'power';
-            } else if ((this.dragStartNode.config && this.dragStartNode.config.type === 'water_pump') || (endNode.config && endNode.config.type === 'water_pump')) {
-              connectType = 'water';
-            } else if ((this.dragStartNode.config && this.dragStartNode.config.type === 'waste_filter') || (endNode.config && endNode.config.type === 'waste_filter')) {
-              connectType = 'sewage';
-            } else if (this.dragStartNode instanceof POWATER.HouseEntity && endNode instanceof POWATER.HouseEntity) {
-              connectType = ['power', 'water', 'sewage'].includes(this.game.activeTool) ? this.game.activeTool : 'power';
-            }
 
-            this.game.connectNodes(connectType, this.dragStartNode, endNode);
-            this.ui.updateHUD();
+          // If dragged a distance and ended over another node, complete the connection!
+          if (dragDist > 15 && endNode && endNode.id !== this.dragStartNode.id) {
+            this.handleConnect(this.dragStartNode, endNode);
+            this.selectedNode = null;
+          } else if (dragDist > 15 && !endNode) {
+            this.selectedNode = null;
           }
         }
         this.isDragging = false;
@@ -191,24 +224,56 @@
       this.render();
     }
 
+    handleConnect(nodeA, nodeB) {
+      if (!nodeA || !nodeB || nodeA.id === nodeB.id) return;
+
+      let connectType = this.game.activeTool;
+      if ((nodeA.config && nodeA.config.type === 'generator') || (nodeB.config && nodeB.config.type === 'generator')) {
+        connectType = 'power';
+      } else if ((nodeA.config && nodeA.config.type === 'water_pump') || (nodeB.config && nodeB.config.type === 'water_pump')) {
+        connectType = 'water';
+      } else if ((nodeA.config && nodeA.config.type === 'waste_filter') || (nodeB.config && nodeB.config.type === 'waste_filter')) {
+        connectType = 'sewage';
+      } else if (nodeA instanceof POWATER.HouseEntity && nodeB instanceof POWATER.HouseEntity) {
+        connectType = ['power', 'water', 'sewage'].includes(this.game.activeTool) ? this.game.activeTool : 'power';
+      }
+
+      this.game.connectNodes(connectType, nodeA, nodeB);
+      this.ui.updateHUD();
+    }
+
     render() {
-      if (!this.pixiGfx) return;
-      const gfx = this.pixiGfx;
-      gfx.clear();
+      if (!this.pixiGfxWires || !this.pixiGfxOverlay) return;
+      const gfxW = this.pixiGfxWires;
+      const gfxO = this.pixiGfxOverlay;
 
-      // 1. Render Map & Chao Phraya River
-      this.game.map.render(gfx);
+      gfxW.clear();
+      gfxO.clear();
 
-      // 2. Render Established Connections (Wires & Pipes)
-      this.game.connections.forEach(conn => conn.render(gfx));
+      // === LAYER 1 (Underneath objects): River & Wires ===
+      // 1. Render Map & River
+      this.game.map.render(gfxW);
 
+      // 2. Render Established Connections
+      this.game.connections.forEach(conn => conn.render(gfxW));
+
+      // === LAYER 2 (Above objects): Status Rings, Pins, Preview Lines & Hover Rings ===
       // 3. Render House Status Rings & Pins
-      this.game.houses.forEach(house => house.render(gfx));
+      this.game.houses.forEach(house => house.render(gfxO));
 
       // 4. Render Building Footprints & Indicators
-      this.game.buildings.forEach(building => building.render(gfx));
+      this.game.buildings.forEach(building => building.render(gfxO));
 
-      // 5. Render Live Dragging Preview Wire
+      // 5. Selected Node Highlight (Click-to-Connect)
+      const activeSource = (this.isDragging && this.dragStartNode) ? this.dragStartNode : this.selectedNode;
+      if (activeSource) {
+        const sc = activeSource.getCenter();
+        const pulseR = 48 + Math.sin(this.pulseTime * 6) * 3;
+        gfxO.lineStyle(3, 0xffd166, 0.9);
+        gfxO.drawCircle(sc.x, sc.y, pulseR);
+      }
+
+      // 6. Live Dragging Preview Wire (Above everything!)
       if (this.isDragging && this.dragStartNode) {
         const p1 = this.dragStartNode.getCenter();
         const p2 = { x: this.currentMouseX, y: this.currentMouseY };
@@ -217,30 +282,30 @@
         if (this.game.activeTool === 'water') wireColor = 0x00b4d8;
         else if (this.game.activeTool === 'sewage') wireColor = 0xc77dff;
 
-        // Outer glow
-        gfx.lineStyle(6, 0x1a1334, 0.7);
-        gfx.moveTo(p1.x, p1.y);
-        gfx.lineTo(p2.x, p2.y);
+        // Outer dark casing
+        gfxO.lineStyle(7, 0x1a1334, 0.75);
+        gfxO.moveTo(p1.x, p1.y);
+        gfxO.lineTo(p2.x, p2.y);
 
-        // Core line
-        gfx.lineStyle(3, wireColor, 1.0);
-        gfx.moveTo(p1.x, p1.y);
-        gfx.lineTo(p2.x, p2.y);
+        // Core bright wire
+        gfxO.lineStyle(3.5, wireColor, 1.0);
+        gfxO.moveTo(p1.x, p1.y);
+        gfxO.lineTo(p2.x, p2.y);
 
-        // Start & End terminals
-        gfx.lineStyle(1.5, 0xffffff, 1.0);
-        gfx.beginFill(wireColor, 1.0);
-        gfx.drawCircle(p1.x, p1.y, 6);
-        gfx.drawCircle(p2.x, p2.y, 5);
-        gfx.endFill();
+        // Terminals
+        gfxO.lineStyle(1.5, 0xffffff, 1.0);
+        gfxO.beginFill(wireColor, 1.0);
+        gfxO.drawCircle(p1.x, p1.y, 6.0);
+        gfxO.drawCircle(p2.x, p2.y, 5.0);
+        gfxO.endFill();
 
-        // Target hover pulse ring
+        // Target hover pulsating ring
         const targetNode = this.game.getNodeAt(p2.x, p2.y);
         if (targetNode && targetNode.id !== this.dragStartNode.id) {
           const tc = targetNode.getCenter();
-          const ringR = 48 + Math.sin(this.pulseTime * 5) * 4;
-          gfx.lineStyle(3, 0x06d6a0, 0.9);
-          gfx.drawCircle(tc.x, tc.y, ringR);
+          const targetR = (targetNode instanceof POWATER.HouseEntity ? 54 : 44) + Math.sin(this.pulseTime * 6) * 4;
+          gfxO.lineStyle(3, 0x06d6a0, 0.95);
+          gfxO.drawCircle(tc.x, tc.y, targetR);
         }
       }
     }

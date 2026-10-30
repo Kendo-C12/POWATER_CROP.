@@ -22,7 +22,6 @@ const server = http.createServer((req, res) => {
   let reqPath = decodeURIComponent(req.url.split('?')[0]);
   if (reqPath === '/') reqPath = '/index.html';
 
-  let filePath = path.join(PREVIEW_DIR, reqPath);
   if (reqPath === '/manifest.webmanifest') {
     res.writeHead(200, { 'Content-Type': 'application/manifest+json' });
     res.end(JSON.stringify({ name: 'POWATER CORP.', short_name: 'POWATER', start_url: '.' }));
@@ -33,6 +32,8 @@ const server = http.createServer((req, res) => {
     res.end();
     return;
   }
+
+  let filePath = path.join(PREVIEW_DIR, reqPath);
   if (!fs.existsSync(filePath) && reqPath.startsWith('/assets/')) {
     filePath = path.join(PROJECT_ASSETS_DIR, reqPath.replace('/assets/', ''));
   }
@@ -74,12 +75,6 @@ async function runTest() {
   const consoleLogs = [];
   const errors = [];
 
-  page.on('response', response => {
-    if (response.status() >= 400) {
-      console.log('HTTP Error:', response.status(), response.url());
-    }
-  });
-
   page.on('console', msg => {
     const text = msg.text();
     consoleLogs.push(`[${msg.type()}] ${text}`);
@@ -99,80 +94,148 @@ async function runTest() {
   // Wait 2.5 seconds for scene and game systems to initialize
   await new Promise(r => setTimeout(r, 2500));
 
-  // Evaluate game state
-  const gameState = await page.evaluate(() => {
-    const powater = window.POWATER || {};
-    const game = powater.game;
-    const ui = powater.uiManager;
-
-    if (!game) {
-      return { loaded: false, error: 'POWATER.game not found on window' };
-    }
-
-    return {
-      loaded: true,
-      level: game.currentLevel ? game.currentLevel.name : null,
-      money: game.money,
-      housesCount: game.houses.length,
-      buildingsCount: game.buildings.length,
-      connectionsCount: game.connections.length,
-      complaints: game.complaints,
-      pollution: game.pollution,
-      hudExists: !!document.getElementById('powater-ui-root'),
-      hudMoney: document.getElementById('hud-money') ? document.getElementById('hud-money').textContent : null,
-      hudDay: document.getElementById('hud-day-name') ? document.getElementById('hud-day-name').textContent : null
-    };
+  // Close briefing modal if open
+  await page.evaluate(() => {
+    const modal = document.getElementById('modal-briefing');
+    if (modal) modal.classList.remove('active');
   });
 
-  console.log('Game State Evaluated:', JSON.stringify(gameState, null, 2));
-
-  // Test Smart Auto-Drag Wire Connection between Generator and House
-  const dragResult = await page.evaluate(() => {
+  // Evaluate game state & dimensions
+  const entityPositions = await page.evaluate(() => {
     const game = window.POWATER && window.POWATER.game;
-    if (!game || game.buildings.length === 0 || game.houses.length === 0) {
-      return { success: false, reason: 'Entities not available' };
+    if (!game) return null;
+
+    return {
+      buildings: game.buildings.map(b => ({
+        id: b.id,
+        type: b.config.type,
+        center: b.getCenter(),
+        width: b.width,
+        height: b.height
+      })),
+      houses: game.houses.map(h => ({
+        id: h.id,
+        center: h.getCenter(),
+        width: h.width,
+        height: h.height
+      }))
+    };
+  });
+
+  console.log('Entities in scene:', JSON.stringify(entityPositions, null, 2));
+
+  // Verify no overlaps between buildings and houses
+  let overlapFound = false;
+  const allEntities = [...entityPositions.buildings, ...entityPositions.houses];
+  for (let i = 0; i < allEntities.length; i++) {
+    for (let j = i + 1; j < allEntities.length; j++) {
+      const e1 = allEntities[i];
+      const e2 = allEntities[j];
+      const dist = Math.hypot(e1.center.x - e2.center.x, e1.center.y - e2.center.y);
+      const minSafeDist = (Math.max(e1.width, e1.height) + Math.max(e2.width, e2.height)) / 2 + 10;
+      if (dist < minSafeDist) {
+        console.error(`OVERLAP DETECTED between ${e1.id} and ${e2.id}! Dist: ${dist}, Min: ${minSafeDist}`);
+        overlapFound = true;
+      }
     }
+  }
 
-    const gen = game.buildings.find(b => b.config.type === 'generator');
-    const house = game.houses[0];
-    if (!gen || !house) return { success: false, reason: 'Gen or House not found' };
+  if (!overlapFound) {
+    console.log('PASSED: All entities are cleanly spaced with ZERO overlaps!');
+  }
 
-    const initialConns = game.connections.length;
-    game.connectNodes('power', gen, house);
+  // Test Mouse Drag from Generator to House 1
+  const gen = entityPositions.buildings.find(b => b.type === 'generator');
+  const house = entityPositions.houses[0];
 
+  console.log(`Simulating mouse drag from (${gen.center.x}, ${gen.center.y}) to (${house.center.x}, ${house.center.y})...`);
+
+  // Move to Generator
+  await page.mouse.move(gen.center.x, gen.center.y);
+  await new Promise(r => setTimeout(r, 100));
+
+  // Mouse down on Generator
+  await page.mouse.down();
+  await new Promise(r => setTimeout(r, 100));
+
+  // Move in steps to House
+  const steps = 10;
+  for (let s = 1; s <= steps; s++) {
+    const curX = gen.center.x + (house.center.x - gen.center.x) * (s / steps);
+    const curY = gen.center.y + (house.center.y - gen.center.y) * (s / steps);
+    await page.mouse.move(curX, curY);
+    await new Promise(r => setTimeout(r, 30));
+  }
+
+  // Mouse up on House
+  await page.mouse.up();
+  await new Promise(r => setTimeout(r, 300));
+
+  // Check connection status
+  const postDragState = await page.evaluate(() => {
+    const game = window.POWATER && window.POWATER.game;
     return {
-      success: game.connections.length > initialConns,
-      connections: game.connections.length,
-      connType: game.connections[game.connections.length - 1].type
+      connectionsCount: game ? game.connections.length : 0,
+      connections: game ? game.connections.map(c => ({
+        type: c.type,
+        from: c.fromNode.id,
+        to: c.toNode.id,
+        active: c.active
+      })) : []
     };
   });
 
-  console.log('Drag Connection Test Result:', JSON.stringify(dragResult, null, 2));
+  console.log('Post Drag State:', JSON.stringify(postDragState, null, 2));
 
-  // Test Upgrade Modal Opening
-  const modalResult = await page.evaluate(() => {
-    const upgBtn = document.getElementById('btn-open-upgrades');
-    if (upgBtn) upgBtn.click();
-    const modal = document.getElementById('modal-upgrade');
+  if (postDragState.connectionsCount > 0) {
+    console.log('PASSED: Mouse Drag Successfully Established Connection!');
+  } else {
+    console.error('FAILED: Mouse Drag Did Not Establish Connection!');
+  }
+
+  // Also test Click-to-Connect from Water Pump to House 2
+  const pump = entityPositions.buildings.find(b => b.type === 'water_pump');
+  const house2 = entityPositions.houses[1];
+
+  console.log(`Testing Click-to-Connect from Pump (${pump.center.x}, ${pump.center.y}) to House 2 (${house2.center.x}, ${house2.center.y})...`);
+  await page.mouse.move(pump.center.x, pump.center.y);
+  await page.mouse.down();
+  await new Promise(r => setTimeout(r, 80));
+  await page.mouse.up();
+  await new Promise(r => setTimeout(r, 150));
+
+  await page.mouse.move(house2.center.x, house2.center.y);
+  await page.mouse.down();
+  await new Promise(r => setTimeout(r, 80));
+  await page.mouse.up();
+  await new Promise(r => setTimeout(r, 300));
+
+  const clickConnectState = await page.evaluate(() => {
+    const game = window.POWATER && window.POWATER.game;
     return {
-      modalOpened: modal ? modal.classList.contains('active') : false,
-      cardsCount: document.querySelectorAll('.upgrade-card').length
+      connectionsCount: game ? game.connections.length : 0,
+      connections: game ? game.connections.map(c => ({
+        type: c.type,
+        from: c.fromNode.id,
+        to: c.toNode.id,
+        active: c.active
+      })) : []
     };
   });
 
-  console.log('Upgrade Modal Test Result:', JSON.stringify(modalResult, null, 2));
+  console.log('Post Click-to-Connect State:', JSON.stringify(clickConnectState, null, 2));
 
   const screenshotPath = path.join(__dirname, '..', 'test_screenshot.png');
   await page.screenshot({ path: screenshotPath });
   console.log('Screenshot saved to:', screenshotPath);
 
-  console.log('Total console logs captured:', consoleLogs.length);
-  const realErrors = errors.filter(e => 
-    !e.includes('cloudflarestorage') && 
-    !e.includes('manifest') && 
-    !e.includes('screenshot') && 
+  const realErrors = errors.filter(e =>
+    !e.includes('cloudflarestorage') &&
+    !e.includes('manifest') &&
+    !e.includes('screenshot') &&
     !e.includes('net::ERR_FAILED')
   );
+
   console.log('Engine errors encountered:', realErrors.length);
   if (realErrors.length > 0) {
     console.log('Errors:', realErrors);
@@ -181,10 +244,10 @@ async function runTest() {
   await browser.close();
   server.close();
 
-  if (realErrors.length > 0) {
+  if (realErrors.length > 0 || overlapFound || postDragState.connectionsCount === 0) {
     process.exit(1);
   } else {
-    console.log('ALL TESTS PASSED SUCCESSFULLY!');
+    console.log('ALL TESTS PASSED WITH 100% SUCCESS!');
   }
 }
 

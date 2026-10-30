@@ -7,13 +7,13 @@
   const CONFIG = (global.POWATER && global.POWATER.CONFIG) || {};
 
   class HouseEntity {
-    constructor(id, runtimeObject, x, y, side) {
+    constructor(id, runtimeObject, centerX, centerY, side) {
       this.id = id;
       this.runtimeObject = runtimeObject;
-      this.x = x;
-      this.y = y;
-      this.width = runtimeObject ? runtimeObject.getWidth() : 75;
-      this.height = runtimeObject ? runtimeObject.getHeight() : 50;
+      this.width = 84;
+      this.height = 56;
+      this.centerX = centerX;
+      this.centerY = centerY;
       this.side = side || 'right';
 
       // Needs & Supply State
@@ -38,16 +38,16 @@
           y: this.runtimeObject.getY() + this.runtimeObject.getHeight() / 2
         };
       }
-      return { x: this.x + this.width / 2, y: this.y + this.height / 2 };
+      return { x: this.centerX, y: this.centerY };
     }
 
     update(dt, onComplaint, gracePeriodActive = false) {
       this.pulseAngle += dt * 3.5;
       if (this.runtimeObject) {
-        this.x = this.runtimeObject.getX();
-        this.y = this.runtimeObject.getY();
         this.width = this.runtimeObject.getWidth();
         this.height = this.runtimeObject.getHeight();
+        this.centerX = this.runtimeObject.getX() + this.width / 2;
+        this.centerY = this.runtimeObject.getY() + this.height / 2;
       }
 
       const isFullySatisfied = this.hasPower && this.hasWater && this.hasDrainage;
@@ -87,11 +87,11 @@
     render(pixiGfx) {
       if (!pixiGfx) return;
       const c = this.getCenter();
-      const radius = Math.max(this.width, this.height) / 2 + 4;
+      const radius = 46; // Clean proportion for 84x56 sprite
 
       // 1. Status Ring
       let ringColor = 0x6c757d;
-      let alpha = 0.7;
+      let alpha = 0.75;
       if (this.hasPower && this.hasWater && this.hasDrainage) {
         ringColor = 0x06d6a0; // Perfect Green (All 3 supplied)
         alpha = 0.95;
@@ -107,7 +107,7 @@
         alpha = 0.85;
       }
 
-      pixiGfx.lineStyle(3, ringColor, alpha);
+      pixiGfx.lineStyle(2.5, ringColor, alpha);
       pixiGfx.drawCircle(c.x, c.y, radius);
 
       // 2. Connection Pins around the House (4 directions)
@@ -117,7 +117,7 @@
         const px = c.x + Math.cos(ang) * pinDist;
         const py = c.y + Math.sin(ang) * pinDist;
 
-        pixiGfx.lineStyle(2, ringColor, 0.8);
+        pixiGfx.lineStyle(2, ringColor, 0.85);
         pixiGfx.moveTo(c.x + Math.cos(ang) * (radius - 2), c.y + Math.sin(ang) * (radius - 2));
         pixiGfx.lineTo(px, py);
 
@@ -152,10 +152,10 @@
 
       // 4. Unhappy Timer Bar (beneath house)
       if (this.unhappyTimer > 0) {
-        const barW = 34;
-        const barH = 5;
+        const barW = 32;
+        const barH = 4;
         const barX = c.x - barW / 2;
-        const barY = c.y + radius + 7;
+        const barY = c.y + radius + 6;
         const prog = Math.min(1.0, this.unhappyTimer / this.maxUnhappyTime);
 
         // Bar background
@@ -174,14 +174,14 @@
   }
 
   class BuildingEntity {
-    constructor(id, config, runtimeObject, x, y) {
+    constructor(id, config, runtimeObject, centerX, centerY) {
       this.id = id;
       this.config = config;
       this.runtimeObject = runtimeObject;
-      this.x = x;
-      this.y = y;
-      this.width = runtimeObject ? runtimeObject.getWidth() : (config.width || 55);
-      this.height = runtimeObject ? runtimeObject.getHeight() : (config.height || 55);
+      this.width = config.width || 56;
+      this.height = config.height || 56;
+      this.centerX = centerX;
+      this.centerY = centerY;
       this.capacity = config.capacity;
       this.usedCapacity = 0;
       this.active = true;
@@ -195,23 +195,23 @@
           y: this.runtimeObject.getY() + this.runtimeObject.getHeight() / 2
         };
       }
-      return { x: this.x + this.width / 2, y: this.y + this.height / 2 };
+      return { x: this.centerX, y: this.centerY };
     }
 
     update(dt) {
       this.pulse += dt * 2.5;
       if (this.runtimeObject) {
-        this.x = this.runtimeObject.getX();
-        this.y = this.runtimeObject.getY();
         this.width = this.runtimeObject.getWidth();
         this.height = this.runtimeObject.getHeight();
+        this.centerX = this.runtimeObject.getX() + this.width / 2;
+        this.centerY = this.runtimeObject.getY() + this.height / 2;
       }
     }
 
     render(pixiGfx) {
       if (!pixiGfx) return;
       const c = this.getCenter();
-      const r = Math.max(this.width, this.height) / 2 + 4;
+      const r = 34; // Clean proportion for 56x56 sprite
 
       // Base footprint ring
       let baseColor = 0xffb703;
@@ -251,7 +251,6 @@
       const p2 = this.toNode ? this.toNode.getCenter() : null;
       if (!p1 || !p2) return null;
 
-      // Calculate perpendicular offset for parallel distinct lines
       const dx = p2.x - p1.x;
       const dy = p2.y - p1.y;
       const dist = Math.hypot(dx, dy) || 1;
@@ -305,8 +304,8 @@
       // 4. Terminal dots
       pixiGfx.lineStyle(1.5, 0xffffff, 0.85);
       pixiGfx.beginFill(colorInt, 1.0);
-      pixiGfx.drawCircle(pts.x1, pts.y1, 4.5);
-      pixiGfx.drawCircle(pts.x2, pts.y2, 4.5);
+      pixiGfx.drawCircle(pts.x1, pts.y1, 4.0);
+      pixiGfx.drawCircle(pts.x2, pts.y2, 4.0);
       pixiGfx.endFill();
 
       // 5. Animated Energy/Water Flow Pulses
@@ -319,7 +318,7 @@
 
           pixiGfx.lineStyle(1, 0xffffff, 0.9);
           pixiGfx.beginFill(glowInt, 0.9);
-          pixiGfx.drawCircle(px, py, 3);
+          pixiGfx.drawCircle(px, py, 2.5);
           pixiGfx.endFill();
         }
       }
