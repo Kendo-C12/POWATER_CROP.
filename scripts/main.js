@@ -4,7 +4,10 @@
 (function (global) {
   'use strict';
 
-  const POWATER = global.POWATER || {};
+  global.POWATER = global.POWATER || {};
+  if (global.POWATER.GameController) {
+    return; // Prevent prototype invalidation on repeated frame execution
+  }
 
   class GameController {
     constructor() {
@@ -30,19 +33,19 @@
       if (this.initialized) return;
 
       // 1. Initialize Audio Engine
-      if (!POWATER.soundManager) {
-        POWATER.soundManager = new POWATER.SoundManager();
-        POWATER.soundManager.init();
+      if (!global.POWATER.soundManager) {
+        global.POWATER.soundManager = new global.POWATER.SoundManager();
+        global.POWATER.soundManager.init();
       }
 
       // 2. Initialize Core Simulation Engine
-      this.game = new POWATER.GameEngine();
+      this.game = new global.POWATER.GameEngine();
       this.game.setRuntimeScene(runtimeScene);
-      POWATER.game = this.game;
+      global.POWATER.game = this.game;
 
       // 3. Initialize UI Overlay & Modals
-      this.ui = new POWATER.UIManager(this.game);
-      POWATER.uiManager = this.ui;
+      this.ui = new global.POWATER.UIManager(this.game);
+      global.POWATER.uiManager = this.ui;
       this.ui.init();
 
       // 4. Start Demo City Level (Bangkok)
@@ -135,7 +138,7 @@
 
       // Left-click down
       if (isMouseDown && !this.wasMouseDown) {
-        if (POWATER.soundManager) POWATER.soundManager.resume();
+        if (global.POWATER.soundManager) global.POWATER.soundManager.resume();
 
         // 1. Demolish tool
         if (this.game.activeTool === 'delete') {
@@ -160,7 +163,7 @@
               this.ui.selectTool('sewage');
             } else if (hitNode.config && hitNode.config.type === 'air_filter') {
               this.game.addFloatingText('🍃 เครื่องฟอกอากาศ: ลดมลภาวะ -0.2/วิ', hitNode.getCenter().x, hitNode.getCenter().y - 20, '#2ec4b6');
-            } else if (hitNode instanceof POWATER.HouseEntity) {
+            } else if (hitNode.isHouse || hitNode.entityType === 'house') {
               if (!['power', 'water', 'sewage'].includes(this.game.activeTool)) {
                 if (hitNode.hasWater && !hitNode.hasDrainage) this.ui.selectTool('sewage');
                 else if (!hitNode.hasPower) this.ui.selectTool('power');
@@ -234,7 +237,7 @@
         connectType = 'water';
       } else if ((nodeA.config && nodeA.config.type === 'waste_filter') || (nodeB.config && nodeB.config.type === 'waste_filter')) {
         connectType = 'sewage';
-      } else if (nodeA instanceof POWATER.HouseEntity && nodeB instanceof POWATER.HouseEntity) {
+      } else if (nodeA.isHouse && nodeB.isHouse) {
         connectType = ['power', 'water', 'sewage'].includes(this.game.activeTool) ? this.game.activeTool : 'power';
       }
 
@@ -303,7 +306,7 @@
         const targetNode = this.game.getNodeAt(p2.x, p2.y);
         if (targetNode && targetNode.id !== this.dragStartNode.id) {
           const tc = targetNode.getCenter();
-          const targetR = (targetNode instanceof POWATER.HouseEntity ? 54 : 44) + Math.sin(this.pulseTime * 6) * 4;
+          const targetR = (targetNode.isHouse ? 54 : 44) + Math.sin(this.pulseTime * 6) * 4;
           gfxO.lineStyle(3, 0x06d6a0, 0.95);
           gfxO.drawCircle(tc.x, tc.y, targetR);
         }
@@ -311,12 +314,6 @@
     }
   }
 
-  global.POWATER = global.POWATER || {};
   global.POWATER.GameController = GameController;
-
-  // GDevelop Lifecycle Entry Point
-  if (!global._powaterControllerInstance) {
-    global._powaterControllerInstance = new GameController();
-  }
 
 })(typeof window !== 'undefined' ? window : globalThis);

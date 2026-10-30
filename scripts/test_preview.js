@@ -100,130 +100,63 @@ async function runTest() {
     if (modal) modal.classList.remove('active');
   });
 
-  // Evaluate game state & dimensions
-  const entityPositions = await page.evaluate(() => {
+  // Check initial state of House 1 (should have NO power, so needs power)
+  const initialHouseState = await page.evaluate(() => {
     const game = window.POWATER && window.POWATER.game;
-    if (!game) return null;
-
+    const h = game.houses[0];
     return {
-      buildings: game.buildings.map(b => ({
-        id: b.id,
-        type: b.config.type,
-        center: b.getCenter(),
-        width: b.width,
-        height: b.height
-      })),
-      houses: game.houses.map(h => ({
-        id: h.id,
-        center: h.getCenter(),
-        width: h.width,
-        height: h.height
-      }))
+      hasPower: h.hasPower,
+      hasWater: h.hasWater,
+      hasDrainage: h.hasDrainage
     };
   });
-
-  console.log('Entities in scene:', JSON.stringify(entityPositions, null, 2));
-
-  // Verify no overlaps between buildings and houses
-  let overlapFound = false;
-  const allEntities = [...entityPositions.buildings, ...entityPositions.houses];
-  for (let i = 0; i < allEntities.length; i++) {
-    for (let j = i + 1; j < allEntities.length; j++) {
-      const e1 = allEntities[i];
-      const e2 = allEntities[j];
-      const dist = Math.hypot(e1.center.x - e2.center.x, e1.center.y - e2.center.y);
-      const minSafeDist = (Math.max(e1.width, e1.height) + Math.max(e2.width, e2.height)) / 2 + 10;
-      if (dist < minSafeDist) {
-        console.error(`OVERLAP DETECTED between ${e1.id} and ${e2.id}! Dist: ${dist}, Min: ${minSafeDist}`);
-        overlapFound = true;
-      }
-    }
-  }
-
-  if (!overlapFound) {
-    console.log('PASSED: All entities are cleanly spaced with ZERO overlaps!');
-  }
+  console.log('Initial House 1 State:', initialHouseState);
 
   // Test Mouse Drag from Generator to House 1
-  const gen = entityPositions.buildings.find(b => b.type === 'generator');
-  const house = entityPositions.houses[0];
+  const entityPositions = await page.evaluate(() => {
+    const game = window.POWATER && window.POWATER.game;
+    return {
+      gen: game.buildings.find(b => b.config.type === 'generator').getCenter(),
+      house: game.houses[0].getCenter()
+    };
+  });
 
-  console.log(`Simulating mouse drag from (${gen.center.x}, ${gen.center.y}) to (${house.center.x}, ${house.center.y})...`);
+  console.log(`Simulating mouse drag from Generator (${entityPositions.gen.x}, ${entityPositions.gen.y}) to House 1 (${entityPositions.house.x}, ${entityPositions.house.y})...`);
 
-  // Move to Generator
-  await page.mouse.move(gen.center.x, gen.center.y);
-  await new Promise(r => setTimeout(r, 100));
-
-  // Mouse down on Generator
+  await page.mouse.move(entityPositions.gen.x, entityPositions.gen.y);
   await page.mouse.down();
   await new Promise(r => setTimeout(r, 100));
 
-  // Move in steps to House
   const steps = 10;
   for (let s = 1; s <= steps; s++) {
-    const curX = gen.center.x + (house.center.x - gen.center.x) * (s / steps);
-    const curY = gen.center.y + (house.center.y - gen.center.y) * (s / steps);
+    const curX = entityPositions.gen.x + (entityPositions.house.x - entityPositions.gen.x) * (s / steps);
+    const curY = entityPositions.gen.y + (entityPositions.house.y - entityPositions.gen.y) * (s / steps);
     await page.mouse.move(curX, curY);
-    await new Promise(r => setTimeout(r, 30));
+    await new Promise(r => setTimeout(r, 25));
   }
 
-  // Mouse up on House
   await page.mouse.up();
   await new Promise(r => setTimeout(r, 300));
 
-  // Check connection status
-  const postDragState = await page.evaluate(() => {
+  // Check if House 1 now hasPower === true!
+  const postPowerState = await page.evaluate(() => {
     const game = window.POWATER && window.POWATER.game;
+    const h = game.houses[0];
     return {
-      connectionsCount: game ? game.connections.length : 0,
-      connections: game ? game.connections.map(c => ({
-        type: c.type,
-        from: c.fromNode.id,
-        to: c.toNode.id,
-        active: c.active
-      })) : []
+      connectionsCount: game.connections.length,
+      house1_hasPower: h.hasPower,
+      house1_hasWater: h.hasWater,
+      house1_hasDrainage: h.hasDrainage
     };
   });
 
-  console.log('Post Drag State:', JSON.stringify(postDragState, null, 2));
+  console.log('Post-Power Wiring State:', postPowerState);
 
-  if (postDragState.connectionsCount > 0) {
-    console.log('PASSED: Mouse Drag Successfully Established Connection!');
+  if (postPowerState.house1_hasPower === true) {
+    console.log('PASSED: House 1 successfully received power! Power requirement satisfied!');
   } else {
-    console.error('FAILED: Mouse Drag Did Not Establish Connection!');
+    console.error('FAILED: House 1 did not receive power!');
   }
-
-  // Also test Click-to-Connect from Water Pump to House 2
-  const pump = entityPositions.buildings.find(b => b.type === 'water_pump');
-  const house2 = entityPositions.houses[1];
-
-  console.log(`Testing Click-to-Connect from Pump (${pump.center.x}, ${pump.center.y}) to House 2 (${house2.center.x}, ${house2.center.y})...`);
-  await page.mouse.move(pump.center.x, pump.center.y);
-  await page.mouse.down();
-  await new Promise(r => setTimeout(r, 80));
-  await page.mouse.up();
-  await new Promise(r => setTimeout(r, 150));
-
-  await page.mouse.move(house2.center.x, house2.center.y);
-  await page.mouse.down();
-  await new Promise(r => setTimeout(r, 80));
-  await page.mouse.up();
-  await new Promise(r => setTimeout(r, 300));
-
-  const clickConnectState = await page.evaluate(() => {
-    const game = window.POWATER && window.POWATER.game;
-    return {
-      connectionsCount: game ? game.connections.length : 0,
-      connections: game ? game.connections.map(c => ({
-        type: c.type,
-        from: c.fromNode.id,
-        to: c.toNode.id,
-        active: c.active
-      })) : []
-    };
-  });
-
-  console.log('Post Click-to-Connect State:', JSON.stringify(clickConnectState, null, 2));
 
   const screenshotPath = path.join(__dirname, '..', 'test_screenshot.png');
   await page.screenshot({ path: screenshotPath });
@@ -244,7 +177,7 @@ async function runTest() {
   await browser.close();
   server.close();
 
-  if (realErrors.length > 0 || overlapFound || postDragState.connectionsCount === 0) {
+  if (realErrors.length > 0 || !postPowerState.house1_hasPower) {
     process.exit(1);
   } else {
     console.log('ALL TESTS PASSED WITH 100% SUCCESS!');

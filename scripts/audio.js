@@ -4,6 +4,9 @@
 (function (global) {
   'use strict';
 
+  global.POWATER = global.POWATER || {};
+  if (global.POWATER.SoundManager) return;
+
   class SoundManager {
     constructor() {
       this.ctx = null;

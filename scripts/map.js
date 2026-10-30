@@ -4,6 +4,9 @@
 (function (global) {
   'use strict';
 
+  global.POWATER = global.POWATER || {};
+  if (global.POWATER.CityMap) return;
+
   class CityMap {
     constructor(levelConfig) {
       this.level = levelConfig;

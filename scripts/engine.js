@@ -4,14 +4,18 @@
 (function (global) {
   'use strict';
 
-  const POWATER = global.POWATER || {};
-  const CONFIG = POWATER.CONFIG || {};
+  global.POWATER = global.POWATER || {};
+  if (global.POWATER.GameEngine) {
+    return; // Prevent prototype invalidation on repeated frame execution
+  }
+
+  const CONFIG = global.POWATER.CONFIG || {};
 
   class GameEngine {
     constructor() {
       this.levelIndex = 0;
       this.currentLevel = CONFIG.LEVELS ? CONFIG.LEVELS[0] : {};
-      this.map = new POWATER.CityMap(this.currentLevel);
+      this.map = new global.POWATER.CityMap(this.currentLevel);
 
       // Simulation State
       this.money = this.currentLevel.startingBudget || 120;
@@ -69,7 +73,7 @@
     startLevel(levelIndex) {
       this.levelIndex = levelIndex;
       this.currentLevel = (CONFIG.LEVELS && CONFIG.LEVELS[levelIndex]) || CONFIG.LEVELS[0];
-      this.map = new POWATER.CityMap(this.currentLevel);
+      this.map = new global.POWATER.CityMap(this.currentLevel);
 
       this.money = this.currentLevel.startingBudget || 120;
       this.pollution = 0.0;
@@ -112,8 +116,8 @@
 
       this.setupStartingCity();
 
-      if (POWATER.soundManager) {
-        POWATER.soundManager.resume();
+      if (global.POWATER.soundManager) {
+        global.POWATER.soundManager.resume();
       }
     }
 
@@ -155,7 +159,7 @@
         }
       }
 
-      const building = new POWATER.BuildingEntity(
+      const building = new global.POWATER.BuildingEntity(
         `b_${this.nextEntityId++}`,
         buildCfg,
         runtimeObj,
@@ -220,11 +224,11 @@
         }
       }
 
-      const house = new POWATER.HouseEntity(`h_${this.nextEntityId++}`, runtimeObj, x, y, side);
+      const house = new global.POWATER.HouseEntity(`h_${this.nextEntityId++}`, runtimeObj, x, y, side);
       this.houses.push(house);
 
-      if (POWATER.soundManager) {
-        POWATER.soundManager.playPlace();
+      if (global.POWATER.soundManager) {
+        global.POWATER.soundManager.playPlace();
       }
       return house;
     }
@@ -245,8 +249,8 @@
           this.gracePeriodActive = false;
           this.gracePeriodWarningShown = true;
           this.isPaused = true;
-          if (POWATER.soundManager) POWATER.soundManager.playComplaint();
-          if (POWATER.uiManager) POWATER.uiManager.showGracePeriodEndedModal();
+          if (global.POWATER.soundManager) global.POWATER.soundManager.playComplaint();
+          if (global.POWATER.uiManager) global.POWATER.uiManager.showGracePeriodEndedModal();
         } else {
           this.gracePeriodActive = false;
         }
@@ -304,17 +308,20 @@
         const grant = 25 + (this.upgradeLevels.elec_cap - 1) * 5;
         this.money += grant;
         this.addFloatingText(`+$${grant} วันใหม่ (${this.dayNames[this.dayIndex]})`, CONFIG.CANVAS_WIDTH / 2, 80, '#ffd166');
-        if (POWATER.soundManager) POWATER.soundManager.playUpgrade();
+        if (global.POWATER.soundManager) global.POWATER.soundManager.playUpgrade();
       }
     }
 
     simulateNetwork() {
-      // Reset states
+      // Reset supply and drainage states
       this.houses.forEach(h => {
         h.hasPower = false;
         h.hasWater = false;
         h.hasDrainage = false;
         h.producesWaste = false;
+        if (h.runtimeObject && h.runtimeObject.getVariables && h.runtimeObject.getVariables().has("IsPowered")) {
+          h.runtimeObject.getVariables().get("IsPowered").setBoolean(false);
+        }
       });
 
       this.buildings.forEach(b => {
@@ -382,11 +389,15 @@
               visited.add(nextNode.id);
               queue.push(nextNode);
 
-              if (nextNode instanceof POWATER.HouseEntity) {
+              // Explicit boolean check: avoids ES6 prototype mismatch
+              if (nextNode.isHouse || nextNode.entityType === 'house') {
                 let served = false;
                 if (type === 'power' && !nextNode.hasPower) {
                   nextNode.hasPower = true;
                   served = true;
+                  if (nextNode.runtimeObject && nextNode.runtimeObject.getVariables && nextNode.runtimeObject.getVariables().has("IsPowered")) {
+                    nextNode.runtimeObject.getVariables().get("IsPowered").setBoolean(true);
+                  }
                 } else if (type === 'water' && !nextNode.hasWater) {
                   nextNode.hasWater = true;
                   served = true;
@@ -432,7 +443,7 @@
               visited.add(nextNode.id);
               queue.push(nextNode);
 
-              if (nextNode instanceof POWATER.HouseEntity) {
+              if (nextNode.isHouse || nextNode.entityType === 'house') {
                 if (nextNode.producesWaste && !nextNode.hasDrainage) {
                   nextNode.hasDrainage = true;
                   filter.usedCapacity++;
@@ -458,7 +469,7 @@
       if (!this.pollutionStartedNotified) {
         this.pollutionStartedNotified = true;
         this.addFloatingText('⚠️ ครบ 3 นาที: ระบบมลภาวะเริ่มทำงานแล้ว!', CONFIG.CANVAS_WIDTH / 2, 80, '#ffd166');
-        if (POWATER.soundManager) POWATER.soundManager.playPollutionWarn();
+        if (global.POWATER.soundManager) global.POWATER.soundManager.playPollutionWarn();
       }
 
       let delta = 0.0;
@@ -494,8 +505,8 @@
       this.pollution = Math.max(0.0, this.pollution + delta);
 
       if (this.pollution >= this.currentLevel.maxPollution * CONFIG.POLLUTION_WARN_THRESHOLD) {
-        if (Math.random() < 0.04 && POWATER.soundManager) {
-          POWATER.soundManager.playPollutionWarn();
+        if (Math.random() < 0.04 && global.POWATER.soundManager) {
+          global.POWATER.soundManager.playPollutionWarn();
         }
       }
     }
@@ -510,7 +521,7 @@
       });
 
       this.addFloatingText(`⚠️ ร้องเรียน: ${reason} (${this.complaints}/${CONFIG.MAX_COMPLAINTS})`, house.centerX, house.centerY - 25, '#e63946');
-      if (POWATER.soundManager) POWATER.soundManager.playComplaint();
+      if (global.POWATER.soundManager) global.POWATER.soundManager.playComplaint();
 
       if (this.complaints >= CONFIG.MAX_COMPLAINTS) {
         this.triggerGameOver('ประชาชนยื่นเรื่องร้องเรียนครบ 3 รอบ! (ขาดแคลนสาธารณูปโภคต่อเนื่อง)');
@@ -536,15 +547,15 @@
       if (this.isGameOver) return;
       this.isGameOver = true;
       this.gameOverReason = reason;
-      if (POWATER.soundManager) POWATER.soundManager.playGameOver();
-      if (POWATER.uiManager) POWATER.uiManager.showGameOverModal(reason);
+      if (global.POWATER.soundManager) global.POWATER.soundManager.playGameOver();
+      if (global.POWATER.uiManager) global.POWATER.uiManager.showGameOverModal(reason);
     }
 
     triggerGameWon() {
       if (this.isGameWon) return;
       this.isGameWon = true;
-      if (POWATER.soundManager) POWATER.soundManager.playWin();
-      if (POWATER.uiManager) POWATER.uiManager.showGameWonModal();
+      if (global.POWATER.soundManager) global.POWATER.soundManager.playWin();
+      if (global.POWATER.uiManager) global.POWATER.uiManager.showGameWonModal();
     }
 
     placeBuilding(typeKey, x, y) {
@@ -581,7 +592,7 @@
       this.money -= buildCfg.cost;
       const building = this.createBuilding(typeKey, x, y);
 
-      if (POWATER.soundManager) POWATER.soundManager.playPlace();
+      if (global.POWATER.soundManager) global.POWATER.soundManager.playPlace();
       this.addFloatingText(`-$${buildCfg.cost}`, x, y - 20, '#ffd166');
       return true;
     }
@@ -601,7 +612,7 @@
         actualType = 'water';
       } else if ((nodeA.config && nodeA.config.type === 'waste_filter') || (nodeB.config && nodeB.config.type === 'waste_filter')) {
         actualType = 'sewage';
-      } else if (nodeA instanceof POWATER.HouseEntity && nodeB instanceof POWATER.HouseEntity) {
+      } else if (nodeA.isHouse && nodeB.isHouse) {
         const hasConn = (t) => this.connections.some(c =>
           c.type === t &&
           ((c.fromNode.id === nodeA.id && c.toNode.id === nodeB.id) || (c.fromNode.id === nodeB.id && c.toNode.id === nodeA.id))
@@ -628,7 +639,7 @@
       const p2 = nodeB.getCenter();
       const crossesRiver = this.map.checkLineIntersectsRiver(p1, p2);
 
-      const conn = new POWATER.ConnectionEntity(`c_${this.nextEntityId++}`, actualType, nodeA, nodeB);
+      const conn = new global.POWATER.ConnectionEntity(`c_${this.nextEntityId++}`, actualType, nodeA, nodeB);
       conn.crossesRiver = crossesRiver;
       this.connections.push(conn);
 
@@ -636,10 +647,10 @@
       const typeColors = { power: '#ffd166', water: '#00b4d8', sewage: '#c77dff' };
       this.addFloatingText(typeLabels[actualType] || 'เชื่อมต่อสำเร็จ', (p1.x + p2.x) / 2, (p1.y + p2.y) / 2 - 20, typeColors[actualType] || '#06d6a0');
 
-      if (POWATER.soundManager) {
-        if (actualType === 'power') POWATER.soundManager.playWireConnect();
-        else if (actualType === 'water') POWATER.soundManager.playWaterConnect();
-        else POWATER.soundManager.playSewageConnect();
+      if (global.POWATER.soundManager) {
+        if (actualType === 'power') global.POWATER.soundManager.playWireConnect();
+        else if (actualType === 'water') global.POWATER.soundManager.playWaterConnect();
+        else global.POWATER.soundManager.playSewageConnect();
       }
 
       return true;
@@ -656,7 +667,7 @@
         if (dist < 15) {
           const typeLabel = c.type === 'power' ? 'สายไฟ' : (c.type === 'water' ? 'ท่อน้ำดี' : 'ท่อระบายน้ำ');
           this.connections.splice(i, 1);
-          if (POWATER.soundManager) POWATER.soundManager.playClick();
+          if (global.POWATER.soundManager) global.POWATER.soundManager.playClick();
           this.addFloatingText(`ลบ${typeLabel}แล้ว`, x, y, '#90e0ef');
           return true;
         }
@@ -680,7 +691,7 @@
         }
         this.buildings.splice(bIdx, 1);
 
-        if (POWATER.soundManager) POWATER.soundManager.playClick();
+        if (global.POWATER.soundManager) global.POWATER.soundManager.playClick();
         this.addFloatingText(`รื้อถอน (คืนเงิน +$${refund})`, x, y, '#ffd166');
         return true;
       }
@@ -736,17 +747,16 @@
       this.money -= cost;
       this.upgradeLevels[upg.id] = curLv + 1;
 
-      if (POWATER.soundManager) POWATER.soundManager.playUpgrade();
+      if (global.POWATER.soundManager) global.POWATER.soundManager.playUpgrade();
       this.addFloatingText(`อัปเกรดสำเร็จ: ${upg.name}!`, CONFIG.CANVAS_WIDTH / 2, 90, '#06d6a0');
       return true;
     }
 
     addFloatingText(text, x, y, color = '#ffd166') {
-      this.floatingTexts.push(new POWATER.FloatingTextEntity(text, x, y, color));
+      this.floatingTexts.push(new global.POWATER.FloatingTextEntity(text, x, y, color));
     }
   }
 
-  global.POWATER = global.POWATER || {};
   global.POWATER.GameEngine = GameEngine;
 
 })(typeof window !== 'undefined' ? window : globalThis);

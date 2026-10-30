@@ -4,6 +4,9 @@
 (function (global) {
   'use strict';
 
+  global.POWATER = global.POWATER || {};
+  if (global.POWATER.UIManager) return;
+
   const POWATER = global.POWATER || {};
   const CONFIG = POWATER.CONFIG || {};
 

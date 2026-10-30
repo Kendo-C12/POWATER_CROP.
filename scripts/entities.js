@@ -4,11 +4,18 @@
 (function (global) {
   'use strict';
 
-  const CONFIG = (global.POWATER && global.POWATER.CONFIG) || {};
+  global.POWATER = global.POWATER || {};
+  if (global.POWATER.HouseEntity && global.POWATER.BuildingEntity) {
+    return; // Prevent class prototype invalidation on repeated frame execution
+  }
+
+  const CONFIG = global.POWATER.CONFIG || {};
 
   class HouseEntity {
     constructor(id, runtimeObject, centerX, centerY, side) {
       this.id = id;
+      this.isHouse = true;
+      this.entityType = 'house';
       this.runtimeObject = runtimeObject;
       this.width = 84;
       this.height = 56;
@@ -62,6 +69,7 @@
         let mult = 1.0;
         if (!this.hasPower && !this.hasWater) mult = 1.35;
         else if (this.hasPower && this.hasWater && !this.hasDrainage) mult = 0.75;
+        else if (this.hasPower || this.hasWater) mult = 0.45; // Partially supplied reduces stress
 
         this.unhappyTimer += dt * mult;
         this.isCritical = this.unhappyTimer > (this.maxUnhappyTime * 0.6);
@@ -87,7 +95,7 @@
     render(pixiGfx) {
       if (!pixiGfx) return;
       const c = this.getCenter();
-      const radius = 46; // Clean proportion for 84x56 sprite
+      const radius = 46;
 
       // 1. Status Ring
       let ringColor = 0x6c757d;
@@ -127,26 +135,52 @@
       });
 
       // 3. Needs Indicator Badges (above house)
+      // DISAPPEARS as soon as each utility is connected!
       const badges = [];
-      if (!this.hasPower) badges.push({ color: 0xffd166 }); // Power need
-      if (!this.hasWater) badges.push({ color: 0x00b4d8 }); // Water need
-      if (this.hasWater && !this.hasDrainage) badges.push({ color: 0xc77dff }); // Sewage drainage need
+      if (!this.hasPower) badges.push({ type: 'power', color: 0xffd166 }); // Power needed
+      if (!this.hasWater) badges.push({ type: 'water', color: 0x00b4d8 }); // Water needed
+      if (this.hasWater && !this.hasDrainage) badges.push({ type: 'sewage', color: 0xc77dff }); // Drainage needed
 
       if (badges.length > 0) {
         const badgeY = c.y - radius - 10;
-        const spacing = 16;
+        const spacing = 18;
         const startX = c.x - ((badges.length - 1) * spacing) / 2;
 
         badges.forEach((b, i) => {
           const bx = startX + i * spacing;
-          pixiGfx.lineStyle(1.5, b.color, 1.0);
-          pixiGfx.beginFill(0x16102a, 0.9);
-          pixiGfx.drawCircle(bx, badgeY, 7);
+
+          // Outer badge circle
+          pixiGfx.lineStyle(2.0, b.color, 1.0);
+          pixiGfx.beginFill(0x16102a, 0.95);
+          pixiGfx.drawCircle(bx, badgeY, 8);
           pixiGfx.endFill();
 
-          pixiGfx.beginFill(b.color, 1.0);
-          pixiGfx.drawCircle(bx, badgeY, 3);
-          pixiGfx.endFill();
+          // Inner icon graphic
+          if (b.type === 'power') {
+            // Lightning bolt shape
+            pixiGfx.lineStyle(1.5, 0xffd166, 1.0);
+            pixiGfx.beginFill(0xffd166, 1.0);
+            pixiGfx.moveTo(bx + 1, badgeY - 5);
+            pixiGfx.lineTo(bx - 3, badgeY);
+            pixiGfx.lineTo(bx, badgeY);
+            pixiGfx.lineTo(bx - 1, badgeY + 5);
+            pixiGfx.lineTo(bx + 3, badgeY - 1);
+            pixiGfx.lineTo(bx, badgeY - 1);
+            pixiGfx.closePath();
+            pixiGfx.endFill();
+          } else if (b.type === 'water') {
+            // Water drop shape
+            pixiGfx.lineStyle(1.5, 0x00b4d8, 1.0);
+            pixiGfx.beginFill(0x00b4d8, 1.0);
+            pixiGfx.drawCircle(bx, badgeY + 1, 3.5);
+            pixiGfx.endFill();
+          } else {
+            // Sewage warning dot
+            pixiGfx.lineStyle(1.5, 0xc77dff, 1.0);
+            pixiGfx.beginFill(0xc77dff, 1.0);
+            pixiGfx.drawCircle(bx, badgeY, 3.5);
+            pixiGfx.endFill();
+          }
         });
       }
 
@@ -176,6 +210,8 @@
   class BuildingEntity {
     constructor(id, config, runtimeObject, centerX, centerY) {
       this.id = id;
+      this.isBuilding = true;
+      this.entityType = 'building';
       this.config = config;
       this.runtimeObject = runtimeObject;
       this.width = config.width || 56;
@@ -211,7 +247,7 @@
     render(pixiGfx) {
       if (!pixiGfx) return;
       const c = this.getCenter();
-      const r = 34; // Clean proportion for 56x56 sprite
+      const r = 34;
 
       // Base footprint ring
       let baseColor = 0xffb703;
@@ -342,7 +378,6 @@
     }
   }
 
-  global.POWATER = global.POWATER || {};
   global.POWATER.HouseEntity = HouseEntity;
   global.POWATER.BuildingEntity = BuildingEntity;
   global.POWATER.ConnectionEntity = ConnectionEntity;
