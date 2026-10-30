@@ -185,39 +185,144 @@ if (typeof POWATER !== 'undefined' && POWATER.GameController) {
 
 main_code_lines = combined_source.split('\n')
 
-# 4. Clean Events (Single master JS execution event)
+# 4. Clean & Structured Events Sheet (Modular Groups with Visual GDevelop Events)
 layout['events'] = [
     {
-        'type': 'BuiltinCommonInstructions::Standard',
-        'conditions': [
+        'type': 'BuiltinCommonInstructions::Group',
+        'name': '🎬 1. Scene Initialization & Setup',
+        'backgroundColor': '#2980b9',
+        'color': {'r': 41, 'g': 128, 'b': 185},
+        'folded': False,
+        'events': [
             {
-                'type': {'value': 'SceneJustBegins'},
-                'parameters': ['']
+                'type': 'BuiltinCommonInstructions::Comment',
+                'color': {'b': 230, 'g': 200, 'r': 180, 'textB': 0, 'textG': 0, 'textR': 0},
+                'comment': 'Runs once when the scene begins. Resets timers and initializes city variables.'
+            },
+            {
+                'type': 'BuiltinCommonInstructions::Standard',
+                'conditions': [
+                    {
+                        'type': {'value': 'SceneJustBegins'},
+                        'parameters': ['']
+                    }
+                ],
+                'actions': [
+                    {
+                        'type': {'value': 'ResetTimer'},
+                        'parameters': ['', '"spawn"']
+                    },
+                    {
+                        'type': {'value': 'ResetTimer'},
+                        'parameters': ['', '"1sec"']
+                    },
+                    {
+                        'type': {'value': 'SetNumberVariable'},
+                        'parameters': ['Pollution_total', '=', '0']
+                    },
+                    {
+                        'type': {'value': 'SetNumberVariable'},
+                        'parameters': ['Polltution_per_second', '=', '1']
+                    }
+                ]
             }
-        ],
-        'actions': []
+        ]
     },
     {
-        # THE BACKUP SCRIPT (Disabled)
-        'disabled': True,
-        'type': 'BuiltinCommonInstructions::JsCode',
-        'inlineCode': [
-            "// [BACKUP SCRIPT - Original User Script]",
-            "// runtimeScene.setBackgroundColor(100,100,240);",
-            ""
-        ],
-        'parameterObjects': '',
-        'useStrict': True,
-        'eventsSheetExpanded': False
+        'type': 'BuiltinCommonInstructions::Group',
+        'name': '⏱️ 2. Timers & Resource Loop (Visual GDevelop Events)',
+        'backgroundColor': '#27ae60',
+        'color': {'r': 39, 'g': 174, 'b': 96},
+        'folded': False,
+        'events': [
+            {
+                'type': 'BuiltinCommonInstructions::Comment',
+                'color': {'b': 200, 'g': 240, 'r': 190, 'textB': 0, 'textG': 0, 'textR': 0},
+                'comment': 'Every 1 second: increments citizen resource counters and tracks pollution.'
+            },
+            {
+                'type': 'BuiltinCommonInstructions::Standard',
+                'conditions': [
+                    {
+                        'type': {'value': 'CompareTimer'},
+                        'parameters': ['', '"1sec"', '>=', '1']
+                    }
+                ],
+                'actions': [
+                    {
+                        'type': {'value': 'SetNumberObjectVariable'},
+                        'parameters': ['house', 'Water', '+', '1']
+                    },
+                    {
+                        'type': {'value': 'SetNumberObjectVariable'},
+                        'parameters': ['house', 'Electricity', '+', '1']
+                    },
+                    {
+                        'type': {'value': 'SetNumberVariable'},
+                        'parameters': ['Pollution_total', '+', 'Polltution_per_second']
+                    },
+                    {
+                        'type': {'value': 'ResetTimer'},
+                        'parameters': ['', '"1sec"']
+                    }
+                ]
+            }
+        ]
     },
     {
-        # THE MAIN SCRIPT
-        'disabled': False,
-        'type': 'BuiltinCommonInstructions::JsCode',
-        'inlineCode': main_code_lines,
-        'parameterObjects': '',
-        'useStrict': True,
-        'eventsSheetExpanded': True
+        'type': 'BuiltinCommonInstructions::Group',
+        'name': '🏡 3. Procedural Citizen Spawner (Visual GDevelop Events)',
+        'backgroundColor': '#d35400',
+        'color': {'r': 211, 'g': 84, 'b': 0},
+        'folded': False,
+        'events': [
+            {
+                'type': 'BuiltinCommonInstructions::Comment',
+                'color': {'b': 180, 'g': 210, 'r': 255, 'textB': 0, 'textG': 0, 'textR': 0},
+                'comment': 'Spawns new citizen houses in Bangkok & Thonburi at random intervals.'
+            },
+            {
+                'type': 'BuiltinCommonInstructions::Standard',
+                'conditions': [
+                    {
+                        'type': {'value': 'CompareTimer'},
+                        'parameters': ['', '"spawn"', '>', '25']
+                    }
+                ],
+                'actions': [
+                    {
+                        'type': {'value': 'Create'},
+                        'parameters': ['', 'house', 'RandomInRange(80,1100)', 'RandomInRange(80,580)', '']
+                    },
+                    {
+                        'type': {'value': 'ResetTimer'},
+                        'parameters': ['', '"spawn"']
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        'type': 'BuiltinCommonInstructions::Group',
+        'name': '⚡ 4. POWATER CORP. Core Simulation Engine (Wiring, River & Utilities)',
+        'backgroundColor': '#8e44ad',
+        'color': {'r': 142, 'g': 68, 'b': 173},
+        'folded': False,
+        'events': [
+            {
+                'type': 'BuiltinCommonInstructions::Comment',
+                'color': {'b': 255, 'g': 215, 'r': 230, 'textB': 0, 'textG': 0, 'textR': 0},
+                'comment': 'POWATER CORP. Engine Bridge: Coordinates interactive multi-utility wiring (Power, Clean Water, Wastewater), dual-layer PixiJS rendering, river flow simulation, sound effects, and HUD overlay.'
+            },
+            {
+                'disabled': False,
+                'type': 'BuiltinCommonInstructions::JsCode',
+                'inlineCode': main_code_lines,
+                'parameterObjects': '',
+                'useStrict': True,
+                'eventsSheetExpanded': False
+            }
+        ]
     }
 ]
 

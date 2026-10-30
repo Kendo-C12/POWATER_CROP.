@@ -256,11 +256,23 @@
         }
       }
 
-      // 3. House Spawner
-      this.spawnTimer += dt * 1000;
-      if (this.spawnTimer >= this.currentLevel.spawnInterval) {
-        this.spawnTimer = 0;
-        this.spawnHouse();
+      // 3. Synchronize any houses created by GDevelop Event Sheet
+      if (this.runtimeScene && this.runtimeScene.getObjects) {
+        const sceneHouses = this.runtimeScene.getObjects('house');
+        for (let i = 0; i < sceneHouses.length; i++) {
+          const obj = sceneHouses[i];
+          const alreadyTracked = this.houses.some(h => h.runtimeObject === obj);
+          if (!alreadyTracked) {
+            const w = 84, h = 56;
+            if (obj.setSize) obj.setSize(w, h);
+            const cx = obj.getX() + w / 2;
+            const cy = obj.getY() + h / 2;
+            const riverCenterX = this.map ? this.map.getRiverCenterAtY(cy) : 550;
+            const side = cx < riverCenterX ? 'left' : 'right';
+            const house = new global.POWATER.HouseEntity(`h_${this.nextEntityId++}`, obj, cx, cy, side);
+            this.houses.push(house);
+          }
+        }
       }
 
       // 4. Utility Network Flow Propagation (Power, Water, Sewage)
@@ -503,6 +515,16 @@
 
       this.currentPollutionRate = dt > 0 ? (delta / dt) : 0;
       this.pollution = Math.max(0.0, this.pollution + delta);
+
+      // Sync with GDevelop Scene Variable
+      if (this.runtimeScene && this.runtimeScene.getVariables) {
+        try {
+          const sceneVars = this.runtimeScene.getVariables();
+          if (sceneVars.has('Pollution_total')) {
+            sceneVars.get('Pollution_total').setNumber(Math.round(this.pollution));
+          }
+        } catch (e) {}
+      }
 
       if (this.pollution >= this.currentLevel.maxPollution * CONFIG.POLLUTION_WARN_THRESHOLD) {
         if (Math.random() < 0.04 && global.POWATER.soundManager) {
