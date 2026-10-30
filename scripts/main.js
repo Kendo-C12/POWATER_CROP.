@@ -48,12 +48,12 @@
       global.POWATER.uiManager = this.ui;
       this.ui.init();
 
-      // 4. Start Demo City Level (Bangkok)
+      // 4. Initialize PixiJS Graphics & Drawing UI Layers
+      this.setupPixiLayers(runtimeScene);
+
+      // 5. Start Demo City Level (Bangkok)
       this.game.startLevel(0);
       this.ui.showLevelBriefing(this.game.currentLevel);
-
-      // 5. Initialize Dual PixiJS Graphics Layers
-      this.setupPixiLayers(runtimeScene);
 
       this.initialized = true;
       this.lastTime = performance.now();
@@ -86,6 +86,19 @@
             }
             this.pixiGfxOverlay = gfxOverlay;
             runtimeScene._powaterPixiGfxOverlay = gfxOverlay;
+
+            // Layer 3: In-Game Drawn UI (Buttons, Top HUD, Modals) (Z=10, top of scene)
+            const uiContainer = new PIXI.Container();
+            if (renderer.addRendererObject) {
+              renderer.addRendererObject(uiContainer, 10);
+            } else {
+              container.addChild(uiContainer);
+            }
+            this.pixiUIContainer = uiContainer;
+            runtimeScene._powaterPixiUIContainer = uiContainer;
+            if (this.ui && this.ui.setupPixi) {
+              this.ui.setupPixi(uiContainer);
+            }
           }
         }
       } catch (e) {
@@ -122,6 +135,22 @@
       this.currentMouseX = mouseX;
       this.currentMouseY = mouseY;
       this.game.currentPointerPos = { x: mouseX, y: mouseY };
+
+      // 2. In-Game Drawing UI Update & Click Consumption
+      let uiHandled = false;
+      if (this.ui && this.ui.update) {
+        uiHandled = this.ui.update(dt, mouseX, mouseY, isMouseDown, this.wasMouseDown);
+      }
+
+      // If mouse is interacting with UI buttons or inside modal, do not process world clicks/drags
+      if (uiHandled) {
+        this.selectedNode = null;
+        this.dragStartNode = null;
+        this.isDragging = false;
+        this.wasMouseDown = isMouseDown;
+        this.wasRightDown = isRightDown;
+        return;
+      }
 
       const hitNode = this.game.getNodeAt(mouseX, mouseY);
       this.game.hoveredNode = hitNode;

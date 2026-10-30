@@ -70,6 +70,10 @@
       this.runtimeScene = scene;
     }
 
+    selectTool(toolId) {
+      this.activeTool = toolId;
+    }
+
     startLevel(levelIndex) {
       this.levelIndex = levelIndex;
       this.currentLevel = (CONFIG.LEVELS && CONFIG.LEVELS[levelIndex]) || CONFIG.LEVELS[0];
@@ -122,19 +126,80 @@
     }
 
     setupStartingCity() {
-      // 1. Initial Water Pump along river
-      this.createBuilding('water_pump', 680, 270);
+      let foundAny = false;
 
-      // 2. Initial Wastewater Outlet along river (200px below Water Pump)
-      this.createBuilding('waste_filter', 740, 470);
+      // 1. Pick up any pre-placed buildings from GDevelop Scene Editor
+      if (this.runtimeScene && this.runtimeScene.getObjects) {
+        const buildingMappings = [
+          { name: 'generator', key: 'GENERATOR_COAL' },
+          { name: 'solar', key: 'GENERATOR_SOLAR' },
+          { name: 'water_pump', key: 'WATER_PUMP' },
+          { name: 'waste_filter', key: 'WASTE_FILTER' },
+          { name: 'air_filter', key: 'AIR_FILTER' }
+        ];
 
-      // 3. Initial Electricity Generator (Power Tower) on Bangkok side
-      this.createBuilding('generator_coal', 860, 270);
+        for (let i = 0; i < buildingMappings.length; i++) {
+          const m = buildingMappings[i];
+          const objs = this.runtimeScene.getObjects(m.name);
+          for (let j = 0; j < objs.length; j++) {
+            const obj = objs[j];
+            const alreadyTracked = this.buildings.some(b => b.runtimeObject === obj);
+            if (!alreadyTracked) {
+              const buildCfg = CONFIG.BUILDINGS[m.key];
+              if (buildCfg) {
+                const w = buildCfg.width || 56;
+                const h = buildCfg.height || 56;
+                if (obj.setSize) obj.setSize(w, h);
+                const cx = obj.getX() + w / 2;
+                const cy = obj.getY() + h / 2;
+                const building = new global.POWATER.BuildingEntity(
+                  `b_${this.nextEntityId++}`,
+                  buildCfg,
+                  obj,
+                  cx,
+                  cy
+                );
+                this.buildings.push(building);
+                foundAny = true;
+              }
+            }
+          }
+        }
 
-      // 4. Initial 3 Houses (Spacious, zero overlaps)
-      this.spawnHouse('right', 860, 110); // Bangkok North
-      this.spawnHouse('right', 920, 460); // Bangkok South
-      this.spawnHouse('left', 350, 320);  // Thonburi West across river
+        // 2. Pick up any pre-placed houses from GDevelop Scene Editor
+        const houseObjs = this.runtimeScene.getObjects('house');
+        for (let j = 0; j < houseObjs.length; j++) {
+          const obj = houseObjs[j];
+          const alreadyTracked = this.houses.some(h => h.runtimeObject === obj);
+          if (!alreadyTracked) {
+            const w = 84, h = 56;
+            if (obj.setSize) obj.setSize(w, h);
+            const cx = obj.getX() + w / 2;
+            const cy = obj.getY() + h / 2;
+            const riverCenterX = this.map ? this.map.getRiverCenterAtY(cy) : 600;
+            const side = cx < riverCenterX ? 'left' : 'right';
+            const house = new global.POWATER.HouseEntity(
+              `h_${this.nextEntityId++}`,
+              obj,
+              cx,
+              cy,
+              side
+            );
+            this.houses.push(house);
+            foundAny = true;
+          }
+        }
+      }
+
+      // Fallback only if the scene was completely empty
+      if (!foundAny) {
+        this.createBuilding('water_pump', 680, 270);
+        this.createBuilding('waste_filter', 740, 470);
+        this.createBuilding('generator_coal', 860, 270);
+        this.spawnHouse('right', 860, 110);
+        this.spawnHouse('right', 920, 460);
+        this.spawnHouse('left', 350, 320);
+      }
     }
 
     createBuilding(typeKey, centerX, centerY) {

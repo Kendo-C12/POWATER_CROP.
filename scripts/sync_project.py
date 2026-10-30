@@ -101,7 +101,107 @@ for bname, bimg, bw, bh in buildings:
 # Remove WirePainter and text objects from layout objects
 objects = [obj for obj in objects if obj.get('name') not in ['WirePainter', 'Water', 'Electricity']]
 layout['objects'] = objects
-layout['instances'] = []
+
+# Populate Main screen layout with starting instances if empty, so the user sees everything in GDevelop editor
+if not layout.get('instances'):
+    layout['instances'] = [
+        {
+            'angle': 0,
+            'customSize': True,
+            'height': 56,
+            'layer': '',
+            'locked': False,
+            'name': 'generator',
+            'persistentUuid': 'inst-generator-starting',
+            'width': 56,
+            'x': 832,
+            'y': 242,
+            'zOrder': 4,
+            'numberProperties': [],
+            'stringProperties': [],
+            'initialVariables': []
+        },
+        {
+            'angle': 0,
+            'customSize': True,
+            'height': 56,
+            'layer': '',
+            'locked': False,
+            'name': 'water_pump',
+            'persistentUuid': 'inst-water-pump-starting',
+            'width': 56,
+            'x': 652,
+            'y': 242,
+            'zOrder': 4,
+            'numberProperties': [],
+            'stringProperties': [],
+            'initialVariables': []
+        },
+        {
+            'angle': 0,
+            'customSize': True,
+            'height': 56,
+            'layer': '',
+            'locked': False,
+            'name': 'waste_filter',
+            'persistentUuid': 'inst-waste-filter-starting',
+            'width': 56,
+            'x': 712,
+            'y': 442,
+            'zOrder': 4,
+            'numberProperties': [],
+            'stringProperties': [],
+            'initialVariables': []
+        },
+        {
+            'angle': 0,
+            'customSize': True,
+            'height': 56,
+            'layer': '',
+            'locked': False,
+            'name': 'house',
+            'persistentUuid': 'inst-house-bkk-north',
+            'width': 84,
+            'x': 818,
+            'y': 82,
+            'zOrder': 3,
+            'numberProperties': [],
+            'stringProperties': [],
+            'initialVariables': []
+        },
+        {
+            'angle': 0,
+            'customSize': True,
+            'height': 56,
+            'layer': '',
+            'locked': False,
+            'name': 'house',
+            'persistentUuid': 'inst-house-bkk-south',
+            'width': 84,
+            'x': 878,
+            'y': 432,
+            'zOrder': 3,
+            'numberProperties': [],
+            'stringProperties': [],
+            'initialVariables': []
+        },
+        {
+            'angle': 0,
+            'customSize': True,
+            'height': 56,
+            'layer': '',
+            'locked': False,
+            'name': 'house',
+            'persistentUuid': 'inst-house-thonburi',
+            'width': 84,
+            'x': 308,
+            'y': 292,
+            'zOrder': 3,
+            'numberProperties': [],
+            'stringProperties': [],
+            'initialVariables': []
+        }
+    ]
 
 for obj in objects:
     if obj.get('name') == 'house':

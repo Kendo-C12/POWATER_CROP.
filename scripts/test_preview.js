@@ -96,8 +96,9 @@ async function runTest() {
 
   // Close briefing modal if open
   await page.evaluate(() => {
-    const modal = document.getElementById('modal-briefing');
-    if (modal) modal.classList.remove('active');
+    if (window.POWATER && window.POWATER.uiManager && window.POWATER.uiManager.closeModal) {
+      window.POWATER.uiManager.closeModal();
+    }
   });
 
   // Check initial state of House 1 (should have NO power, so needs power)
@@ -156,6 +157,21 @@ async function runTest() {
     console.log('PASSED: House 1 successfully received power! Power requirement satisfied!');
   } else {
     console.error('FAILED: House 1 did not receive power!');
+  }
+
+  // Test clicking drawn WATER button at (344, 678)
+  console.log('Testing click on drawn WATER button at (344, 678)...');
+  await page.mouse.move(344, 678);
+  await page.mouse.down();
+  await new Promise(r => setTimeout(r, 80));
+  await page.mouse.up();
+  await new Promise(r => setTimeout(r, 100));
+  const activeToolAfterClick = await page.evaluate(() => window.POWATER && window.POWATER.game && window.POWATER.game.activeTool);
+  console.log('Active tool after clicking drawn button:', activeToolAfterClick);
+  if (activeToolAfterClick === 'water') {
+    console.log('PASSED: Drawn UI button click correctly selected clean water tool!');
+  } else {
+    console.error('FAILED: Drawn button click did not switch tool to water!');
   }
 
   const screenshotPath = path.join(__dirname, '..', 'test_screenshot.png');
