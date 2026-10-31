@@ -254,7 +254,7 @@ async function runTest() {
       riverX: riverObj ? riverObj.getX() : null,
       riverW: riverObj ? riverObj.getWidth() : null,
       centerAt360: map ? map.getRiverCenterAtY(360) : null,
-      isPointInRiverCenter: map ? map.isPointInRiver(630, 360) : null,
+      isPointInRiverCenter: map ? map.isPointInRiver(570, 360) : null,
       isPointInRiverOutside: map ? map.isPointInRiver(200, 360) : null
     };
   });

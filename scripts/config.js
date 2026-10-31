@@ -198,12 +198,12 @@
         spawnInterval: 30000,
         riverPath: [
           { x: 610, y: 0 },
-          { x: 640, y: 180 },
-          { x: 580, y: 360 },
-          { x: 680, y: 540 },
+          { x: 650, y: 180 },
+          { x: 570, y: 360 },
+          { x: 690, y: 540 },
           { x: 650, y: 720 }
         ],
-        riverWidth: 80
+        riverWidth: 100
       },
       {
         id: 'venice',
