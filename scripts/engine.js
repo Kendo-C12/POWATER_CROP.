@@ -68,6 +68,19 @@
 
     setRuntimeScene(scene) {
       this.runtimeScene = scene;
+      if (this.map && typeof this.map.setRuntimeScene === 'function') {
+        this.map.setRuntimeScene(scene);
+      }
+    }
+
+    togglePause() {
+      this.isPaused = !this.isPaused;
+      return this.isPaused;
+    }
+
+    toggleSpeed() {
+      this.gameSpeed = (this.gameSpeed === 1.0) ? 2.0 : 1.0;
+      return this.gameSpeed;
     }
 
     selectTool(toolId) {
@@ -77,7 +90,7 @@
     startLevel(levelIndex) {
       this.levelIndex = levelIndex;
       this.currentLevel = (CONFIG.LEVELS && CONFIG.LEVELS[levelIndex]) || CONFIG.LEVELS[0];
-      this.map = new global.POWATER.CityMap(this.currentLevel);
+      this.map = new global.POWATER.CityMap(this.currentLevel, this.runtimeScene);
 
       this.money = this.currentLevel.startingBudget || 120;
       this.pollution = 0.0;

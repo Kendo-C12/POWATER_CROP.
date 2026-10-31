@@ -235,10 +235,22 @@
       } else if (btn.type === 'action') {
         switch (btn.action) {
           case 'togglePause':
-            this.game.togglePause();
+            if (this.game) {
+              if (typeof this.game.togglePause === 'function') {
+                this.game.togglePause();
+              } else {
+                this.game.isPaused = !this.game.isPaused;
+              }
+            }
             break;
           case 'toggleSpeed':
-            this.game.toggleSpeed();
+            if (this.game) {
+              if (typeof this.game.toggleSpeed === 'function') {
+                this.game.toggleSpeed();
+              } else {
+                this.game.gameSpeed = (this.game.gameSpeed === 1.0) ? 2.0 : 1.0;
+              }
+            }
             break;
           case 'openUpgrades':
             this.showUpgradesModal();
@@ -329,7 +341,9 @@
         const btn = this.buttons[i];
         const isHovered = (this.hoveredButtonId === btn.id);
         const isActive = (btn.toolId && this.game.activeTool === btn.toolId) ||
-                         (btn.buildId && this.game.activeTool === btn.buildId);
+                         (btn.buildId && this.game.activeTool === btn.buildId) ||
+                         (btn.id === 'pause' && this.game.isPaused) ||
+                         (btn.id === 'speed' && this.game.gameSpeed === 2.0);
 
         if (isActive) {
           // Bright glowing outline around active tool

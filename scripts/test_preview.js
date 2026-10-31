@@ -178,6 +178,93 @@ async function runTest() {
     console.error('FAILED: Button click did not switch tool to water!');
   }
 
+  // Test clicking PAUSE button
+  const pauseBtnPos = await page.evaluate(() => {
+    const btn = window.POWATER && window.POWATER.uiManager && window.POWATER.uiManager.buttons.find(b => b.id === 'pause');
+    return btn ? { x: btn.x + btn.w / 2, y: btn.y + btn.h / 2 } : { x: 674, y: 682 };
+  });
+  console.log(`Testing click on PAUSE PNG button at (${pauseBtnPos.x}, ${pauseBtnPos.y})...`);
+  await page.mouse.move(pauseBtnPos.x, pauseBtnPos.y);
+  await page.mouse.down();
+  await new Promise(r => setTimeout(r, 80));
+  await page.mouse.up();
+  await new Promise(r => setTimeout(r, 100));
+  const isPausedState1 = await page.evaluate(() => window.POWATER && window.POWATER.game && window.POWATER.game.isPaused);
+  console.log('Game isPaused after 1st pause click:', isPausedState1);
+  if (isPausedState1 === true) {
+    console.log('PASSED: PAUSE button click paused game without error!');
+  } else {
+    console.error('FAILED: PAUSE button click did not pause game!');
+  }
+
+  // Click PAUSE again to resume
+  await page.mouse.move(pauseBtnPos.x, pauseBtnPos.y);
+  await page.mouse.down();
+  await new Promise(r => setTimeout(r, 80));
+  await page.mouse.up();
+  await new Promise(r => setTimeout(r, 100));
+  const isPausedState2 = await page.evaluate(() => window.POWATER && window.POWATER.game && window.POWATER.game.isPaused);
+  console.log('Game isPaused after 2nd pause click:', isPausedState2);
+  if (isPausedState2 === false) {
+    console.log('PASSED: PAUSE button unpaused game successfully!');
+  } else {
+    console.error('FAILED: PAUSE button did not unpause game!');
+  }
+
+  // Test clicking SPEED button
+  const speedBtnPos = await page.evaluate(() => {
+    const btn = window.POWATER && window.POWATER.uiManager && window.POWATER.uiManager.buttons.find(b => b.id === 'speed');
+    return btn ? { x: btn.x + btn.w / 2, y: btn.y + btn.h / 2 } : { x: 746, y: 682 };
+  });
+  console.log(`Testing click on SPEED PNG button at (${speedBtnPos.x}, ${speedBtnPos.y})...`);
+  await page.mouse.move(speedBtnPos.x, speedBtnPos.y);
+  await page.mouse.down();
+  await new Promise(r => setTimeout(r, 80));
+  await page.mouse.up();
+  await new Promise(r => setTimeout(r, 100));
+  const speedState1 = await page.evaluate(() => window.POWATER && window.POWATER.game && window.POWATER.game.gameSpeed);
+  console.log('Game speed after 1st speed click:', speedState1);
+  if (speedState1 === 2.0) {
+    console.log('PASSED: SPEED button click toggled speed to 2X!');
+  } else {
+    console.error('FAILED: SPEED button did not set speed to 2X!');
+  }
+
+  // Click SPEED again to revert to 1.0
+  await page.mouse.move(speedBtnPos.x, speedBtnPos.y);
+  await page.mouse.down();
+  await new Promise(r => setTimeout(r, 80));
+  await page.mouse.up();
+  await new Promise(r => setTimeout(r, 100));
+  const speedState2 = await page.evaluate(() => window.POWATER && window.POWATER.game && window.POWATER.game.gameSpeed);
+  console.log('Game speed after 2nd speed click:', speedState2);
+  if (speedState2 === 1.0) {
+    console.log('PASSED: SPEED button click reverted speed to 1X!');
+  } else {
+    console.error('FAILED: SPEED button did not revert speed to 1X!');
+  }
+
+  // Test River Scene Object Binding & Single River Truth
+  const riverVerification = await page.evaluate(() => {
+    const game = window.POWATER && window.POWATER.game;
+    const map = game && game.map;
+    const riverObj = map && map.getRiverObject();
+    return {
+      hasRiverObj: !!riverObj,
+      riverX: riverObj ? riverObj.getX() : null,
+      riverW: riverObj ? riverObj.getWidth() : null,
+      centerAt360: map ? map.getRiverCenterAtY(360) : null,
+      isPointInRiverCenter: map ? map.isPointInRiver(630, 360) : null,
+      isPointInRiverOutside: map ? map.isPointInRiver(200, 360) : null
+    };
+  });
+  console.log('River Scene Object Verification:', riverVerification);
+  if (riverVerification.hasRiverObj && riverVerification.isPointInRiverCenter && !riverVerification.isPointInRiverOutside) {
+    console.log('PASSED: River is directly mapped to scene object with single source of truth!');
+  } else {
+    console.error('FAILED: River scene object binding check failed!');
+  }
+
   const screenshotPath = path.join(__dirname, '..', 'test_screenshot.png');
   await page.screenshot({ path: screenshotPath });
   console.log('Screenshot saved to:', screenshotPath);
