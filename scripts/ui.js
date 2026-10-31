@@ -151,6 +151,16 @@
         this.txtTime.text = `⏱️ ${dName} D${dNum} (${timeStr})`;
       }
 
+      // Dynamically reposition Time and Strikes in fullscreen
+      const screenW = (this.game && this.game.runtimeScene && this.game.runtimeScene.getGame) ?
+                      Math.max(1280, this.game.runtimeScene.getGame().getGameResolutionWidth()) : 1280;
+      if (this.txtTime) {
+        this.txtTime.x = Math.max(760, screenW - 520) + 15;
+      }
+      if (this.txtStrikes) {
+        this.txtStrikes.x = Math.max(960, screenW - 320) + 10;
+      }
+
       // Update Pause & Speed Button Labels if text elements exist
       if (this.buttonTexts) {
         if (this.buttonTexts['pause'] && this.buttonTexts['pause'].title) {
@@ -276,15 +286,14 @@
       g.clear();
 
       // --- TOP HUD BAR ---
-      // Background bar
-      g.beginFill(0x120d24, 0.94);
-      g.drawRect(0, 0, 1280, 44);
-      g.endFill();
+      const screenW = (this.game && this.game.runtimeScene && this.game.runtimeScene.getGame) ?
+                      Math.max(1280, this.game.runtimeScene.getGame().getGameResolutionWidth()) : 1280;
 
-      // Bottom border line
+      // The top banner background is provided by scene object 'hud_bar' (assets/hud_bar.png).
+      // We also draw a subtle border across screenW to guarantee seamless coverage:
       g.lineStyle(1.5, 0x48cae4, 0.35);
       g.moveTo(0, 44);
-      g.lineTo(1280, 44);
+      g.lineTo(screenW, 44);
 
       // Top HUD Stat Pill Outlines
       const drawStatPill = (x, y, w, h) => {
@@ -294,12 +303,15 @@
         g.endFill();
       };
 
+      const timeX = Math.max(760, screenW - 520);
+      const strikeX = Math.max(960, screenW - 320);
+
       drawStatPill(10, 6, 210, 32);  // Logo
       drawStatPill(230, 6, 130, 32); // Budget
       drawStatPill(370, 6, 120, 32); // Served
       drawStatPill(500, 6, 250, 32); // Pollution
-      drawStatPill(760, 6, 190, 32); // Time
-      drawStatPill(960, 6, 180, 32); // Strikes
+      drawStatPill(timeX, 6, 190, 32); // Time
+      drawStatPill(strikeX, 6, 180, 32); // Strikes
 
       // Pollution Bar Draw
       const curP = this.game.pollution || 0;
@@ -327,7 +339,7 @@
       const maxComplaints = CONFIG.MAX_COMPLAINTS || 3;
       const curComplaints = this.game.complaints || 0;
       for (let i = 0; i < maxComplaints; i++) {
-        const pipX = 1060 + (i * 22);
+        const pipX = strikeX + 100 + (i * 22);
         const pipY = 12;
         const struck = i < curComplaints;
         g.lineStyle(1, struck ? 0xff4d6d : 0xffffff, struck ? 1.0 : 0.3);

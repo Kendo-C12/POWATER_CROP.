@@ -130,18 +130,7 @@
     render(pixiGfx) {
       if (!pixiGfx) return;
 
-      // 1. Urban Grid lines
-      pixiGfx.lineStyle(1, 0x1f2442, 0.4);
-      const step = 32;
-      for (let x = 0; x < this.width; x += step) {
-        pixiGfx.moveTo(x, 0);
-        pixiGfx.lineTo(x, this.height);
-      }
-      for (let y = 0; y < this.height; y += step) {
-        pixiGfx.moveTo(0, y);
-        pixiGfx.lineTo(this.width, y);
-      }
-
+      // Urban Grid lines are provided by the scene object 'grid_bg' (assets/grid_bg.png)!
       // The scene object 'river' is the single source of truth for the river visual!
       // No duplicate second river body is drawn here.
 

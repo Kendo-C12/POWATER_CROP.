@@ -87,6 +87,16 @@
             this.pixiGfxOverlay = gfxOverlay;
             runtimeScene._powaterPixiGfxOverlay = gfxOverlay;
 
+            // Layer 2.5: Utility PNG Badges (Z=7, above houses and status rings)
+            const badgeContainer = new PIXI.Container();
+            if (renderer.addRendererObject) {
+              renderer.addRendererObject(badgeContainer, 7);
+            } else {
+              container.addChild(badgeContainer);
+            }
+            this.pixiBadgeContainer = badgeContainer;
+            runtimeScene._powaterPixiBadgeContainer = badgeContainer;
+
             // Layer 3: In-Game Drawn UI (Buttons, Top HUD, Modals) (Z=10, top of scene)
             const uiContainer = new PIXI.Container();
             if (renderer.addRendererObject) {
@@ -291,7 +301,7 @@
 
       // === LAYER 2 (Above objects): Status Rings, Pins, Preview Lines & Hover Rings ===
       // 3. Render House Status Rings & Pins
-      this.game.houses.forEach(house => house.render(gfxO));
+      this.game.houses.forEach(house => house.render(gfxO, this.pixiBadgeContainer));
 
       // 4. Render Building Footprints & Indicators
       this.game.buildings.forEach(building => building.render(gfxO));

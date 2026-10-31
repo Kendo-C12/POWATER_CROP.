@@ -201,6 +201,46 @@
         "name": "btn_guide.png",
         "smoothed": true,
         "userAdded": true
+      },
+      {
+        "file": "assets/badge_power.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "badge_power.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "file": "assets/badge_water.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "badge_water.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "file": "assets/badge_drain.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "badge_drain.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "file": "assets/hud_bar.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "hud_bar.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "file": "assets/grid_bg.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "grid_bg.png",
+        "smoothed": true,
+        "userAdded": true
       }
     ]
   },
@@ -254,6 +294,22 @@
         }
       ],
       "instances": [
+        {
+          "angle": 0,
+          "customSize": true,
+          "height": 1440,
+          "layer": "",
+          "locked": false,
+          "name": "grid_bg",
+          "persistentUuid": "inst-grid-bg",
+          "width": 2560,
+          "x": 0,
+          "y": 0,
+          "zOrder": 0,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
         {
           "angle": 0,
           "customSize": true,
@@ -362,6 +418,22 @@
           "x": 308,
           "y": 292,
           "zOrder": 3,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "height": 44,
+          "layer": "",
+          "locked": false,
+          "name": "hud_bar",
+          "persistentUuid": "inst-hud-bar",
+          "width": 2560,
+          "x": 0,
+          "y": 0,
+          "zOrder": 8,
           "numberProperties": [],
           "stringProperties": [],
           "initialVariables": []
@@ -1353,6 +1425,246 @@
                         "name": "centre",
                         "x": 64.0,
                         "y": 48.0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "adaptCollisionMaskAutomatically": true,
+          "assetStoreId": "",
+          "name": "grid_bg",
+          "persistentUuid": "uuid-grid_bg",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 0.025,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "grid_bg.png",
+                      "points": [
+                        {
+                          "name": "Point",
+                          "x": 1280.0,
+                          "y": -10.0
+                        }
+                      ],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0.0,
+                        "y": 0.0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 1280.0,
+                        "y": 720.0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "adaptCollisionMaskAutomatically": true,
+          "assetStoreId": "",
+          "name": "hud_bar",
+          "persistentUuid": "uuid-hud_bar",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 0.025,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "hud_bar.png",
+                      "points": [
+                        {
+                          "name": "Point",
+                          "x": 1280.0,
+                          "y": -10.0
+                        }
+                      ],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0.0,
+                        "y": 0.0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 1280.0,
+                        "y": 22.0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "adaptCollisionMaskAutomatically": true,
+          "assetStoreId": "",
+          "name": "badge_power",
+          "persistentUuid": "uuid-badge_power",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 0.025,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "badge_power.png",
+                      "points": [
+                        {
+                          "name": "Point",
+                          "x": 24.0,
+                          "y": -10.0
+                        }
+                      ],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0.0,
+                        "y": 0.0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 24.0,
+                        "y": 24.0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "adaptCollisionMaskAutomatically": true,
+          "assetStoreId": "",
+          "name": "badge_water",
+          "persistentUuid": "uuid-badge_water",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 0.025,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "badge_water.png",
+                      "points": [
+                        {
+                          "name": "Point",
+                          "x": 24.0,
+                          "y": -10.0
+                        }
+                      ],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0.0,
+                        "y": 0.0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 24.0,
+                        "y": 24.0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "adaptCollisionMaskAutomatically": true,
+          "assetStoreId": "",
+          "name": "badge_drain",
+          "persistentUuid": "uuid-badge_drain",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 0.025,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "badge_drain.png",
+                      "points": [
+                        {
+                          "name": "Point",
+                          "x": 24.0,
+                          "y": -10.0
+                        }
+                      ],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0.0,
+                        "y": 0.0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 24.0,
+                        "y": 24.0
                       },
                       "customCollisionMask": []
                     }
@@ -2361,18 +2673,7 @@
                 "    render(pixiGfx) {",
                 "      if (!pixiGfx) return;",
                 "",
-                "      // 1. Urban Grid lines",
-                "      pixiGfx.lineStyle(1, 0x1f2442, 0.4);",
-                "      const step = 32;",
-                "      for (let x = 0; x < this.width; x += step) {",
-                "        pixiGfx.moveTo(x, 0);",
-                "        pixiGfx.lineTo(x, this.height);",
-                "      }",
-                "      for (let y = 0; y < this.height; y += step) {",
-                "        pixiGfx.moveTo(0, y);",
-                "        pixiGfx.lineTo(this.width, y);",
-                "      }",
-                "",
+                "      // Urban Grid lines are provided by the scene object 'grid_bg' (assets/grid_bg.png)!",
                 "      // The scene object 'river' is the single source of truth for the river visual!",
                 "      // No duplicate second river body is drawn here.",
                 "",
@@ -2502,7 +2803,7 @@
                 "      }",
                 "    }",
                 "",
-                "    render(pixiGfx) {",
+                "    render(pixiGfx, badgeContainer = null) {",
                 "      if (!pixiGfx) return;",
                 "      const c = this.getCenter();",
                 "      const radius = 46;",
@@ -2544,52 +2845,50 @@
                 "        pixiGfx.endFill();",
                 "      });",
                 "",
-                "      // 3. Needs Indicator Badges (above house)",
+                "      // 3. Needs Indicator Badges (above house) using PNG sprites",
                 "      // DISAPPEARS as soon as each utility is connected!",
-                "      const badges = [];",
-                "      if (!this.hasPower) badges.push({ type: 'power', color: 0xffd166 }); // Power needed",
-                "      if (!this.hasWater) badges.push({ type: 'water', color: 0x00b4d8 }); // Water needed",
-                "      if (this.hasWater && !this.hasDrainage) badges.push({ type: 'sewage', color: 0xc77dff }); // Drainage needed",
+                "      const activeBadges = [];",
+                "      if (!this.hasPower) activeBadges.push('power');",
+                "      if (!this.hasWater) activeBadges.push('water');",
+                "      if (this.hasWater && !this.hasDrainage) activeBadges.push('drain');",
                 "",
-                "      if (badges.length > 0) {",
+                "      const container = badgeContainer || pixiGfx.parent;",
+                "      if (!this.badgeSprites && container && typeof PIXI !== 'undefined') {",
+                "        const createBadgeSprite = (imgName) => {",
+                "          const tex = PIXI.Texture.from(imgName);",
+                "          const sp = new PIXI.Sprite(tex);",
+                "          sp.anchor.set(0.5);",
+                "          sp.scale.set(22 / 48);",
+                "          container.addChild(sp);",
+                "          return sp;",
+                "        };",
+                "        this.badgeSprites = {",
+                "          power: createBadgeSprite('badge_power.png'),",
+                "          water: createBadgeSprite('badge_water.png'),",
+                "          drain: createBadgeSprite('badge_drain.png')",
+                "        };",
+                "      }",
+                "",
+                "      if (this.badgeSprites) {",
                 "        const badgeY = c.y - radius - 10;",
-                "        const spacing = 18;",
-                "        const startX = c.x - ((badges.length - 1) * spacing) / 2;",
+                "        const spacing = 22;",
+                "        const startX = c.x - ((activeBadges.length - 1) * spacing) / 2;",
                 "",
-                "        badges.forEach((b, i) => {",
-                "          const bx = startX + i * spacing;",
-                "",
-                "          // Outer badge circle",
-                "          pixiGfx.lineStyle(2.0, b.color, 1.0);",
-                "          pixiGfx.beginFill(0x16102a, 0.95);",
-                "          pixiGfx.drawCircle(bx, badgeY, 8);",
-                "          pixiGfx.endFill();",
-                "",
-                "          // Inner icon graphic",
-                "          if (b.type === 'power') {",
-                "            // Lightning bolt shape",
-                "            pixiGfx.lineStyle(1.5, 0xffd166, 1.0);",
-                "            pixiGfx.beginFill(0xffd166, 1.0);",
-                "            pixiGfx.moveTo(bx + 1, badgeY - 5);",
-                "            pixiGfx.lineTo(bx - 3, badgeY);",
-                "            pixiGfx.lineTo(bx, badgeY);",
-                "            pixiGfx.lineTo(bx - 1, badgeY + 5);",
-                "            pixiGfx.lineTo(bx + 3, badgeY - 1);",
-                "            pixiGfx.lineTo(bx, badgeY - 1);",
-                "            pixiGfx.closePath();",
-                "            pixiGfx.endFill();",
-                "          } else if (b.type === 'water') {",
-                "            // Water drop shape",
-                "            pixiGfx.lineStyle(1.5, 0x00b4d8, 1.0);",
-                "            pixiGfx.beginFill(0x00b4d8, 1.0);",
-                "            pixiGfx.drawCircle(bx, badgeY + 1, 3.5);",
-                "            pixiGfx.endFill();",
+                "        ['power', 'water', 'drain'].forEach(type => {",
+                "          const sp = this.badgeSprites[type];",
+                "          const idx = activeBadges.indexOf(type);",
+                "          if (idx !== -1) {",
+                "            sp.visible = true;",
+                "            sp.x = startX + idx * spacing;",
+                "            sp.y = badgeY;",
+                "            if (sp.texture && sp.texture.baseTexture && sp.texture.baseTexture.valid) {",
+                "              sp.width = 20;",
+                "              sp.height = 20;",
+                "            } else {",
+                "              sp.scale.set(20 / 48);",
+                "            }",
                 "          } else {",
-                "            // Sewage warning dot",
-                "            pixiGfx.lineStyle(1.5, 0xc77dff, 1.0);",
-                "            pixiGfx.beginFill(0xc77dff, 1.0);",
-                "            pixiGfx.drawCircle(bx, badgeY, 3.5);",
-                "            pixiGfx.endFill();",
+                "            sp.visible = false;",
                 "          }",
                 "        });",
                 "      }",
@@ -2613,6 +2912,16 @@
                 "        pixiGfx.beginFill(barColor, 1.0);",
                 "        pixiGfx.drawRect(barX, barY, barW * (1.0 - prog), barH);",
                 "        pixiGfx.endFill();",
+                "      }",
+                "    }",
+                "",
+                "    destroy() {",
+                "      if (this.badgeSprites) {",
+                "        Object.values(this.badgeSprites).forEach(sp => {",
+                "          if (sp.parent) sp.parent.removeChild(sp);",
+                "          try { sp.destroy(); } catch (e) {}",
+                "        });",
+                "        this.badgeSprites = null;",
                 "      }",
                 "    }",
                 "  }",
@@ -3815,6 +4124,16 @@
                 "        this.txtTime.text = `⏱️ ${dName} D${dNum} (${timeStr})`;",
                 "      }",
                 "",
+                "      // Dynamically reposition Time and Strikes in fullscreen",
+                "      const screenW = (this.game && this.game.runtimeScene && this.game.runtimeScene.getGame) ?",
+                "                      Math.max(1280, this.game.runtimeScene.getGame().getGameResolutionWidth()) : 1280;",
+                "      if (this.txtTime) {",
+                "        this.txtTime.x = Math.max(760, screenW - 520) + 15;",
+                "      }",
+                "      if (this.txtStrikes) {",
+                "        this.txtStrikes.x = Math.max(960, screenW - 320) + 10;",
+                "      }",
+                "",
                 "      // Update Pause & Speed Button Labels if text elements exist",
                 "      if (this.buttonTexts) {",
                 "        if (this.buttonTexts['pause'] && this.buttonTexts['pause'].title) {",
@@ -3940,15 +4259,14 @@
                 "      g.clear();",
                 "",
                 "      // --- TOP HUD BAR ---",
-                "      // Background bar",
-                "      g.beginFill(0x120d24, 0.94);",
-                "      g.drawRect(0, 0, 1280, 44);",
-                "      g.endFill();",
+                "      const screenW = (this.game && this.game.runtimeScene && this.game.runtimeScene.getGame) ?",
+                "                      Math.max(1280, this.game.runtimeScene.getGame().getGameResolutionWidth()) : 1280;",
                 "",
-                "      // Bottom border line",
+                "      // The top banner background is provided by scene object 'hud_bar' (assets/hud_bar.png).",
+                "      // We also draw a subtle border across screenW to guarantee seamless coverage:",
                 "      g.lineStyle(1.5, 0x48cae4, 0.35);",
                 "      g.moveTo(0, 44);",
-                "      g.lineTo(1280, 44);",
+                "      g.lineTo(screenW, 44);",
                 "",
                 "      // Top HUD Stat Pill Outlines",
                 "      const drawStatPill = (x, y, w, h) => {",
@@ -3958,12 +4276,15 @@
                 "        g.endFill();",
                 "      };",
                 "",
+                "      const timeX = Math.max(760, screenW - 520);",
+                "      const strikeX = Math.max(960, screenW - 320);",
+                "",
                 "      drawStatPill(10, 6, 210, 32);  // Logo",
                 "      drawStatPill(230, 6, 130, 32); // Budget",
                 "      drawStatPill(370, 6, 120, 32); // Served",
                 "      drawStatPill(500, 6, 250, 32); // Pollution",
-                "      drawStatPill(760, 6, 190, 32); // Time",
-                "      drawStatPill(960, 6, 180, 32); // Strikes",
+                "      drawStatPill(timeX, 6, 190, 32); // Time",
+                "      drawStatPill(strikeX, 6, 180, 32); // Strikes",
                 "",
                 "      // Pollution Bar Draw",
                 "      const curP = this.game.pollution || 0;",
@@ -3991,7 +4312,7 @@
                 "      const maxComplaints = CONFIG.MAX_COMPLAINTS || 3;",
                 "      const curComplaints = this.game.complaints || 0;",
                 "      for (let i = 0; i < maxComplaints; i++) {",
-                "        const pipX = 1060 + (i * 22);",
+                "        const pipX = strikeX + 100 + (i * 22);",
                 "        const pipY = 12;",
                 "        const struck = i < curComplaints;",
                 "        g.lineStyle(1, struck ? 0xff4d6d : 0xffffff, struck ? 1.0 : 0.3);",
@@ -4513,6 +4834,16 @@
                 "            this.pixiGfxOverlay = gfxOverlay;",
                 "            runtimeScene._powaterPixiGfxOverlay = gfxOverlay;",
                 "",
+                "            // Layer 2.5: Utility PNG Badges (Z=7, above houses and status rings)",
+                "            const badgeContainer = new PIXI.Container();",
+                "            if (renderer.addRendererObject) {",
+                "              renderer.addRendererObject(badgeContainer, 7);",
+                "            } else {",
+                "              container.addChild(badgeContainer);",
+                "            }",
+                "            this.pixiBadgeContainer = badgeContainer;",
+                "            runtimeScene._powaterPixiBadgeContainer = badgeContainer;",
+                "",
                 "            // Layer 3: In-Game Drawn UI (Buttons, Top HUD, Modals) (Z=10, top of scene)",
                 "            const uiContainer = new PIXI.Container();",
                 "            if (renderer.addRendererObject) {",
@@ -4717,7 +5048,7 @@
                 "",
                 "      // === LAYER 2 (Above objects): Status Rings, Pins, Preview Lines & Hover Rings ===",
                 "      // 3. Render House Status Rings & Pins",
-                "      this.game.houses.forEach(house => house.render(gfxO));",
+                "      this.game.houses.forEach(house => house.render(gfxO, this.pixiBadgeContainer));",
                 "",
                 "      // 4. Render Building Footprints & Indicators",
                 "      this.game.buildings.forEach(building => building.render(gfxO));",
@@ -4938,6 +5269,21 @@
         },
         {
           "name": "btn_guide.png"
+        },
+        {
+          "name": "badge_power.png"
+        },
+        {
+          "name": "badge_water.png"
+        },
+        {
+          "name": "badge_drain.png"
+        },
+        {
+          "name": "hud_bar.png"
+        },
+        {
+          "name": "grid_bg.png"
         }
       ]
     }
@@ -5002,6 +5348,21 @@
     },
     {
       "name": "btn_guide.png"
+    },
+    {
+      "name": "badge_power.png"
+    },
+    {
+      "name": "badge_water.png"
+    },
+    {
+      "name": "badge_drain.png"
+    },
+    {
+      "name": "hud_bar.png"
+    },
+    {
+      "name": "grid_bg.png"
     }
   ]
 }

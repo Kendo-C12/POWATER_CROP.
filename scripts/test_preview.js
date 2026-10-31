@@ -265,9 +265,43 @@ async function runTest() {
     console.error('FAILED: River scene object binding check failed!');
   }
 
+  const badgeDebug = await page.evaluate(() => {
+    const game = window.POWATER && window.POWATER.game;
+    const h = game && game.houses[1]; // house 2 has not received power or water!
+    const bs = h && h.badgeSprites;
+    return {
+      hasH: !!h,
+      hasBS: !!bs,
+      powerVis: bs && bs.power ? bs.power.visible : null,
+      powerPos: bs && bs.power ? { x: bs.power.x, y: bs.power.y } : null,
+      powerSize: bs && bs.power ? { w: bs.power.width, h: bs.power.height, sx: bs.power.scale.x, sy: bs.power.scale.y } : null,
+      texValid: bs && bs.power && bs.power.texture ? bs.power.texture.baseTexture.valid : null,
+      texWidth: bs && bs.power && bs.power.texture ? bs.power.texture.width : null,
+      parent: bs && bs.power && bs.power.parent ? bs.power.parent.constructor.name : null
+    };
+  });
+  console.log('Badge Debug:', badgeDebug);
+
   const screenshotPath = path.join(__dirname, '..', 'test_screenshot.png');
   await page.screenshot({ path: screenshotPath });
   console.log('Screenshot saved to:', screenshotPath);
+
+  // Test Fullscreen Viewport (1600x900)
+  console.log('Testing fullscreen viewport 1600x900...');
+  await page.setViewport({ width: 1600, height: 900 });
+  await new Promise(r => setTimeout(r, 400));
+  const fullscreenScreenshotPath = path.join(__dirname, '..', 'test_fullscreen.png');
+  await page.screenshot({ path: fullscreenScreenshotPath });
+  console.log('Fullscreen screenshot saved to:', fullscreenScreenshotPath);
+
+  // Verify that at x = 1450 (which was previously blank white space), it is now gridded/covered!
+  const fullscreenCheck = await page.evaluate(() => {
+    const game = window.POWATER && window.POWATER.game;
+    const scene = game && game.runtimeScene;
+    const gWidth = scene ? scene.getGame().getGameResolutionWidth() : null;
+    return { gWidth };
+  });
+  console.log('Fullscreen Game Width:', fullscreenCheck);
 
   const realErrors = errors.filter(e =>
     !e.includes('cloudflarestorage') &&

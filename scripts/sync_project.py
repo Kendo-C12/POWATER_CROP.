@@ -27,6 +27,11 @@ assets = [
     ('btn_upgrade.png', 'assets/btn_upgrade.png'),
     ('btn_sdgs.png', 'assets/btn_sdgs.png'),
     ('btn_guide.png', 'assets/btn_guide.png'),
+    ('badge_power.png', 'assets/badge_power.png'),
+    ('badge_water.png', 'assets/badge_water.png'),
+    ('badge_drain.png', 'assets/badge_drain.png'),
+    ('hud_bar.png', 'assets/hud_bar.png'),
+    ('grid_bg.png', 'assets/grid_bg.png'),
 ]
 for name, file_path in assets:
     if name not in res_map:
@@ -113,7 +118,12 @@ buildings = [
     ('btn_speed', 'btn_speed.png', 128, 96),
     ('btn_upgrade', 'btn_upgrade.png', 128, 96),
     ('btn_sdgs', 'btn_sdgs.png', 128, 96),
-    ('btn_guide', 'btn_guide.png', 128, 96)
+    ('btn_guide', 'btn_guide.png', 128, 96),
+    ('grid_bg', 'grid_bg.png', 2560, 1440),
+    ('hud_bar', 'hud_bar.png', 2560, 44),
+    ('badge_power', 'badge_power.png', 48, 48),
+    ('badge_water', 'badge_water.png', 48, 48),
+    ('badge_drain', 'badge_drain.png', 48, 48)
 ]
 
 for bname, bimg, bw, bh in buildings:
@@ -124,8 +134,25 @@ for bname, bimg, bw, bh in buildings:
 objects = [obj for obj in objects if obj.get('name') not in ['WirePainter', 'Water', 'Electricity']]
 layout['objects'] = objects
 
-# Populate Main screen layout with starting instances (River, Buildings, Houses, Button PNG Sprites)
+# Populate Main screen layout with starting instances (Grid, River, Buildings, Houses, HUD, Button PNG Sprites)
 layout['instances'] = [
+    # 0. Urban Grid Blueprint Background (covers full layout and fullscreen expansions)
+    {
+        'angle': 0,
+        'customSize': True,
+        'height': 1440,
+        'layer': '',
+        'locked': False,
+        'name': 'grid_bg',
+        'persistentUuid': 'inst-grid-bg',
+        'width': 2560,
+        'x': 0,
+        'y': 0,
+        'zOrder': 0,
+        'numberProperties': [],
+        'stringProperties': [],
+        'initialVariables': []
+    },
     # 1. River Background (Running vertically down the center)
     {
         'angle': 0,
@@ -241,7 +268,24 @@ layout['instances'] = [
         'stringProperties': [],
         'initialVariables': []
     },
-    # 4. Toolbar Button PNG Sprites (Centrally aligned along bottom)
+    # 4. Top HUD Bar Background (PNG Banner)
+    {
+        'angle': 0,
+        'customSize': True,
+        'height': 44,
+        'layer': '',
+        'locked': False,
+        'name': 'hud_bar',
+        'persistentUuid': 'inst-hud-bar',
+        'width': 2560,
+        'x': 0,
+        'y': 0,
+        'zOrder': 8,
+        'numberProperties': [],
+        'stringProperties': [],
+        'initialVariables': []
+    },
+    # 5. Toolbar Button PNG Sprites (Centrally aligned along bottom)
     { 'name': 'btn_power', 'x': 276, 'y': 658, 'width': 64, 'height': 48, 'zOrder': 10, 'persistentUuid': 'inst-btn-power', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
     { 'name': 'btn_water', 'x': 346, 'y': 658, 'width': 64, 'height': 48, 'zOrder': 10, 'persistentUuid': 'inst-btn-water', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
     { 'name': 'btn_drain', 'x': 416, 'y': 658, 'width': 64, 'height': 48, 'zOrder': 10, 'persistentUuid': 'inst-btn-drain', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },

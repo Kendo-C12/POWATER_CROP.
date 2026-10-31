@@ -92,7 +92,7 @@
       }
     }
 
-    render(pixiGfx) {
+    render(pixiGfx, badgeContainer = null) {
       if (!pixiGfx) return;
       const c = this.getCenter();
       const radius = 46;
@@ -134,52 +134,50 @@
         pixiGfx.endFill();
       });
 
-      // 3. Needs Indicator Badges (above house)
+      // 3. Needs Indicator Badges (above house) using PNG sprites
       // DISAPPEARS as soon as each utility is connected!
-      const badges = [];
-      if (!this.hasPower) badges.push({ type: 'power', color: 0xffd166 }); // Power needed
-      if (!this.hasWater) badges.push({ type: 'water', color: 0x00b4d8 }); // Water needed
-      if (this.hasWater && !this.hasDrainage) badges.push({ type: 'sewage', color: 0xc77dff }); // Drainage needed
+      const activeBadges = [];
+      if (!this.hasPower) activeBadges.push('power');
+      if (!this.hasWater) activeBadges.push('water');
+      if (this.hasWater && !this.hasDrainage) activeBadges.push('drain');
 
-      if (badges.length > 0) {
+      const container = badgeContainer || pixiGfx.parent;
+      if (!this.badgeSprites && container && typeof PIXI !== 'undefined') {
+        const createBadgeSprite = (imgName) => {
+          const tex = PIXI.Texture.from(imgName);
+          const sp = new PIXI.Sprite(tex);
+          sp.anchor.set(0.5);
+          sp.scale.set(22 / 48);
+          container.addChild(sp);
+          return sp;
+        };
+        this.badgeSprites = {
+          power: createBadgeSprite('badge_power.png'),
+          water: createBadgeSprite('badge_water.png'),
+          drain: createBadgeSprite('badge_drain.png')
+        };
+      }
+
+      if (this.badgeSprites) {
         const badgeY = c.y - radius - 10;
-        const spacing = 18;
-        const startX = c.x - ((badges.length - 1) * spacing) / 2;
+        const spacing = 22;
+        const startX = c.x - ((activeBadges.length - 1) * spacing) / 2;
 
-        badges.forEach((b, i) => {
-          const bx = startX + i * spacing;
-
-          // Outer badge circle
-          pixiGfx.lineStyle(2.0, b.color, 1.0);
-          pixiGfx.beginFill(0x16102a, 0.95);
-          pixiGfx.drawCircle(bx, badgeY, 8);
-          pixiGfx.endFill();
-
-          // Inner icon graphic
-          if (b.type === 'power') {
-            // Lightning bolt shape
-            pixiGfx.lineStyle(1.5, 0xffd166, 1.0);
-            pixiGfx.beginFill(0xffd166, 1.0);
-            pixiGfx.moveTo(bx + 1, badgeY - 5);
-            pixiGfx.lineTo(bx - 3, badgeY);
-            pixiGfx.lineTo(bx, badgeY);
-            pixiGfx.lineTo(bx - 1, badgeY + 5);
-            pixiGfx.lineTo(bx + 3, badgeY - 1);
-            pixiGfx.lineTo(bx, badgeY - 1);
-            pixiGfx.closePath();
-            pixiGfx.endFill();
-          } else if (b.type === 'water') {
-            // Water drop shape
-            pixiGfx.lineStyle(1.5, 0x00b4d8, 1.0);
-            pixiGfx.beginFill(0x00b4d8, 1.0);
-            pixiGfx.drawCircle(bx, badgeY + 1, 3.5);
-            pixiGfx.endFill();
+        ['power', 'water', 'drain'].forEach(type => {
+          const sp = this.badgeSprites[type];
+          const idx = activeBadges.indexOf(type);
+          if (idx !== -1) {
+            sp.visible = true;
+            sp.x = startX + idx * spacing;
+            sp.y = badgeY;
+            if (sp.texture && sp.texture.baseTexture && sp.texture.baseTexture.valid) {
+              sp.width = 20;
+              sp.height = 20;
+            } else {
+              sp.scale.set(20 / 48);
+            }
           } else {
-            // Sewage warning dot
-            pixiGfx.lineStyle(1.5, 0xc77dff, 1.0);
-            pixiGfx.beginFill(0xc77dff, 1.0);
-            pixiGfx.drawCircle(bx, badgeY, 3.5);
-            pixiGfx.endFill();
+            sp.visible = false;
           }
         });
       }
@@ -203,6 +201,16 @@
         pixiGfx.beginFill(barColor, 1.0);
         pixiGfx.drawRect(barX, barY, barW * (1.0 - prog), barH);
         pixiGfx.endFill();
+      }
+    }
+
+    destroy() {
+      if (this.badgeSprites) {
+        Object.values(this.badgeSprites).forEach(sp => {
+          if (sp.parent) sp.parent.removeChild(sp);
+          try { sp.destroy(); } catch (e) {}
+        });
+        this.badgeSprites = null;
       }
     }
   }
