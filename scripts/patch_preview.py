@@ -20,6 +20,19 @@ for f in os.listdir(assets_dir):
         shutil.copy2(src, os.path.join(prev_assets, f))
 print('Assets copied to preview directory.')
 
+# 1.1 Sync data.js with POWATER CROPS..json
+project_json_path = r'c:\Users\user\Desktop\Folder\GDEV_POWATER\POWATER CROPS..json'
+if os.path.exists(project_json_path):
+    import json
+    with open(project_json_path, 'r', encoding='utf-8') as pf:
+        proj_data = json.load(pf)
+    # GDevelop's ResourceLoader requires usedResources list in projectData
+    proj_data.setdefault('usedResources', [{'name': r['name']} for r in proj_data.get('resources', {}).get('resources', [])])
+    data_js_path = os.path.join(prev_dir, 'data.js')
+    with open(data_js_path, 'w', encoding='utf-8') as df:
+        df.write('gdjs.projectData = ' + json.dumps(proj_data) + ';\n')
+    print('data.js updated in preview directory.')
+
 # 2. Bundle all scripts in proper dependency order
 scripts_order = ['config.js', 'audio.js', 'map.js', 'entities.js', 'engine.js', 'ui.js', 'main.js']
 bundle = ''

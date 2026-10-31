@@ -44,27 +44,25 @@
     }
 
     setupButtonLayout() {
-      // Bottom Toolbar Configuration
-      const tbY = 654;
-      const tbH = 50;
+      // Toolbar Button Sprites (Aligned along bottom, matching scene layout)
+      const tbY = 658;
+      const tbH = 48;
+      const tbW = 64;
 
       this.buttons = [
         // Tools
-        { id: 'power', type: 'tool', toolId: 'power', x: 230, y: tbY, w: 72, h: tbH, title: 'POWER', sub: '[1] Free', color: 0xffb703, icon: '⚡' },
-        { id: 'water', type: 'tool', toolId: 'water', x: 308, y: tbY, w: 72, h: tbH, title: 'WATER', sub: '[2] Free', color: 0x00b4d8, icon: '💧' },
-        { id: 'sewage', type: 'tool', toolId: 'sewage', x: 386, y: tbY, w: 72, h: tbH, title: 'DRAIN', sub: '[3] Free', color: 0x9d4edd, icon: '🟣' },
+        { id: 'power', objectName: 'btn_power', type: 'tool', toolId: 'power', x: 276, y: tbY, w: tbW, h: tbH, color: 0xffb703 },
+        { id: 'water', objectName: 'btn_water', type: 'tool', toolId: 'water', x: 346, y: tbY, w: tbW, h: tbH, color: 0x00b4d8 },
+        { id: 'sewage', objectName: 'btn_drain', type: 'tool', toolId: 'sewage', x: 416, y: tbY, w: tbW, h: tbH, color: 0x9d4edd },
         // Buildings
-        { id: 'solar', type: 'build', buildId: 'solar', x: 472, y: tbY, w: 72, h: tbH, title: 'SOLAR', sub: '[4] $45', color: 0xffd166, icon: '☀️' },
-        { id: 'air_filter', type: 'build', buildId: 'air_filter', x: 550, y: tbY, w: 72, h: tbH, title: 'FILTER', sub: '[5] $40', color: 0x06d6a0, icon: '🍃' },
+        { id: 'solar', objectName: 'btn_solar', type: 'build', buildId: 'solar', x: 494, y: tbY, w: tbW, h: tbH, color: 0xffd166 },
+        { id: 'air_filter', objectName: 'btn_filter', type: 'build', buildId: 'air_filter', x: 564, y: tbY, w: tbW, h: tbH, color: 0x06d6a0 },
         // Game Controls
-        { id: 'pause', type: 'action', action: 'togglePause', x: 636, y: tbY, w: 56, h: tbH, title: 'PAUSE', sub: '[Space]', color: 0xadb5bd, icon: '⏸️' },
-        { id: 'speed', type: 'action', action: 'toggleSpeed', x: 698, y: tbY, w: 56, h: tbH, title: '1X', sub: 'SPEED', color: 0xadb5bd, icon: '⏩' },
-        { id: 'upgrades', type: 'action', action: 'openUpgrades', x: 760, y: tbY, w: 76, h: tbH, title: 'UPGRADE', sub: '[U]', color: 0xffd166, icon: '🔧' },
-        { id: 'sdgs', type: 'action', action: 'openSdgs', x: 842, y: tbY, w: 60, h: tbH, title: 'SDGs', sub: 'GOALS', color: 0x00b4d8, icon: '🎯' },
-        { id: 'audio', type: 'action', action: 'toggleAudio', x: 908, y: tbY, w: 56, h: tbH, title: 'AUDIO', sub: '[M]', color: 0xadb5bd, icon: '🔊' },
-
-        // Header Buttons
-        { id: 'guide', type: 'action', action: 'openGuide', x: 1160, y: 8, w: 104, h: 28, title: '📋 GUIDE', sub: '', color: 0x00b4d8 }
+        { id: 'pause', objectName: 'btn_pause', type: 'action', action: 'togglePause', x: 642, y: tbY, w: tbW, h: tbH, color: 0xadb5bd },
+        { id: 'speed', objectName: 'btn_speed', type: 'action', action: 'toggleSpeed', x: 712, y: tbY, w: tbW, h: tbH, color: 0xadb5bd },
+        { id: 'upgrades', objectName: 'btn_upgrade', type: 'action', action: 'openUpgrades', x: 790, y: tbY, w: tbW, h: tbH, color: 0xffd166 },
+        { id: 'sdgs', objectName: 'btn_sdgs', type: 'action', action: 'openSdgs', x: 860, y: tbY, w: tbW, h: tbH, color: 0x00b4d8 },
+        { id: 'guide', objectName: 'btn_guide', type: 'action', action: 'openGuide', x: 930, y: tbY, w: tbW, h: tbH, color: 0x48cae4 }
       ];
     }
 
@@ -72,11 +70,11 @@
       if (!container) return;
       this.container = container;
 
-      // 1. Base Graphics Layer for Top HUD and Toolbar
+      // 1. Base Graphics Layer for Top HUD and Button Selection Glows
       this.gfx = new PIXI.Graphics();
       container.addChild(this.gfx);
 
-      // 2. Toolbar & HUD Texts Container
+      // 2. HUD Texts Container
       this.textContainer = new PIXI.Container();
       container.addChild(this.textContainer);
 
@@ -105,35 +103,6 @@
       this.txtStrikes = new PIXI.Text('⚠️ STRIKES:', { fontFamily: font, fontSize: 11, fontWeight: 'bold', fill: 0xe63946 });
       this.txtStrikes.position.set(970, 13);
       this.textContainer.addChild(this.txtStrikes);
-
-      // Create Texts for each button
-      this.buttonTexts = {};
-      this.buttons.forEach(btn => {
-        const titleTxt = new PIXI.Text(btn.title, {
-          fontFamily: font,
-          fontSize: btn.sub ? 11 : 12,
-          fontWeight: 'bold',
-          fill: 0xffffff
-        });
-        titleTxt.anchor.set(0.5, 0);
-        titleTxt.position.set(btn.x + btn.w / 2, btn.y + (btn.sub ? 7 : 6));
-        this.textContainer.addChild(titleTxt);
-
-        let subTxt = null;
-        if (btn.sub) {
-          subTxt = new PIXI.Text(btn.sub, {
-            fontFamily: font,
-            fontSize: 9,
-            fontWeight: '600',
-            fill: btn.color
-          });
-          subTxt.anchor.set(0.5, 0);
-          subTxt.position.set(btn.x + btn.w / 2, btn.y + 26);
-          this.textContainer.addChild(subTxt);
-        }
-
-        this.buttonTexts[btn.id] = { title: titleTxt, sub: subTxt };
-      });
 
       // 3. Modal Layer Container (Placed on top of HUD)
       this.modalContainer = new PIXI.Container();
@@ -182,20 +151,39 @@
         this.txtTime.text = `⏱️ ${dName} D${dNum} (${timeStr})`;
       }
 
-      // Update Pause & Speed Button Labels
-      if (this.buttonTexts['pause']) {
-        this.buttonTexts['pause'].title.text = this.game.isPaused ? 'PLAY' : 'PAUSE';
-      }
-      if (this.buttonTexts['speed']) {
-        this.buttonTexts['speed'].title.text = (this.game.gameSpeed || 1) === 2 ? '2X' : '1X';
-      }
-      if (this.buttonTexts['audio'] && global.POWATER.soundManager) {
-        this.buttonTexts['audio'].title.text = global.POWATER.soundManager.muted ? 'MUTED' : 'AUDIO';
+      // Update Pause & Speed Button Labels if text elements exist
+      if (this.buttonTexts) {
+        if (this.buttonTexts['pause'] && this.buttonTexts['pause'].title) {
+          this.buttonTexts['pause'].title.text = this.game.isPaused ? 'PLAY' : 'PAUSE';
+        }
+        if (this.buttonTexts['speed'] && this.buttonTexts['speed'].title) {
+          this.buttonTexts['speed'].title.text = (this.game.gameSpeed || 1) === 2 ? '2X' : '1X';
+        }
+        if (this.buttonTexts['audio'] && this.buttonTexts['audio'].title && global.POWATER.soundManager) {
+          this.buttonTexts['audio'].title.text = global.POWATER.soundManager.muted ? 'MUTED' : 'AUDIO';
+        }
       }
     }
 
     update(dt, mouseX, mouseY, isMouseDown, wasMouseDown) {
       this.updateHUD();
+
+      // 0. Sync button positions from GDevelop scene objects if moved by user
+      if (this.game && this.game.runtimeScene && this.game.runtimeScene.getObjects) {
+        for (let i = 0; i < this.buttons.length; i++) {
+          const btn = this.buttons[i];
+          if (btn.objectName) {
+            const objs = this.game.runtimeScene.getObjects(btn.objectName);
+            if (objs && objs.length > 0) {
+              const obj = objs[0];
+              btn.x = obj.getX();
+              btn.y = obj.getY();
+              btn.w = obj.getWidth();
+              btn.h = obj.getHeight();
+            }
+          }
+        }
+      }
 
       const justClicked = isMouseDown && !wasMouseDown;
       let clickConsumed = false;
@@ -227,11 +215,11 @@
         clickConsumed = true;
       }
 
-      // 3. Render Top HUD & Bottom Toolbar
+      // 3. Render Top HUD & Button Selection Glows
       this.renderToolbarAndHUD(mouseX, mouseY);
 
       // Check if mouse is within Top HUD (y < 44) or Bottom Toolbar (y > 644)
-      const inUIZone = mouseY < 44 || (mouseY >= 646 && mouseX >= 220 && mouseX <= 975);
+      const inUIZone = mouseY < 44 || (mouseY >= 646 && mouseX >= 250 && mouseX <= 1010);
       return clickConsumed || inUIZone;
     }
 
@@ -336,61 +324,26 @@
         g.endFill();
       }
 
-      // --- BOTTOM TOOLBAR CONTAINER ---
-      const tbX = 220;
-      const tbY = 648;
-      const tbW = 754;
-      const tbH = 62;
-
-      // Outer Glow & Shadow Capsule
-      g.lineStyle(1.5, 0x48cae4, 0.35);
-      g.beginFill(0x120d24, 0.95);
-      g.drawRoundedRect(tbX, tbY, tbW, tbH, 12);
-      g.endFill();
-
-      // Divider vertical lines
-      g.lineStyle(1, 0xffffff, 0.15);
-      g.moveTo(464, tbY + 8);
-      g.lineTo(464, tbY + tbH - 8);
-      g.moveTo(628, tbY + 8);
-      g.lineTo(628, tbY + tbH - 8);
-
-      // Render Each Button as a Drawing
+      // --- RENDER ACTIVE & HOVER SELECTION GLOWS AROUND BUTTON SPRITES ---
       for (let i = 0; i < this.buttons.length; i++) {
         const btn = this.buttons[i];
         const isHovered = (this.hoveredButtonId === btn.id);
         const isActive = (btn.toolId && this.game.activeTool === btn.toolId) ||
                          (btn.buildId && this.game.activeTool === btn.buildId);
 
-        let fill = 0x1a1334;
-        let alpha = 0.85;
-        let border = 0x3d3060;
-        let borderW = 1.0;
-
         if (isActive) {
-          fill = 0x241d45;
-          alpha = 1.0;
-          border = btn.color || 0x00b4d8;
-          borderW = 2.5;
-        } else if (isHovered) {
-          fill = 0x2a2055;
-          alpha = 0.95;
-          border = 0x48cae4;
-          borderW = 1.5;
-        }
-
-        // Draw Button Box
-        g.lineStyle(borderW, border, 0.9);
-        g.beginFill(fill, alpha);
-        g.drawRoundedRect(btn.x, btn.y, btn.w, btn.h, 7);
-        g.endFill();
-
-        // Active Top Stripe
-        if (isActive) {
+          // Bright glowing outline around active tool
+          g.lineStyle(3.5, btn.color || 0x00b4d8, 1.0);
+          g.drawRoundedRect(btn.x - 2, btn.y - 2, btn.w + 4, btn.h + 4, 8);
+          // Highlight underlay
           g.lineStyle(0);
-          g.beginFill(btn.color || 0x00b4d8, 1.0);
-          g.drawRoundedRect(btn.x + 4, btn.y + 2, btn.w - 8, 3, 2);
+          g.beginFill(btn.color || 0x00b4d8, 0.18);
+          g.drawRoundedRect(btn.x, btn.y, btn.w, btn.h, 6);
           g.endFill();
+        } else if (isHovered) {
+          // Subtle glow on hover
+          g.lineStyle(2, 0x48cae4, 0.85);
+          g.drawRoundedRect(btn.x - 2, btn.y - 2, btn.w + 4, btn.h + 4, 8);
         }
       }
     }

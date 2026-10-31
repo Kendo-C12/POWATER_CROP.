@@ -159,19 +159,23 @@ async function runTest() {
     console.error('FAILED: House 1 did not receive power!');
   }
 
-  // Test clicking drawn WATER button at (344, 678)
-  console.log('Testing click on drawn WATER button at (344, 678)...');
-  await page.mouse.move(344, 678);
+  // Test clicking WATER button
+  const waterBtnPos = await page.evaluate(() => {
+    const btn = window.POWATER && window.POWATER.uiManager && window.POWATER.uiManager.buttons.find(b => b.id === 'water');
+    return btn ? { x: btn.x + btn.w / 2, y: btn.y + btn.h / 2 } : { x: 378, y: 682 };
+  });
+  console.log(`Testing click on WATER PNG button at (${waterBtnPos.x}, ${waterBtnPos.y})...`);
+  await page.mouse.move(waterBtnPos.x, waterBtnPos.y);
   await page.mouse.down();
   await new Promise(r => setTimeout(r, 80));
   await page.mouse.up();
   await new Promise(r => setTimeout(r, 100));
   const activeToolAfterClick = await page.evaluate(() => window.POWATER && window.POWATER.game && window.POWATER.game.activeTool);
-  console.log('Active tool after clicking drawn button:', activeToolAfterClick);
+  console.log('Active tool after clicking button:', activeToolAfterClick);
   if (activeToolAfterClick === 'water') {
-    console.log('PASSED: Drawn UI button click correctly selected clean water tool!');
+    console.log('PASSED: WATER button click correctly selected clean water tool!');
   } else {
-    console.error('FAILED: Drawn button click did not switch tool to water!');
+    console.error('FAILED: Button click did not switch tool to water!');
   }
 
   const screenshotPath = path.join(__dirname, '..', 'test_screenshot.png');

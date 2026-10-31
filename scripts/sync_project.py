@@ -16,6 +16,17 @@ assets = [
     ('Blue barrel.png', 'assets/Blue barrel.png'),
     ('Orange barrel.png', 'assets/Orange barrel.png'),
     ('AirFilter.png', 'assets/AirFilter.png'),
+    ('river.png', 'assets/river.png'),
+    ('btn_power.png', 'assets/btn_power.png'),
+    ('btn_water.png', 'assets/btn_water.png'),
+    ('btn_drain.png', 'assets/btn_drain.png'),
+    ('btn_solar.png', 'assets/btn_solar.png'),
+    ('btn_filter.png', 'assets/btn_filter.png'),
+    ('btn_pause.png', 'assets/btn_pause.png'),
+    ('btn_speed.png', 'assets/btn_speed.png'),
+    ('btn_upgrade.png', 'assets/btn_upgrade.png'),
+    ('btn_sdgs.png', 'assets/btn_sdgs.png'),
+    ('btn_guide.png', 'assets/btn_guide.png'),
 ]
 for name, file_path in assets:
     if name not in res_map:
@@ -91,7 +102,18 @@ buildings = [
     ('solar', 'Solar.png', 140, 140),
     ('water_pump', 'Blue barrel.png', 140, 140),
     ('waste_filter', 'Orange barrel.png', 140, 140),
-    ('air_filter', 'AirFilter.png', 140, 140)
+    ('air_filter', 'AirFilter.png', 140, 140),
+    ('river', 'river.png', 100, 720),
+    ('btn_power', 'btn_power.png', 128, 96),
+    ('btn_water', 'btn_water.png', 128, 96),
+    ('btn_drain', 'btn_drain.png', 128, 96),
+    ('btn_solar', 'btn_solar.png', 128, 96),
+    ('btn_filter', 'btn_filter.png', 128, 96),
+    ('btn_pause', 'btn_pause.png', 128, 96),
+    ('btn_speed', 'btn_speed.png', 128, 96),
+    ('btn_upgrade', 'btn_upgrade.png', 128, 96),
+    ('btn_sdgs', 'btn_sdgs.png', 128, 96),
+    ('btn_guide', 'btn_guide.png', 128, 96)
 ]
 
 for bname, bimg, bw, bh in buildings:
@@ -102,106 +124,135 @@ for bname, bimg, bw, bh in buildings:
 objects = [obj for obj in objects if obj.get('name') not in ['WirePainter', 'Water', 'Electricity']]
 layout['objects'] = objects
 
-# Populate Main screen layout with starting instances if empty, so the user sees everything in GDevelop editor
-if not layout.get('instances'):
-    layout['instances'] = [
-        {
-            'angle': 0,
-            'customSize': True,
-            'height': 56,
-            'layer': '',
-            'locked': False,
-            'name': 'generator',
-            'persistentUuid': 'inst-generator-starting',
-            'width': 56,
-            'x': 832,
-            'y': 242,
-            'zOrder': 4,
-            'numberProperties': [],
-            'stringProperties': [],
-            'initialVariables': []
-        },
-        {
-            'angle': 0,
-            'customSize': True,
-            'height': 56,
-            'layer': '',
-            'locked': False,
-            'name': 'water_pump',
-            'persistentUuid': 'inst-water-pump-starting',
-            'width': 56,
-            'x': 652,
-            'y': 242,
-            'zOrder': 4,
-            'numberProperties': [],
-            'stringProperties': [],
-            'initialVariables': []
-        },
-        {
-            'angle': 0,
-            'customSize': True,
-            'height': 56,
-            'layer': '',
-            'locked': False,
-            'name': 'waste_filter',
-            'persistentUuid': 'inst-waste-filter-starting',
-            'width': 56,
-            'x': 712,
-            'y': 442,
-            'zOrder': 4,
-            'numberProperties': [],
-            'stringProperties': [],
-            'initialVariables': []
-        },
-        {
-            'angle': 0,
-            'customSize': True,
-            'height': 56,
-            'layer': '',
-            'locked': False,
-            'name': 'house',
-            'persistentUuid': 'inst-house-bkk-north',
-            'width': 84,
-            'x': 818,
-            'y': 82,
-            'zOrder': 3,
-            'numberProperties': [],
-            'stringProperties': [],
-            'initialVariables': []
-        },
-        {
-            'angle': 0,
-            'customSize': True,
-            'height': 56,
-            'layer': '',
-            'locked': False,
-            'name': 'house',
-            'persistentUuid': 'inst-house-bkk-south',
-            'width': 84,
-            'x': 878,
-            'y': 432,
-            'zOrder': 3,
-            'numberProperties': [],
-            'stringProperties': [],
-            'initialVariables': []
-        },
-        {
-            'angle': 0,
-            'customSize': True,
-            'height': 56,
-            'layer': '',
-            'locked': False,
-            'name': 'house',
-            'persistentUuid': 'inst-house-thonburi',
-            'width': 84,
-            'x': 308,
-            'y': 292,
-            'zOrder': 3,
-            'numberProperties': [],
-            'stringProperties': [],
-            'initialVariables': []
-        }
-    ]
+# Populate Main screen layout with starting instances (River, Buildings, Houses, Button PNG Sprites)
+layout['instances'] = [
+    # 1. River Background (Running vertically down the center)
+    {
+        'angle': 0,
+        'customSize': True,
+        'height': 720,
+        'layer': '',
+        'locked': False,
+        'name': 'river',
+        'persistentUuid': 'inst-river-bg',
+        'width': 100,
+        'x': 580,
+        'y': 0,
+        'zOrder': 1,
+        'numberProperties': [],
+        'stringProperties': [],
+        'initialVariables': []
+    },
+    # 2. Starting Buildings
+    {
+        'angle': 0,
+        'customSize': True,
+        'height': 56,
+        'layer': '',
+        'locked': False,
+        'name': 'generator',
+        'persistentUuid': 'inst-generator-starting',
+        'width': 56,
+        'x': 832,
+        'y': 242,
+        'zOrder': 4,
+        'numberProperties': [],
+        'stringProperties': [],
+        'initialVariables': []
+    },
+    {
+        'angle': 0,
+        'customSize': True,
+        'height': 56,
+        'layer': '',
+        'locked': False,
+        'name': 'water_pump',
+        'persistentUuid': 'inst-water-pump-starting',
+        'width': 56,
+        'x': 652,
+        'y': 242,
+        'zOrder': 4,
+        'numberProperties': [],
+        'stringProperties': [],
+        'initialVariables': []
+    },
+    {
+        'angle': 0,
+        'customSize': True,
+        'height': 56,
+        'layer': '',
+        'locked': False,
+        'name': 'waste_filter',
+        'persistentUuid': 'inst-waste-filter-starting',
+        'width': 56,
+        'x': 712,
+        'y': 442,
+        'zOrder': 4,
+        'numberProperties': [],
+        'stringProperties': [],
+        'initialVariables': []
+    },
+    # 3. Starting Houses
+    {
+        'angle': 0,
+        'customSize': True,
+        'height': 56,
+        'layer': '',
+        'locked': False,
+        'name': 'house',
+        'persistentUuid': 'inst-house-bkk-north',
+        'width': 84,
+        'x': 818,
+        'y': 82,
+        'zOrder': 3,
+        'numberProperties': [],
+        'stringProperties': [],
+        'initialVariables': []
+    },
+    {
+        'angle': 0,
+        'customSize': True,
+        'height': 56,
+        'layer': '',
+        'locked': False,
+        'name': 'house',
+        'persistentUuid': 'inst-house-bkk-south',
+        'width': 84,
+        'x': 878,
+        'y': 432,
+        'zOrder': 3,
+        'numberProperties': [],
+        'stringProperties': [],
+        'initialVariables': []
+    },
+    {
+        'angle': 0,
+        'customSize': True,
+        'height': 56,
+        'layer': '',
+        'locked': False,
+        'name': 'house',
+        'persistentUuid': 'inst-house-thonburi',
+        'width': 84,
+        'x': 308,
+        'y': 292,
+        'zOrder': 3,
+        'numberProperties': [],
+        'stringProperties': [],
+        'initialVariables': []
+    },
+    # 4. Toolbar Button PNG Sprites (Centrally aligned along bottom)
+    { 'name': 'btn_power', 'x': 276, 'y': 658, 'width': 64, 'height': 48, 'zOrder': 10, 'persistentUuid': 'inst-btn-power', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
+    { 'name': 'btn_water', 'x': 346, 'y': 658, 'width': 64, 'height': 48, 'zOrder': 10, 'persistentUuid': 'inst-btn-water', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
+    { 'name': 'btn_drain', 'x': 416, 'y': 658, 'width': 64, 'height': 48, 'zOrder': 10, 'persistentUuid': 'inst-btn-drain', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
+    { 'name': 'btn_solar', 'x': 494, 'y': 658, 'width': 64, 'height': 48, 'zOrder': 10, 'persistentUuid': 'inst-btn-solar', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
+    { 'name': 'btn_filter', 'x': 564, 'y': 658, 'width': 64, 'height': 48, 'zOrder': 10, 'persistentUuid': 'inst-btn-filter', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
+    { 'name': 'btn_pause', 'x': 642, 'y': 658, 'width': 64, 'height': 48, 'zOrder': 10, 'persistentUuid': 'inst-btn-pause', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
+    { 'name': 'btn_speed', 'x': 712, 'y': 658, 'width': 64, 'height': 48, 'zOrder': 10, 'persistentUuid': 'inst-btn-speed', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
+    { 'name': 'btn_upgrade', 'x': 790, 'y': 658, 'width': 64, 'height': 48, 'zOrder': 10, 'persistentUuid': 'inst-btn-upgrade', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
+    { 'name': 'btn_sdgs', 'x': 860, 'y': 658, 'width': 64, 'height': 48, 'zOrder': 10, 'persistentUuid': 'inst-btn-sdgs', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
+    { 'name': 'btn_guide', 'x': 930, 'y': 658, 'width': 64, 'height': 48, 'zOrder': 10, 'persistentUuid': 'inst-btn-guide', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] }
+]
 
 for obj in objects:
     if obj.get('name') == 'house':
@@ -250,6 +301,11 @@ for obj in objects:
                 'type': 'boolean',
                 'value': False
             })
+
+# 2.1 Update usedResources for GDevelop ResourceLoader
+res_items = [{'name': r['name']} for r in project['resources']['resources']]
+project['usedResources'] = res_items
+layout['usedResources'] = res_items
 
 # 3. Concatenate modular scripts
 scripts_order = [
