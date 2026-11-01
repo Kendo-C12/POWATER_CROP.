@@ -27,10 +27,17 @@
       this.currentMouseY = 0;
       this.pulseTime = 0;
       this.lastTime = 0;
+      this.currentRuntimeScene = null;
+      this.currentSceneName = '';
     }
 
     init(runtimeScene) {
-      if (this.initialized) return;
+      this.reinitScene(runtimeScene);
+    }
+
+    reinitScene(runtimeScene) {
+      this.currentRuntimeScene = runtimeScene;
+      this.currentSceneName = runtimeScene ? runtimeScene.getName() : 'Main';
 
       // 1. Initialize Audio Engine
       if (!global.POWATER.soundManager) {
@@ -39,20 +46,32 @@
       }
 
       // 2. Initialize Core Simulation Engine
-      this.game = new global.POWATER.GameEngine();
+      if (!this.game) {
+        this.game = new global.POWATER.GameEngine();
+      }
       this.game.setRuntimeScene(runtimeScene);
       global.POWATER.game = this.game;
 
       // 3. Initialize UI Overlay & Modals
-      this.ui = new global.POWATER.UIManager(this.game);
+      if (!this.ui) {
+        this.ui = new global.POWATER.UIManager(this.game);
+      } else {
+        this.ui.game = this.game;
+      }
       global.POWATER.uiManager = this.ui;
       this.ui.init();
 
       // 4. Initialize PixiJS Graphics & Drawing UI Layers
       this.setupPixiLayers(runtimeScene);
 
-      // 5. Start Demo City Level (Bangkok)
-      this.game.startLevel(0);
+      // 5. Detect and Start Level matching Scene Name
+      const sName = this.currentSceneName.toLowerCase();
+      let levelIdx = 0;
+      if (sName.includes('venice')) levelIdx = 1;
+      else if (sName.includes('tokyo')) levelIdx = 2;
+      else if (sName.includes('endless') || sName.includes('metropolis')) levelIdx = 3;
+
+      this.game.startLevel(levelIdx);
       this.ui.showLevelBriefing(this.game.currentLevel);
 
       this.initialized = true;
@@ -117,8 +136,9 @@
     }
 
     update(runtimeScene) {
-      if (!this.initialized) {
-        this.init(runtimeScene);
+      const currentName = runtimeScene ? runtimeScene.getName() : 'Main';
+      if (!this.initialized || this.currentRuntimeScene !== runtimeScene || this.currentSceneName !== currentName) {
+        this.reinitScene(runtimeScene);
       }
 
       const now = performance.now();

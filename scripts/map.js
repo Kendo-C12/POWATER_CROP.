@@ -47,6 +47,20 @@
       return null;
     }
 
+    getRiverDefaultX() {
+      const id = (this.level && this.level.id) ? this.level.id.toLowerCase() : '';
+      if (id === 'venice') return 420;
+      if (id === 'tokyo') return 460;
+      return 490;
+    }
+
+    getRiverDefaultWidth() {
+      const id = (this.level && this.level.id) ? this.level.id.toLowerCase() : '';
+      if (id === 'venice') return 400;
+      if (id === 'tokyo') return 240;
+      return 280;
+    }
+
     get riverWidth() {
       return this.getRiverWidth();
     }
@@ -57,21 +71,22 @@
 
     getRiverWidth() {
       const riverObj = this.getRiverObject();
+      const defW = this.getRiverDefaultWidth();
       if (riverObj) {
-        // Base width is 100 on a 280px sprite
-        return (this._riverWidth || 100) * (riverObj.getWidth() / 280);
+        return (this._riverWidth || 100) * (riverObj.getWidth() / defW);
       }
       return this._riverWidth || 100;
     }
 
     getRiverCenterAtY(y) {
       const riverObj = this.getRiverObject();
+      const defX = this.getRiverDefaultX();
+      const defW = this.getRiverDefaultWidth();
       let shiftX = 0;
       let scaleX = 1.0;
       if (riverObj) {
-        // Default placement is x: 490, width: 280
-        shiftX = riverObj.getX() - 490;
-        scaleX = riverObj.getWidth() / 280;
+        shiftX = riverObj.getX() - defX;
+        scaleX = riverObj.getWidth() / defW;
       }
 
       const pts = this.riverPath;
@@ -84,13 +99,13 @@
             // Smooth cosine spline matching the visual river curve in river.png
             const smoothFrac = (1 - Math.cos(frac * Math.PI)) / 2;
             const baseX = p1.x + (p2.x - p1.x) * smoothFrac;
-            const localX = (baseX - 490) * scaleX;
-            return 490 + shiftX + localX;
+            const localX = (baseX - defX) * scaleX;
+            return defX + shiftX + localX;
           }
         }
-        return (pts[0].x - 490) * scaleX + 490 + shiftX;
+        return (pts[0].x - defX) * scaleX + defX + shiftX;
       }
-      return 610 + shiftX;
+      return (defX + defW / 2) + shiftX;
     }
 
     isPointInRiver(x, y) {

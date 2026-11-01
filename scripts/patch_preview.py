@@ -129,6 +129,9 @@ gdjs.MainCode.func = function(runtimeScene) {{
 }};
 
 gdjs['MainCode'] = gdjs.MainCode;
+gdjs['VeniceCode'] = gdjs.MainCode;
+gdjs['TokyoCode'] = gdjs.MainCode;
+gdjs['EndlessCode'] = gdjs.MainCode;
 '''
 
 with open(code0_path, 'w', encoding='utf-8') as f:

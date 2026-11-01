@@ -62,13 +62,17 @@
         { id: 'speed', objectName: 'btn_speed', type: 'action', action: 'toggleSpeed', x: 712, y: tbY, w: tbW, h: tbH, color: 0xadb5bd },
         { id: 'upgrades', objectName: 'btn_upgrade', type: 'action', action: 'openUpgrades', x: 790, y: tbY, w: tbW, h: tbH, color: 0xffd166 },
         { id: 'sdgs', objectName: 'btn_sdgs', type: 'action', action: 'openSdgs', x: 860, y: tbY, w: tbW, h: tbH, color: 0x00b4d8 },
-        { id: 'guide', objectName: 'btn_guide', type: 'action', action: 'openGuide', x: 930, y: tbY, w: tbW, h: tbH, color: 0x48cae4 }
+        { id: 'guide', objectName: 'btn_guide', type: 'action', action: 'openGuide', x: 930, y: tbY, w: tbW, h: tbH, color: 0x48cae4 },
+        { id: 'logo', type: 'action', action: 'openGuide', x: 10, y: 6, w: 210, h: 32 }
       ];
     }
 
     setupPixi(container) {
       if (!container) return;
       this.container = container;
+      if (typeof container.removeChildren === 'function') {
+        container.removeChildren();
+      }
 
       // 1. Base Graphics Layer for Top HUD and Button Selection Glows
       this.gfx = new PIXI.Graphics();
@@ -130,6 +134,10 @@
       if (!this.game) return;
 
       // Update Top HUD Texts
+      if (this.txtLogo) {
+        const lvlName = this.game.currentLevel ? (this.game.currentLevel.name || 'Bangkok').split(',')[0] : 'POWATER';
+        this.txtLogo.text = `⚡ ${lvlName.toUpperCase()}`;
+      }
       if (this.txtMoney) {
         this.txtMoney.text = `💰 $${Math.floor(this.game.money)}`;
       }
@@ -484,33 +492,70 @@
     renderBriefingContent(mx, my, mw, mh, mouseX, mouseY) {
       const font = 'system-ui, -apple-system, Segoe UI, Roboto, sans-serif';
       const lvl = this.modalData.level || this.game.currentLevel || {};
+      const curLvlIdx = this.game ? (this.game.levelIndex || 0) : 0;
 
-      const title = new PIXI.Text(`📋 ภารกิจ: ${lvl.thaiName || 'กรุงเทพมหานคร'}`, {
+      const title = new PIXI.Text(`📋 เลือกระดับและภารกิจ (LEVEL SELECTION & BRIEFING)`, {
         fontFamily: font, fontSize: 16, fontWeight: 'bold', fill: 0x00b4d8
       });
       title.position.set(mx + 20, my + 15);
       this.modalTextContainer.addChild(title);
 
+      // Level Tabs (4 selectable levels across the top)
+      const levelTabs = [
+        { name: '1. Bangkok', idx: 0 },
+        { name: '2. Venice', idx: 1 },
+        { name: '3. Tokyo', idx: 2 },
+        { name: '4. Endless', idx: 3 }
+      ];
+
+      const tabW = (mw - 40 - (levelTabs.length - 1) * 8) / levelTabs.length;
+      const tabH = 32;
+      const tabY = my + 56;
+
+      for (let i = 0; i < levelTabs.length; i++) {
+        const lt = levelTabs[i];
+        const tabX = mx + 20 + i * (tabW + 8);
+        const isSelected = (curLvlIdx === lt.idx);
+        const isHover = (mouseX >= tabX && mouseX <= tabX + tabW && mouseY >= tabY && mouseY <= tabY + tabH);
+
+        this.modalButtons.push({ id: `select_level_${lt.idx}`, x: tabX, y: tabY, w: tabW, h: tabH });
+
+        this.modalGfx.lineStyle(1.5, isSelected ? 0x00b4d8 : (isHover ? 0x48cae4 : 0x3d3460), isSelected ? 1.0 : 0.6);
+        this.modalGfx.beginFill(isSelected ? 0x0077b6 : (isHover ? 0x221a44 : 0x181232), 0.95);
+        this.modalGfx.drawRoundedRect(tabX, tabY, tabW, tabH, 6);
+        this.modalGfx.endFill();
+
+        const tabTxt = new PIXI.Text(lt.name, {
+          fontFamily: font,
+          fontSize: 12,
+          fontWeight: isSelected ? 'bold' : 'normal',
+          fill: isSelected ? 0xffffff : (isHover ? 0x90e0ef : 0xadb5bd)
+        });
+        tabTxt.anchor.set(0.5);
+        tabTxt.position.set(tabX + tabW / 2, tabY + tabH / 2);
+        this.modalTextContainer.addChild(tabTxt);
+      }
+
+      // Mission Info for the selected level
       const briefingTxt = new PIXI.Text(
-        `ยินดีต้อนรับสู่ ${lvl.name || 'Bangkok'}!\n\n` +
-        `• แม่น้ำเจ้าพระยาแบ่งเมืองออกเป็นสองฝั่ง\n` +
-        `• ลากสายไฟ (สีเหลือง) จากโรงไฟฟ้าหรือโซล่าร์ไปยังบ้านประชาชน\n` +
-        `• ลากท่อน้ำดี (สีฟ้า) จากเครื่องสูบน้ำริมแม่น้ำไปยังบ้าน\n` +
-        `• เมื่อบ้านได้รับน้ำ จะเกิดน้ำเสียขึ้นมา! ลากท่อระบายน้ำ (สีม่วง) ไประบายที่ท่อบำบัดริมน้ำ\n` +
-        `• ควบคุมมลภาวะไม่ให้เกินเกณฑ์ (${lvl.maxPollution || 5.0}) และดูแลไม่ให้เกิดการประท้วง!\n\n` +
-        `Amigo Quote: "Ciao! Connect utilities freely across the river and from house to house!"`,
+        `📍 ${lvl.thaiName || 'เมืองเป้าหมาย'}\n\n` +
+        `• ${lvl.briefing || 'เชื่อมต่อสายไฟและท่อน้ำดีไปยังบ้านเรือนเพื่อความสุขของประชาชน'}\n\n` +
+        `• แม่น้ำประจำเมือง: ${lvl.riverName || 'แม่น้ำหลัก'}\n` +
+        `• งบประมาณเริ่มต้น: $${lvl.startingBudget || 120}  |  เกณฑ์มลภาวะสูงสุด: ${lvl.maxPollution || 5.0}\n` +
+        `• เป้าหมาย: ให้บริการบ้านครบ ${lvl.targetHousesServed || 12} หลัง  |  ระยะเวลา: ${lvl.goalDays || 7} วัน\n\n` +
+        `Amigo Quote: "${lvl.amigoQuote || 'Connect utilities freely across the river!'}"`,
         { fontFamily: font, fontSize: 13, fill: 0xe9ecef, wordWrap: true, wordWrapWidth: mw - 50, lineHeight: 22 }
       );
-      briefingTxt.position.set(mx + 25, my + 75);
+      briefingTxt.position.set(mx + 25, my + 102);
       this.modalTextContainer.addChild(briefingTxt);
 
       // Start Button
-      const startBtn = { id: 'btn_start', x: mx + mw / 2 - 90, y: my + mh - 65, w: 180, h: 42 };
+      const startBtn = { id: 'btn_start', x: mx + mw / 2 - 90, y: my + mh - 60, w: 180, h: 42 };
       this.modalButtons.push(startBtn);
-      const isHover = (mouseX >= startBtn.x && mouseX <= startBtn.x + startBtn.w && mouseY >= startBtn.y && mouseY <= startBtn.y + startBtn.h);
+      const isStartHover = (mouseX >= startBtn.x && mouseX <= startBtn.x + startBtn.w && mouseY >= startBtn.y && mouseY <= startBtn.y + startBtn.h);
 
       this.modalGfx.lineStyle(2, 0x00b4d8, 1.0);
-      this.modalGfx.beginFill(isHover ? 0x0096c7 : 0x00b4d8, 1.0);
+      this.modalGfx.beginFill(isStartHover ? 0x0096c7 : 0x00b4d8, 1.0);
       this.modalGfx.drawRoundedRect(startBtn.x, startBtn.y, startBtn.w, startBtn.h, 8);
       this.modalGfx.endFill();
 
@@ -699,8 +744,9 @@
       title.position.set(mx + 20, my + 15);
       this.modalTextContainer.addChild(title);
 
+      const curLvl = this.game.currentLevel ? (this.game.currentLevel.name || 'Bangkok') : 'City';
       const msg = new PIXI.Text(
-        `ยอดเยี่ยมมาก! คุณบริหารเมืองครบเป้าหมายอย่างยั่งยืน\n\n` +
+        `ยอดเยี่ยมมาก! คุณบริหาร ${curLvl} ครบเป้าหมายอย่างยั่งยืน\n\n` +
         `• ประชาชนเข้าถึงน้ำสะอาดและไฟฟ้า 100%\n` +
         `• ควบคุมมลภาวะต่ำกว่าเกณฑ์ตลอดระยะเวลา\n` +
         `• ตอบสนองเป้าหมาย SDGs 6, 7, 11 และ 13 ได้อย่างสมบูรณ์แบบ!`,
@@ -709,7 +755,25 @@
       msg.position.set(mx + 25, my + 90);
       this.modalTextContainer.addChild(msg);
 
-      const contBtn = { id: 'btn_cont', x: mx + mw / 2 - 90, y: my + mh - 70, w: 180, h: 42 };
+      // Button 1: Next Level
+      const nextBtn = { id: 'btn_next_level', x: mx + mw / 2 - 185, y: my + mh - 70, w: 175, h: 42 };
+      this.modalButtons.push(nextBtn);
+      const isNextHover = (mouseX >= nextBtn.x && mouseX <= nextBtn.x + nextBtn.w && mouseY >= nextBtn.y && mouseY <= nextBtn.y + nextBtn.h);
+
+      this.modalGfx.lineStyle(2, 0x00b4d8, 1.0);
+      this.modalGfx.beginFill(isNextHover ? 0x0096c7 : 0x0077b6, 1.0);
+      this.modalGfx.drawRoundedRect(nextBtn.x, nextBtn.y, nextBtn.w, nextBtn.h, 8);
+      this.modalGfx.endFill();
+
+      const nextTxt = new PIXI.Text('ด่านถัดไป (NEXT LEVEL)', {
+        fontFamily: font, fontSize: 13, fontWeight: 'bold', fill: 0xffffff
+      });
+      nextTxt.anchor.set(0.5);
+      nextTxt.position.set(nextBtn.x + nextBtn.w / 2, nextBtn.y + nextBtn.h / 2);
+      this.modalTextContainer.addChild(nextTxt);
+
+      // Button 2: Continue Free Play
+      const contBtn = { id: 'btn_cont', x: mx + mw / 2 + 10, y: my + mh - 70, w: 175, h: 42 };
       this.modalButtons.push(contBtn);
       const isHover = (mouseX >= contBtn.x && mouseX <= contBtn.x + contBtn.w && mouseY >= contBtn.y && mouseY <= contBtn.y + contBtn.h);
 
@@ -739,9 +803,41 @@
             return;
           }
 
+          if (btn.id && btn.id.startsWith('select_level_')) {
+            const idx = parseInt(btn.id.replace('select_level_', ''), 10);
+            this.closeModal();
+            const sceneNames = ['Main', 'Venice', 'Tokyo', 'Endless'];
+            const targetScene = sceneNames[idx] || 'Main';
+            if (this.game && this.game.runtimeScene && this.game.runtimeScene.getGame) {
+              const sceneStack = this.game.runtimeScene.getGame().getSceneStack();
+              if (sceneStack && typeof sceneStack.replace === 'function') {
+                sceneStack.replace(targetScene, true);
+                return;
+              }
+            }
+            if (this.game) this.game.startLevel(idx);
+            return;
+          }
+
+          if (btn.id === 'btn_next_level') {
+            this.closeModal();
+            const nextLvl = ((this.game.levelIndex || 0) + 1) % 4;
+            const sceneNames = ['Main', 'Venice', 'Tokyo', 'Endless'];
+            const targetScene = sceneNames[nextLvl] || 'Main';
+            if (this.game && this.game.runtimeScene && this.game.runtimeScene.getGame) {
+              const sceneStack = this.game.runtimeScene.getGame().getSceneStack();
+              if (sceneStack && typeof sceneStack.replace === 'function') {
+                sceneStack.replace(targetScene, true);
+                return;
+              }
+            }
+            if (this.game) this.game.startLevel(nextLvl);
+            return;
+          }
+
           if (btn.id === 'btn_restart') {
             this.closeModal();
-            if (this.game) this.game.startLevel(this.game.currentLevelIndex || 0);
+            if (this.game) this.game.startLevel(this.game.levelIndex || 0);
             return;
           }
 
