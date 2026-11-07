@@ -1,32 +1,74 @@
-// POWATER CORP. - Configuration, Levels, Upgrades & SDG Data
-// Follows the design specifications from Team Green Gang and Pre18-10
+// POWATER CORP. v1.0.0.0 - Configuration, Levels, Disasters, Special Items, Upgrades & SDG Data
+// Implements full specifications from "POWATER IDEA PITCH.pdf" & "POWATER CORP.pdf" (b1.5 -> v1.0 Upgrade)
 
 (function (global) {
   'use strict';
 
   const CONFIG = {
+    VERSION: '1.0.0.0',
     CANVAS_WIDTH: 1280,
     CANVAS_HEIGHT: 720,
     GRID_SIZE: 32,
 
-    // Core Game Mechanics
-    MAX_COMPLAINTS: 3, // 3 complaints = Game Over
+    // Core Game Mechanics (POWATER CORP.pdf)
+    MAX_COMPLAINTS: 3, // Default: 3 complaints = Game Over (Amsterdam overrides to 1)
     STRIKE_TIMER_SECONDS: 27, // 27 seconds unsupplied = complaint
-    GRACE_PERIOD_SECONDS: 120, // 2-minute preparation grace period
+    GRACE_PERIOD_SECONDS: 120, // 2-minute Protecting Time / Grace Period
     POLLUTION_START_DELAY_SECONDS: 180, // Pollution starts after 3 minutes (180s)
-    POLLUTION_WARN_THRESHOLD: 0.8, // 80% of max triggers warning
+    POLLUTION_WARN_THRESHOLD: 0.8,
 
-    // Revenue & Costs
-    REVENUE_PER_HAPPY_HOUSE_SEC: 2.0, // Fully supplied house generates $2/s
-    MIN_HOUSE_DISTANCE: 160, // Minimum distance between houses (plenty of breathing room)
+    // Win Condition (POWATER CORP.pdf: บ้าน > 15 หลังมีน้ำและไฟใช้ตลอดเวลาเป็นเวลา 5-7 นาที)
+    WIN_REQUIRED_HOUSES: 15, // > 15 houses (15+ complete houses)
+    WIN_HOLD_DURATION_SECONDS: 300, // 5 minutes (300s); pauses on Repair/Disaster, resets on Complaint
+
+    // Economy (POWATER CORP.pdf: ทำให้บ้าน complete - 50 ทันที, [จำนวน บ้านที่ complete]*40/ต่อสัปดาห์)
+    HOUSE_COMPLETE_BONUS: 50, // Instant +50 when a house becomes complete for the first time
+    WEEKLY_REVENUE_PER_COMPLETE_HOUSE: 40, // +40 per completed house every week (7 days)
+    REVENUE_PER_HAPPY_HOUSE_SEC: 0.8, // Small continuous operational trickle
+    MIN_HOUSE_DISTANCE: 135,
+
+    // New Systems (POWATER CORP.pdf)
+    REPAIR_CHECK_INTERVAL_SECONDS: 120, // Every 2 minutes (120s)
+    REPAIR_BREAKDOWN_CHANCE: 0.30, // 30% chance for pump/equipment to break down
+    DAY_DURATION_SECONDS: 60, // Day 1 minute (60s)
+    NIGHT_DURATION_SECONDS: 60, // Night 1 minute (60s)
+    UPSIZE_BASE_HOUSES: 10, // Upsize every x+10 houses (10, 20, 30, 40)
+    UPSIZE_STEP_HOUSES: 10,
+    MAX_HOUSES_CAP: 40, // Capped at 40 houses max
+
+    // Special Items (POWATER CORP.pdf: Rome Candles & Amsterdam Emergency Flood Pump)
+    SPECIAL_ITEMS: {
+      CANDLE_PACKS: [
+        { id: 'candle_20', cost: 20, boxes: 2, label: 'Bulk 20€ (2 กล่อง)' },
+        { id: 'candle_50', cost: 50, boxes: 5, label: 'Bulk 50€ (5 กล่อง)' },
+        { id: 'candle_100', cost: 100, boxes: 10, label: 'Bulk 100€ (10 กล่อง)' },
+        { id: 'candle_500', cost: 500, boxes: 50, label: 'Bulk 500€ (50 กล่อง)' }
+      ],
+      CANDLE_BOX_UNIT_PRICE: 10,
+      FLOOD_PUMP: {
+        id: 'flood_pump',
+        name: 'เครื่องสูบน้ำฉุกเฉิน (Emergency Flood Pump)',
+        cost: 500,
+        desc: '500 EUR | One-Time Use: สูบน้ำท่วมออกจากเมืองทันที (ด่าน Amsterdam)'
+      }
+    },
+
+    // Future Feature Plan Roadmap (POWATER CORP.pdf)
+    ROADMAP: [
+      { version: 'v1.0.0.0', title: 'Global Launch Update', desc: '4 เมืองหลัก (Bangkok, Tokyo, Rome, Amsterdam), ระบบซ่อมบำรุง (Repair), กลางวัน/กลางคืน, ขยายแมพ (Upsize 40 หลัง) และภัยพิบัติสุดขั้ว' },
+      { version: 'v1.1.0.0', title: 'Seasonal Update (ฤดูกาล)', desc: 'ระบบฤดูกาลทั้ง 4 ที่ส่งผลต่อปริมาณน้ำฝน พลังงานแสงอาทิตย์ และความต้องการใช้ไฟฟ้าตามฤดูกาล' },
+      { version: 'v1.2.0.0', title: 'Save The World Update', desc: 'เพิ่มเมืองใหม่ และระบบปลูกป่าไม้ (Forestry System) เพื่อดูดซับคาร์บอนตามธรรมชาติ' },
+      { version: 'v1.3.0.0', title: 'Monopoly Update', desc: 'เพิ่มระบบ Gacha [ตัวละครผู้ช่วย/วิศวกรเฉพาะทาง] และ In-App Purchase เพิ่มความหมายของ In-Game Currency' },
+      { version: 'v1.4.0.0', title: 'MMD (Man Made Disaster) Update', desc: 'รับมือภัยพิบัติจากมนุษย์ เช่น ไฟไหม้เมือง (Urban Fire), ภาวะโลกร้อน (Global Warming) และวิกฤตมลพิษอุตสาหกรรม' }
+    ],
 
     POLLUTION_RATES: {
-      ELECTRIC_GENERATOR: 0.3, // Coal generator = +0.3/s
-      AIR_FILTER_REDUCTION: 0.2, // Air filter = -0.2/s
-      WASTEWATER_DISCHARGE_PER_HOUSE: 0.05, // Discharged wastewater = +0.05/s per house
-      WASTEWATER_OUTLET_BASE: 0.05, // Base outlet pollution
-      UNTREATED_SEWAGE_PER_HOUSE: 0.15, // Overflowing untreated sewage = +0.15/s per house
-      NATURAL_DILUTION: 0.01 // River natural cleaning rate
+      ELECTRIC_GENERATOR: 0.3,
+      AIR_FILTER_REDUCTION: 0.2,
+      WASTEWATER_DISCHARGE_PER_HOUSE: 0.05,
+      WASTEWATER_OUTLET_BASE: 0.05,
+      UNTREATED_SEWAGE_PER_HOUSE: 0.15,
+      NATURAL_DILUTION: 0.01
     },
 
     BUILDINGS: {
@@ -34,12 +76,13 @@
         id: 'gen_coal',
         objectName: 'generator',
         name: 'Electricity Generator',
-        thaiName: 'โรงไฟฟ้ามาตรฐาน (ตัวปั่นไฟ)',
+        thaiName: 'โรงปั่นไฟมาตรฐาน',
         type: 'generator',
         cost: 30,
         capacity: Infinity,
         pollutionRate: 0.3,
         clean: false,
+        canBreakDown: true,
         color: '#ffb703',
         icon: '⚡',
         width: 56,
@@ -49,66 +92,71 @@
       GENERATOR_SOLAR: {
         id: 'gen_solar',
         objectName: 'solar',
-        name: 'Solar Power Plant',
-        thaiName: 'โรงไฟฟ้าพลังงานแสงอาทิตย์',
+        name: 'Solar Cell Plant',
+        thaiName: 'โรงไฟฟ้าพลังงานแสงอาทิตย์ (Solar Cell)',
         type: 'generator',
         cost: 60,
         capacity: Infinity,
         pollutionRate: 0.0,
         clean: true,
+        canBreakDown: true,
         color: '#ffd166',
         icon: '☀️',
         width: 56,
         height: 56,
-        desc: 'พลังงานสะอาด 0% มลภาวะ ไม่เพิ่มมลพิษจากการใช้ไฟ (SDG 7)'
+        desc: 'พลังงานสะอาด 0% มลภาวะ (ด่าน Tokyo ลดราคา 25% เหลือ $45)'
       },
       WATER_PUMP: {
         id: 'water_pump',
         objectName: 'water_pump',
         name: 'Water Pump',
-        thaiName: 'สถานีสูบน้ำ',
+        thaiName: 'เครื่องปั๊มน้ำสะอาด',
         type: 'water_pump',
         cost: 30,
         capacity: 15,
         pollutionRate: 0.0,
         mustBeNearWater: true,
+        canBreakDown: true,
         color: '#00b4d8',
         icon: '💧',
         width: 56,
         height: 56,
-        desc: 'สูบน้ำสะอาดได้ 15 หลังคาเรือน (ต้องวางริมแม่น้ำ)'
+        desc: 'สูบน้ำสะอาดได้ 15 หลังคาเรือน (มีโอกาส 30% ที่จะเสียทุกๆ 2 นาที ต้องกดซ่อม)'
       },
       WASTE_FILTER: {
         id: 'waste_filter',
         objectName: 'waste_filter',
-        name: 'Wastewater Outlet Facility',
-        thaiName: 'จุดปล่อยน้ำเสีย (ริมแม่น้ำ)',
+        name: 'Wastewater Dump & Filter',
+        thaiName: 'จุดปล่อยและกรองน้ำเสียริมแม่น้ำ',
         type: 'waste_filter',
         cost: 40,
-        capacity: 10,
+        capacity: 12,
         pollutionRate: 0.05,
         mustBeNearWater: true,
+        canBreakDown: true,
         color: '#7209b7',
         icon: '🧪',
         width: 56,
         height: 56,
-        desc: 'จุดปล่อยและระบายน้ำเสียริมแม่น้ำ ลากท่อระบายน้ำจากบ้านมาปล่อยที่นี่ (SDG 6)'
+        desc: 'จุดระบายน้ำเสียริมแม่น้ำ ลากท่อน้ำเสียจากบ้านมาปล่อยที่นี่ (SDG 6)'
       },
       AIR_FILTER: {
         id: 'air_filter',
         objectName: 'air_filter',
-        name: 'Air Filter Facility',
-        thaiName: 'เครื่องฟอกอากาศ (AirFilter)',
+        name: 'River & Eco Filter',
+        thaiName: 'เครื่องกรองมลภาวะ (Filter)',
         type: 'air_filter',
         cost: 40,
         capacity: 0,
         pollutionReductionRate: 0.2,
+        clean: true,
         mustBeNearWater: false,
+        canBreakDown: false,
         color: '#2ec4b6',
         icon: '🍃',
         width: 56,
         height: 56,
-        desc: 'เครื่องฟอกอากาศ ช่วยดูดซับมลพิษในเมือง ลดมลภาวะ -0.2 หน่วย/วินาที (SDG 11 & 13)'
+        desc: 'ช่วยดูดซับและบำบัดมลภาวะในเมืองและแม่น้ำ ลดมลภาวะ -0.2 หน่วย/วินาที'
       }
     },
 
@@ -117,7 +165,7 @@
         id: 'power',
         name: 'Power Line',
         thaiName: 'สายไฟฟ้า',
-        cost: 0, // Free
+        cost: 0,
         color: '#ffb703',
         glowColor: '#ffd166',
         lineWidth: 3,
@@ -127,7 +175,7 @@
         id: 'water',
         name: 'Clean Water Pipe',
         thaiName: 'ท่อน้ำดี',
-        cost: 0, // Free
+        cost: 0,
         color: '#00b4d8',
         glowColor: '#90e0ef',
         lineWidth: 3,
@@ -136,8 +184,8 @@
       SEWAGE: {
         id: 'sewage',
         name: 'Wastewater Pipe',
-        thaiName: 'ท่อระบายน้ำ',
-        cost: 0, // Free
+        thaiName: 'ท่อระบายน้ำเสีย',
+        cost: 0,
         color: '#9d4edd',
         glowColor: '#c77dff',
         lineWidth: 3,
@@ -148,9 +196,9 @@
     UPGRADES: {
       ELECTRICITY_CAPACITY: {
         id: 'elec_cap',
-        name: 'ELECTRICITY +20%',
+        name: 'ELECTRICITY +20% FASTER',
         thaiName: 'ประสิทธิภาพไฟฟ้า +20%',
-        desc: '+20% Generator transmission efficiency & capacity',
+        desc: '+20% Generator transmission efficiency & reliability',
         icon: '⚡',
         baseCost: 10,
         costMult: 1.8,
@@ -161,7 +209,7 @@
         id: 'poll_red',
         name: 'POLLUTION -5%',
         thaiName: 'ลดมลภาวะ -5%',
-        desc: '-5% to all pollution emissions & higher filter rate',
+        desc: '-5% to all pollution emissions (Max Lv. 10)',
         icon: '☢️',
         baseCost: 100,
         costMult: 1.5,
@@ -170,9 +218,9 @@
       },
       WATER_PUMP_CAPACITY: {
         id: 'water_cap',
-        name: 'WATER PUMP +20%',
+        name: 'WATER PUMP +20% FASTER',
         thaiName: 'ปั๊มน้ำแรงดันสูง +20%',
-        desc: '+20% Water Pump volume & range',
+        desc: '+20% Water Pump volume & capacity (Max Lv. 5)',
         icon: '💧',
         baseCost: 10,
         costMult: 1.8,
@@ -181,21 +229,33 @@
       }
     },
 
+    // v1.0 - 4 Levels (Bangkok, Tokyo, Rome, Amsterdam) per POWATER CORP.pdf
     LEVELS: [
       {
         id: 'bangkok',
-        name: 'Bangkok, Thailand',
-        thaiName: 'กรุงเทพมหานคร (แมพตัวอย่าง)',
-        briefing: 'ยินดีต้อนรับสู่กรุงเทพมหานคร! แม่น้ำเจ้าพระยาแบ่งฝั่งกรุงเทพและฝั่งธนบุรี สามารถเชื่อมต่อสายไฟ ท่อน้ำดี และท่อระบายน้ำข้ามแม่น้ำและพ่วงจากบ้านสู่บ้านได้อย่างอิสระ! เมื่อบ้านใช้น้ำจะเกิดน้ำเสียขึ้นมา ลากท่อระบายน้ำไปบำบัดริมน้ำเพื่อลดมลภาวะ!',
-        amigoQuote: 'Ciao! I am Amigo. Connect electricity, clean water, and wastewater pipes freely across the river and from house to house. Keep complaints at zero and maintain low pollution!',
+        sceneName: 'Main',
+        name: '1. Bangkok, Thailand',
+        thaiName: 'ด่าน 1: กรุงเทพมหานคร (Tutorial & High Tide)',
+        briefing: 'Condition: (0) ไม่มี เป็นด่านแรกและ Tutorial\nExtreme Weather: น้ำขึ้น (High Tide) - ทุกๆ 15 วันในเกมจะเกิดปรากฏการณ์น้ำขึ้น ทำให้อุปกรณ์ใกล้แหล่งน้ำต้องการการซ่อมแซมบ่อยขึ้น!\nเป้าหมายชนะ: มีบ้านครบ > 15 หลังที่มีน้ำและไฟใช้ตลอดเวลาต่อเนื่อง 5 นาที!',
+        conditionPlus: 'ไม่มีเงื่อนไขลบ (ด่านเริ่มต้นและฝึกสอน Tutorial)',
+        conditionMinus: 'Extreme Weather: น้ำขึ้นทุกๆ 15 วัน ทำให้อุปกรณ์ริมแม่น้ำเสียและต้องกดซ่อมบ่อยขึ้น',
+        amigoQuote: 'Ciao! I am Amigo TheGOATHimself. Complete each house for an instant +$50 and +$40/week! Watch out for High Tide every 15 days and repair any broken pumps!',
         riverName: 'Chao Phraya River (แม่น้ำเจ้าพระยา)',
         leftSideLabel: 'ฝั่งธนบุรี (Thonburi)',
         rightSideLabel: 'ฝั่งกรุงเทพ (Bangkok)',
-        startingBudget: 120,
-        maxPollution: 5.0,
-        goalDays: 7,
-        targetHousesServed: 12,
-        spawnInterval: 30000,
+        startingBudget: 150,
+        maxPollution: 6.0,
+        maxComplaints: 3,
+        goalDays: 15,
+        targetHousesServed: 15,
+        spawnInterval: 18000,
+        cleanEnergyDiscount: 0.0,
+        buildCostDiscount: 0.0,
+        unlimitedWaterChain: false,
+        hasHighTide: true,
+        hasEarthquake: false,
+        hasBlackout: false,
+        hasFlood: false,
         riverPath: [
           { x: 610, y: 0 },
           { x: 650, y: 180 },
@@ -206,19 +266,63 @@
         riverWidth: 100
       },
       {
-        id: 'venice',
-        name: 'Venice, Italy',
-        thaiName: 'เวนิส (อิตาลี - บ้านเกิด Amigo)',
-        briefing: 'บ้านเกิดของ Amigo! เวนิสมีคลองน้ำล้อมรอบ กฎหมายสิ่งแวดล้อมเข้มงวดที่สุดในยุโรป มลภาวะห้ามเกิน 4.0 เด็ดขาด! แนะนำให้ใช้พลังงานแสงอาทิตย์ Solar และกรองน้ำเสีย 100%',
-        amigoQuote: 'Ah, Venezia! My beloved home. Every drop of canal water must stay pristine. Build solar, filter wastewater, and show them how the GOAT does it!',
-        riverName: 'Grand Canal (แกรนด์คาแนล)',
-        leftSideLabel: 'San Polo & Dorsoduro',
-        rightSideLabel: 'San Marco & Cannaregio',
-        startingBudget: 150,
-        maxPollution: 4.0,
-        goalDays: 8,
-        targetHousesServed: 16,
-        spawnInterval: 30000,
+        id: 'tokyo',
+        sceneName: 'Tokyo',
+        name: '2. Tokyo, Japan',
+        thaiName: 'ด่าน 2: โตเกียว (Clean Energy & Earthquake)',
+        briefing: '(+) รัฐบาลให้งบประมาณเพิ่มเติม: Clean Energy (Solar & Filter) ราคาถูกลง 25%!\nExtreme Weather: Earthquake 10-15% ทุกๆ 1 นาทีหลังหมดเวลาเตรียมตัว (ต้องซ่อมเครื่องปั๊มน้ำและเครื่องปั่นไฟทุกเครื่อง!) หากผ่านไป 3 นาทีไม่เกิด จะเพิ่มโอกาสนาทีละ +5% และบังคับเกิดที่นาทีที่ 5!',
+        conditionPlus: '(+) รัฐบาลสนับสนุน Clean Energy ราคาถูกลง 25% (Solar เหลือ $45)',
+        conditionMinus: '(-) แผ่นดินไหว (Earthquake): อุปกรณ์น้ำและไฟทุกเครื่องพังพร้อมกัน ต้องรีบซ่อมแซม!',
+        amigoQuote: 'Tokyo subsidizes Clean Energy by 25%! Build Solar Plants, and when an Earthquake strikes, use the Repair button [R] or click buildings to fix them fast!',
+        riverName: 'Sumida River (แม่น้ำสุมิดะ)',
+        leftSideLabel: 'Chuo / Taito',
+        rightSideLabel: 'Sumida / Koto',
+        startingBudget: 180,
+        maxPollution: 7.0,
+        maxComplaints: 3,
+        goalDays: 20,
+        targetHousesServed: 15,
+        spawnInterval: 16000,
+        cleanEnergyDiscount: 0.25,
+        buildCostDiscount: 0.0,
+        unlimitedWaterChain: false,
+        hasHighTide: false,
+        hasEarthquake: true,
+        hasBlackout: false,
+        hasFlood: false,
+        riverPath: [
+          { x: 560, y: 0 },
+          { x: 580, y: 240 },
+          { x: 540, y: 480 },
+          { x: 610, y: 720 }
+        ],
+        riverWidth: 85
+      },
+      {
+        id: 'rome',
+        sceneName: 'Rome',
+        name: '3. Rome, Italy',
+        thaiName: 'ด่าน 3: โรม อิตาลี (Unlimited Aqueducts & Blackout Candles)',
+        briefing: '(+) ระบบน้ำค่อนข้างดีอยู่แล้ว ต่อท่อน้ำจากบ้านต่อบ้านได้อย่างไม่จำกัด!\n(-) ไฟดับทุกๆ 15 วันในเกม มีโอกาสไฟดับ 12.5% ต้องพึ่ง Item พิเศษ: Candle (เทียนไข) ซื้อแบบ Bulk Restock (20€, 50€, 100€, 500€ กล่องละ 10 EUR) เพราะหากไฟดับชาวบ้านต้องใช้เทียน บ้านละ 1 กล่อง/รอบที่ไฟดับ!',
+        conditionPlus: '(+) ระบบท่อส่งน้ำโรมันชั้นเยี่ยม ต่อท่อน้ำจากบ้านต่อบ้านได้ไม่จำกัดความจุ',
+        conditionMinus: '(-) โอกาสไฟดับทุก 15 วัน (12.5%) ต้องสต็อกเทียน (Candle) บ้านละ 1 กล่อง',
+        amigoQuote: 'Benvenuti a Roma! Our ancient aqueducts let you chain water infinitely from house to house. Keep Candle boxes stocked in the ITEMS shop in case of a Blackout!',
+        riverName: 'Tiber River (แม่น้ำไทเบอร์)',
+        leftSideLabel: 'Trastevere & Vatican',
+        rightSideLabel: 'Centro Storico & Colosseo',
+        startingBudget: 200,
+        maxPollution: 5.5,
+        maxComplaints: 3,
+        goalDays: 25,
+        targetHousesServed: 15,
+        spawnInterval: 17000,
+        cleanEnergyDiscount: 0.0,
+        buildCostDiscount: 0.0,
+        unlimitedWaterChain: true,
+        hasHighTide: false,
+        hasEarthquake: false,
+        hasBlackout: true,
+        hasFlood: false,
         riverPath: [
           { x: 730, y: 0 },
           { x: 530, y: 220 },
@@ -229,48 +333,37 @@
         riverWidth: 75
       },
       {
-        id: 'tokyo',
-        name: 'Tokyo, Japan',
-        thaiName: 'โตเกียว (ญี่ปุ่น)',
-        briefing: 'มหานครโตเกียว ประชาชนหนาแน่นมาก! คุณต้องวางผังโครงข่ายไฟฟ้าและท่อน้ำดีเชื่อมต่อไปยังบ้านเรือนให้มีประสิทธิภาพสูงสุดเพื่อรองรับประชากร!',
-        amigoQuote: 'Tokyo moves at lightning speed! Stay calm, upgrade your transformers and pump lines early, and keep complaints at zero!',
-        riverName: 'Sumida River (แม่น้ำสุมิดะ)',
-        leftSideLabel: 'Chuo / Taito',
-        rightSideLabel: 'Sumida / Koto',
-        startingBudget: 180,
-        maxPollution: 8.0,
-        goalDays: 10,
-        targetHousesServed: 20,
-        spawnInterval: 28000,
-        riverPath: [
-          { x: 560, y: 0 },
-          { x: 580, y: 240 },
-          { x: 540, y: 480 },
-          { x: 610, y: 720 }
-        ],
-        riverWidth: 85
-      },
-      {
-        id: 'endless',
-        name: 'Global Metropolis (Endless)',
-        thaiName: 'มหานครไร้ขีดจำกัด (โหมดไม่มีที่สิ้นสุด)',
-        briefing: 'ทดสอบฝีมือการบริหารจัดการระดับโลก! เล่นต่อเนื่องไปได้เรื่อยๆ โดยไม่มีการจำกัดวัน ประชากรจะทยอยเพิ่มขึ้นอย่างเหมาะสม ท้าทายคะแนนสูงสุดของคุณ!',
-        amigoQuote: 'No limits here! Only your skill as an environmental tycoon. Let us see how many weeks you can keep the city thriving!',
-        riverName: 'Continental River',
-        leftSideLabel: 'West District',
-        rightSideLabel: 'East District',
-        startingBudget: 200,
-        maxPollution: 10.0,
-        goalDays: 9999,
-        targetHousesServed: 100,
-        spawnInterval: 28000,
+        id: 'amsterdam',
+        sceneName: 'Amsterdam',
+        name: '4. Amsterdam, Netherlands',
+        thaiName: 'ด่าน 4: อัมสเตอร์ดัม (ด่านยากที่สุดของเกม - Extreme Flood)',
+        briefing: '(+) โครงสร้างพื้นฐานประสิทธิภาพสูง ลดค่าก่อสร้างเริ่มต้น 5% และเมืองอิ่มตัวแล้ว บ้านเกิดช้าลง 20%\n(-) รัฐบาลรับคำร้องเรียนไม่ได้ หากได้รับคำร้องเรียนแม้แต่ครั้งเดียว Game Over ทันที!\nExtreme Weather: Earthquake + น้ำขึ้น + น้ำท่วมใหญ่ (Flood) ทุกๆ 4 สัปดาห์ (28 วัน) หากน้ำท่วมเกิน 2 นาที Game Over! ต้องใช้ Special Item: เครื่องสูบน้ำ (500 EUR) สูบน้ำตอนน้ำท่วม!',
+        conditionPlus: '(+) ลดค่าก่อสร้าง 5% และบ้านเกิดช้าลง 20%',
+        conditionMinus: '(-) ห้ามถูกร้องเรียนเด็ดขาด (1 ร้องเรียน = Game Over) + น้ำท่วมใหญ่ทุก 28 วัน!',
+        amigoQuote: 'Amsterdam is the ultimate test! Zero complaints allowed, plus Earthquakes, High Tide, and a massive Flood every 28 days. Save 500 EUR for the Emergency Flood Pump!',
+        riverName: 'Amstel Canal (คลองอัมสเทล)',
+        leftSideLabel: 'Jordaan & West Canal',
+        rightSideLabel: 'Centrum & Oosterdok',
+        startingBudget: 240,
+        maxPollution: 6.0,
+        maxComplaints: 1, // Instant Game Over on 1st complaint!
+        goalDays: 28,
+        targetHousesServed: 15,
+        spawnInterval: 21600, // 20% slower house spawning
+        cleanEnergyDiscount: 0.05,
+        buildCostDiscount: 0.05,
+        unlimitedWaterChain: false,
+        hasHighTide: true,
+        hasEarthquake: true,
+        hasBlackout: false,
+        hasFlood: true,
         riverPath: [
           { x: 640, y: 0 },
-          { x: 610, y: 240 },
-          { x: 660, y: 480 },
-          { x: 620, y: 720 }
+          { x: 580, y: 240 },
+          { x: 670, y: 480 },
+          { x: 610, y: 720 }
         ],
-        riverWidth: 80
+        riverWidth: 90
       }
     ],
 
@@ -281,8 +374,8 @@
         thaiTitle: 'น้ำสะอาดและสุขาภิบาล',
         color: '#26bde2',
         icon: '🚰',
-        quote: 'เป็นการทำให้เล็งเห็นปัญหาการระบายน้ำที่เกิดขึ้นทุกวันให้เป็นรูปธรรมและเข้าใจง่าย',
-        desc: 'เข้าถึงน้ำดื่มที่สะอาดและระบบสุขาภิบาลที่เหมาะสม ในเกม POWATER CORP. คุณต้องสูบน้ำสะอาดส่งให้ประชาชน และสร้างบ่อบำบัดน้ำเสีย (Wastewater Filter) ไม่ให้น้ำเสียปล่อยลงแม่น้ำจนเกิดมลพิษ'
+        quote: 'เป็นการทำให้เล็งเห็นปัญหาการระบายที่เกิดขึ้นทุกวันให้เป็นรูปธรรมและเข้าใจง่าย',
+        desc: 'เข้าถึงน้ำดื่มที่สะอาดและระบบสุขาภิบาลที่เหมาะสม สูบน้ำสะอาดส่งให้ประชาชน และสร้างจุดบำบัดน้ำเสียริมน้ำเพื่อป้องกันมลพิษ'
       },
       {
         number: 7,
@@ -291,7 +384,7 @@
         color: '#fcc30b',
         icon: '⚡',
         quote: 'สร้างความตระหนักถึงการใช้ไฟฟ้าอย่างประหยัด และมลภาวะที่เกิดขึ้นจากการใช้ไฟฟ้ามากขึ้นเรื่อยๆ และทำให้ผู้เล่นมองหาช่องทางใหม่ๆ ในการสร้างพลังงานสะอาด',
-        desc: 'ส่งเสริมพลังงานหมุนเวียน เช่น โซลาร์เซลล์ (Solar Plant) ที่ผลิตไฟฟ้าได้โดยไม่ปล่อยมลภาวะสู่บรรยากาศ เมื่อเทียบกับโรงไฟฟ้าฟอสซิลทั่วไป'
+        desc: 'ส่งเสริมพลังงานหมุนเวียน เช่น โซลาร์เซลล์ (Solar Cell) ที่ผลิตไฟฟ้าได้โดยไม่ปล่อยมลภาวะสู่บรรยากาศ'
       },
       {
         number: 11,
@@ -299,8 +392,8 @@
         thaiTitle: 'เมืองและชุมชนที่ยั่งยืน',
         color: '#fd9d24',
         icon: '🏙️',
-        quote: 'เสริมทักษะการสร้างบางอย่างให้ยั่งยืน โดยใช้ความสามารถในการคิดด้วยภาพจำลอง',
-        desc: 'การวางผังโครงสร้างพื้นฐานคู่ขนาน (ไฟฟ้า + น้ำ + สิ่งแวดล้อม) อย่างชาญฉลาด เพื่อให้เมืองเติบโตได้โดยประชาชนมีความสุขและสิ่งแวดล้อมไม่ถูกทำลาย'
+        quote: 'เสริมทักษะการสร้างบางอย่างให้ยั่งยืนโดยใช้ความสามารถในการคิดด้วยภาพจำลอง',
+        desc: 'การวางผังโครงสร้างพื้นฐานและรับมือภัยพิบัติ (แผ่นดินไหว น้ำขึ้น น้ำท่วม ไฟดับ) เพื่อให้เมืองเติบโตอย่างยั่งยืน'
       }
     ]
   };

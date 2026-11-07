@@ -1,13 +1,20 @@
+#!/usr/bin/env python3
 import os
 import shutil
+import json
+import re
 
-prev_dir = r'C:\Users\user\AppData\Local\Temp\GDTMP--1\preview'
-assets_dir = r'c:\Users\user\Desktop\Folder\GDEV_POWATER\assets'
-scripts_dir = r'c:\Users\user\Desktop\Folder\GDEV_POWATER\scripts'
+ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+prev_dir = '/mnt/c/Users/user/AppData/Local/Temp/GDTMP--1/preview'
+if not os.path.exists(prev_dir) and os.path.exists(r'C:\Users\user\AppData\Local\Temp\GDTMP--1\preview'):
+    prev_dir = r'C:\Users\user\AppData\Local\Temp\GDTMP--1\preview'
+
+assets_dir = os.path.join(ROOT_DIR, 'assets')
+scripts_dir = os.path.join(ROOT_DIR, 'scripts')
 code0_path = os.path.join(prev_dir, 'code0.js')
 
 if not os.path.exists(prev_dir):
-    print('Preview dir does not exist yet.')
+    print('Preview dir does not exist yet (skipping live preview patch).')
     exit(0)
 
 # 1. Copy all assets to preview root and assets/
@@ -21,12 +28,10 @@ for f in os.listdir(assets_dir):
 print('Assets copied to preview directory.')
 
 # 1.1 Sync data.js with POWATER CROPS..json
-project_json_path = r'c:\Users\user\Desktop\Folder\GDEV_POWATER\POWATER CROPS..json'
+project_json_path = os.path.join(ROOT_DIR, 'POWATER CROPS..json')
 if os.path.exists(project_json_path):
-    import json
     with open(project_json_path, 'r', encoding='utf-8') as pf:
         proj_data = json.load(pf)
-    # GDevelop's ResourceLoader requires usedResources list in projectData
     proj_data.setdefault('usedResources', [{'name': r['name']} for r in proj_data.get('resources', {}).get('resources', [])])
     data_js_path = os.path.join(prev_dir, 'data.js')
     with open(data_js_path, 'w', encoding='utf-8') as df:
@@ -51,12 +56,10 @@ if (typeof POWATER !== 'undefined' && POWATER.GameController) {
 }
 '''
 
-# 3. Detect userFunc name from code0.js if it exists, default to userFunc0x82b728
 user_func_name = 'userFunc0x82b728'
 if os.path.exists(code0_path):
     with open(code0_path, 'r', encoding='utf-8') as f:
         existing = f.read()
-    import re
     m = re.search(r'gdjs\.MainCode\.(userFunc0x[a-f0-9]+)\(runtimeScene\);', existing)
     if m:
         user_func_name = m.group(1)
@@ -129,8 +132,10 @@ gdjs.MainCode.func = function(runtimeScene) {{
 }};
 
 gdjs['MainCode'] = gdjs.MainCode;
-gdjs['VeniceCode'] = gdjs.MainCode;
 gdjs['TokyoCode'] = gdjs.MainCode;
+gdjs['RomeCode'] = gdjs.MainCode;
+gdjs['AmsterdamCode'] = gdjs.MainCode;
+gdjs['VeniceCode'] = gdjs.MainCode;
 gdjs['EndlessCode'] = gdjs.MainCode;
 '''
 

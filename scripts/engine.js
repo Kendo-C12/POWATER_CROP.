@@ -1,12 +1,18 @@
-// POWATER CORP. - Core Game Simulation Engine
-// Manages utility propagation (BFS), economy, calendar clock, pollution dynamics, complaints & win/lose conditions
+// POWATER CORP. v1.0.0.0 - Core Game Simulation Engine
+// Implements all mechanics from POWATER IDEA PITCH.pdf & POWATER CORP.pdf:
+// - Win Condition: >15 completed houses held for 5-7 min (pauses on Repair/Disaster, resets on Complaint)
+// - Economy: +50 instant per completed house, +[completed houses]*40 per week
+// - Repair System: 30% pump breakdown chance every 2 minutes + click/hotkey repair
+// - Day/Night Cycle: 1 min Day, 1 min Night
+// - Map Upsize: expands every +10 houses up to 40 houses max
+// - 4 Levels (Bangkok, Tokyo, Rome, Amsterdam) with High Tide, Earthquake, Blackout + Candles, Flood + Emergency Pump
 
 (function (global) {
   'use strict';
 
   global.POWATER = global.POWATER || {};
   if (global.POWATER.GameEngine) {
-    return; // Prevent prototype invalidation on repeated frame execution
+    return;
   }
 
   const CONFIG = global.POWATER.CONFIG || {};
@@ -18,26 +24,69 @@
       this.map = new global.POWATER.CityMap(this.currentLevel);
 
       // Simulation State
-      this.money = this.currentLevel.startingBudget || 120;
+      this.money = this.currentLevel.startingBudget || 150;
       this.pollution = 0.0;
       this.currentPollutionRate = 0.0;
-      this.complaints = 0; // 3 strikes = Game Over
+      this.complaints = 0;
+      this.maxComplaints = this.currentLevel.maxComplaints || CONFIG.MAX_COMPLAINTS || 3;
       this.complaintLog = [];
       this.isGameOver = false;
       this.isGameWon = false;
       this.isPaused = false;
       this.gameSpeed = 1.0;
 
-      // Calendar & Clock (18 seconds per game day)
+      // Win Condition State (POWATER CORP.pdf: >15 houses for 5-7 minutes)
+      this.winHoldTimer = 0.0;
+      this.winTargetDuration = CONFIG.WIN_HOLD_DURATION_SECONDS || 300;
+      this.winRequiredHouses = CONFIG.WIN_REQUIRED_HOUSES || 15;
+      this.winTimerState = 'WAITING'; // 'WAITING' | 'RUNNING' | 'PAUSED'
+
+      // Calendar & Clock (15 seconds per game day -> 7 days = 1 week)
       this.dayNames = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'];
       this.dayIndex = 0;
       this.dayTime = 0.0;
-      this.dayDuration = 18.0;
+      this.dayDuration = 15.0;
       this.totalDaysPassed = 0;
+      this.weeksPassed = 0;
       this.levelElapsedTime = 0.0;
       this.gracePeriodActive = true;
       this.gracePeriodWarningShown = false;
       this.pollutionStartedNotified = false;
+
+      // Day/Night Cycle (POWATER CORP.pdf: Day 1 min, Night 1 min)
+      this.dayNightTimer = 0.0;
+      this.isNight = false;
+      this.nightAlpha = 0.0;
+
+      // Repair System (POWATER CORP.pdf: 30% chance every 2 minutes)
+      this.repairCheckTimer = 0.0;
+
+      // Map Upsize System (POWATER CORP.pdf: +10 houses per upsize, cap at 40)
+      this.upsizeTier = 0;
+      this.maxHousesCap = CONFIG.MAX_HOUSES_CAP || 40;
+
+      // Extreme Weather & Disasters State
+      this.activeDisasterText = '';
+      this.isHighTide = false;
+      this.highTideTimer = 0.0;
+
+      // Tokyo Earthquake state
+      this.earthquakeMinuteTimer = 0.0;
+      this.minutesWithoutQuake = 0;
+      this.guaranteedQuakeTriggered = false;
+      this.postGuaranteedQuakeBonus = 0.0;
+      this.screenShakeTimer = 0.0;
+
+      // Rome Blackout & Candles state
+      this.candleStock = 4; // Starting sample stock in Rome
+      this.isBlackoutActive = false;
+      this.blackoutTimer = 0.0;
+
+      // Amsterdam Flood & Emergency Pump state
+      this.isFloodActive = false;
+      this.floodTimer = 0.0;
+      this.floodMaxDuration = 120.0; // 2 minutes max before Game Over
+      this.floodPumpsOwned = 0;
 
       // Entities
       this.houses = [];
@@ -50,12 +99,14 @@
       this.upgradeLevels = {
         elec_cap: 1,
         poll_red: 0,
-        water_cap: 1
+        water_cap: 1,
+        waste_cap: 1
       };
 
       // Spawner
       this.spawnTimer = 0;
       this.housesServedPeak = 0;
+      this.completedHousesCount = 0;
 
       // Tools & Dragging
       this.activeTool = 'power';
@@ -87,37 +138,84 @@
       this.activeTool = toolId;
     }
 
+    getBuildingCost(buildCfg) {
+      if (!buildCfg) return 0;
+      let cost = buildCfg.cost || 30;
+      // Tokyo condition (+): Clean Energy -25%
+      if (buildCfg.clean && this.currentLevel && this.currentLevel.cleanEnergyDiscount) {
+        cost = cost * (1.0 - this.currentLevel.cleanEnergyDiscount);
+      }
+      // Amsterdam condition (+): All initial construction costs -5%
+      if (this.currentLevel && this.currentLevel.buildCostDiscount) {
+        cost = cost * (1.0 - this.currentLevel.buildCostDiscount);
+      }
+      return Math.round(cost);
+    }
+
     startLevel(levelIndex) {
       this.levelIndex = levelIndex;
       this.currentLevel = (CONFIG.LEVELS && CONFIG.LEVELS[levelIndex]) || CONFIG.LEVELS[0];
       this.map = new global.POWATER.CityMap(this.currentLevel, this.runtimeScene);
 
-      this.money = this.currentLevel.startingBudget || 120;
+      this.money = this.currentLevel.startingBudget || 150;
       this.pollution = 0.0;
       this.currentPollutionRate = 0.0;
       this.complaints = 0;
+      this.maxComplaints = this.currentLevel.maxComplaints || CONFIG.MAX_COMPLAINTS || 3;
       this.complaintLog = [];
       this.isGameOver = false;
       this.isGameWon = false;
       this.isPaused = false;
       this.gameSpeed = 1.0;
 
+      // Win Timer reset
+      this.winHoldTimer = 0.0;
+      this.winTimerState = 'WAITING';
+
+      // Time & Cycles reset
       this.dayIndex = 0;
       this.dayTime = 0.0;
       this.totalDaysPassed = 0;
+      this.weeksPassed = 0;
       this.levelElapsedTime = 0.0;
       this.gracePeriodActive = true;
       this.gracePeriodWarningShown = false;
       this.pollutionStartedNotified = false;
 
+      this.dayNightTimer = 0.0;
+      this.isNight = false;
+      this.nightAlpha = 0.0;
+      this.repairCheckTimer = 0.0;
+      this.upsizeTier = 0;
+
+      // Disasters reset
+      this.activeDisasterText = '';
+      this.isHighTide = false;
+      this.highTideTimer = 0.0;
+      this.earthquakeMinuteTimer = 0.0;
+      this.minutesWithoutQuake = 0;
+      this.guaranteedQuakeTriggered = false;
+      this.postGuaranteedQuakeBonus = 0.0;
+      this.screenShakeTimer = 0.0;
+
+      this.candleStock = (this.currentLevel.id === 'rome') ? 5 : 0;
+      this.isBlackoutActive = false;
+      this.blackoutTimer = 0.0;
+
+      this.isFloodActive = false;
+      this.floodTimer = 0.0;
+      this.floodPumpsOwned = 0;
+
       // Clean existing runtime objects if any
       if (this.runtimeScene) {
         this.buildings.forEach(b => {
+          if (b.destroy) b.destroy();
           if (b.runtimeObject) {
             try { b.runtimeObject.deleteFromScene(this.runtimeScene); } catch (e) {}
           }
         });
         this.houses.forEach(h => {
+          if (h.destroy) h.destroy();
           if (h.runtimeObject) {
             try { h.runtimeObject.deleteFromScene(this.runtimeScene); } catch (e) {}
           }
@@ -130,6 +228,7 @@
       this.floatingTexts = [];
       this.spawnTimer = 0;
       this.housesServedPeak = 0;
+      this.completedHousesCount = 0;
 
       this.setupStartingCity();
 
@@ -141,7 +240,6 @@
     setupStartingCity() {
       let foundAny = false;
 
-      // 1. Pick up any pre-placed buildings from GDevelop Scene Editor
       if (this.runtimeScene && this.runtimeScene.getObjects) {
         const buildingMappings = [
           { name: 'generator', key: 'GENERATOR_COAL' },
@@ -179,7 +277,6 @@
           }
         }
 
-        // 2. Pick up any pre-placed houses from GDevelop Scene Editor
         const houseObjs = this.runtimeScene.getObjects('house');
         for (let j = 0; j < houseObjs.length; j++) {
           const obj = houseObjs[j];
@@ -204,7 +301,6 @@
         }
       }
 
-      // Fallback only if the scene was completely empty
       if (!foundAny) {
         this.createBuilding('water_pump', 680, 270);
         this.createBuilding('waste_filter', 740, 470);
@@ -249,6 +345,11 @@
     }
 
     spawnHouse(side = null, forceX = null, forceY = null) {
+      // Cap at 40 houses max per POWATER CORP.pdf ("จนตันที่ 40 หลัง")
+      if (this.houses.length >= this.maxHousesCap) {
+        return null;
+      }
+
       let x = forceX;
       let y = forceY;
 
@@ -256,18 +357,23 @@
         const sideChoice = side || (Math.random() < 0.5 ? 'left' : 'right');
         let valid = false;
         let attempts = 0;
-        const minDist = CONFIG.MIN_HOUSE_DISTANCE || 160;
+        // As Map Upsizes (tiers 0..3), allow tighter urban packing so up to 40 houses fit cleanly
+        const baseMinDist = CONFIG.MIN_HOUSE_DISTANCE || 135;
+        const minDist = Math.max(76, baseMinDist - this.upsizeTier * 18);
+        const marginYTop = Math.max(62, 85 - this.upsizeTier * 7);
+        const marginYBottom = Math.max(85, 110 - this.upsizeTier * 7);
+        const marginX = Math.max(48, 75 - this.upsizeTier * 8);
 
-        while (!valid && attempts < 100) {
+        while (!valid && attempts < 140) {
           attempts++;
-          y = 90 + Math.random() * (CONFIG.CANVAS_HEIGHT - 180);
+          y = marginYTop + Math.random() * (CONFIG.CANVAS_HEIGHT - marginYTop - marginYBottom);
           const riverCenterX = this.map.getRiverCenterAtY(y);
 
           if (sideChoice === 'left') {
-            x = 80 + Math.random() * (riverCenterX - 80 - this.map.riverWidth / 2 - 40);
+            x = marginX + Math.random() * Math.max(40, (riverCenterX - marginX - this.map.riverWidth / 2 - 35));
           } else {
-            const startX = riverCenterX + this.map.riverWidth / 2 + 50;
-            x = startX + Math.random() * (CONFIG.CANVAS_WIDTH - startX - 90);
+            const startX = riverCenterX + this.map.riverWidth / 2 + 40;
+            x = startX + Math.random() * Math.max(40, (CONFIG.CANVAS_WIDTH - startX - marginX));
           }
 
           const tooClose = [...this.houses, ...this.buildings].some(e => {
@@ -285,8 +391,9 @@
         if (!valid) return null;
       }
 
-      const w = 84;
-      const h = 56;
+      const scale = Math.max(0.75, 1.0 - this.upsizeTier * 0.07);
+      const w = Math.round(84 * scale);
+      const h = Math.round(56 * scale);
       let runtimeObj = null;
       if (this.runtimeScene) {
         try {
@@ -303,7 +410,10 @@
       }
 
       const house = new global.POWATER.HouseEntity(`h_${this.nextEntityId++}`, runtimeObj, x, y, side);
+      house.applyUpsizeScale(scale);
       this.houses.push(house);
+
+      this.checkMapUpsize();
 
       if (global.POWATER.soundManager) {
         global.POWATER.soundManager.playPlace();
@@ -311,14 +421,34 @@
       return house;
     }
 
+    checkMapUpsize() {
+      // POWATER CORP.pdf: "Upsize: หากมีบ้าน x+10 หลัง ให้ขยายแมพ 1 ครั้งไปเรื่อยๆ จนตันที่ 40 หลัง"
+      const count = this.houses.length;
+      const targetTier = Math.min(3, Math.floor(count / (CONFIG.UPSIZE_STEP_HOUSES || 10)));
+      if (targetTier > this.upsizeTier) {
+        this.upsizeTier = targetTier;
+        const scale = Math.max(0.75, 1.0 - this.upsizeTier * 0.07);
+        this.houses.forEach(h => h.applyUpsizeScale(scale));
+        const maxCapNow = Math.min(40, (this.upsizeTier + 1) * 10);
+        this.addFloatingText(
+          `🗺️ MAP UPSIZE! ขยายเมืองระดับ ${this.upsizeTier} (รองรับ ${maxCapNow}/40 หลัง)`,
+          CONFIG.CANVAS_WIDTH / 2,
+          110,
+          '#00b4d8'
+        );
+        if (global.POWATER.soundManager) global.POWATER.soundManager.playUpgrade();
+      }
+    }
+
     update(rawDt) {
       if (this.isPaused || this.isGameOver || this.isGameWon) return;
       const dt = rawDt * this.gameSpeed;
 
-      // 1. Time & Calendar
+      // 1. Time, Weekly Economy & Day/Night Cycle
       this.updateTime(dt);
+      this.updateDayNightCycle(dt);
 
-      // 2. Grace Period Management (2 minutes)
+      // 2. Protecting Time / Grace Period Management (2 minutes)
       this.levelElapsedTime += dt;
       if (this.levelElapsedTime < CONFIG.GRACE_PERIOD_SECONDS) {
         this.gracePeriodActive = true;
@@ -334,57 +464,82 @@
         }
       }
 
-      // 3. Synchronize any houses created by GDevelop Event Sheet
+      // 3. Procedural House Spawner (respecting level spawnInterval & 40-house cap)
+      const spawnIntervalSec = ((this.currentLevel && this.currentLevel.spawnInterval) || 18000) / 1000.0;
+      this.spawnTimer += dt;
+      if (this.spawnTimer >= spawnIntervalSec && this.houses.length < this.maxHousesCap) {
+        this.spawnTimer = 0;
+        this.spawnHouse();
+      }
+
+      // 4. Synchronize any houses created by GDevelop Event Sheet (capped at 40)
       if (this.runtimeScene && this.runtimeScene.getObjects) {
         const sceneHouses = this.runtimeScene.getObjects('house');
         for (let i = 0; i < sceneHouses.length; i++) {
           const obj = sceneHouses[i];
           const alreadyTracked = this.houses.some(h => h.runtimeObject === obj);
           if (!alreadyTracked) {
-            const w = 84, h = 56;
+            if (this.houses.length >= this.maxHousesCap) {
+              try { obj.deleteFromScene(this.runtimeScene); } catch (e) {}
+              continue;
+            }
+            const scale = Math.max(0.75, 1.0 - this.upsizeTier * 0.07);
+            const w = Math.round(84 * scale), h = Math.round(56 * scale);
             if (obj.setSize) obj.setSize(w, h);
             const cx = obj.getX() + w / 2;
             const cy = obj.getY() + h / 2;
             const riverCenterX = this.map ? this.map.getRiverCenterAtY(cy) : 550;
             const side = cx < riverCenterX ? 'left' : 'right';
             const house = new global.POWATER.HouseEntity(`h_${this.nextEntityId++}`, obj, cx, cy, side);
+            house.applyUpsizeScale(scale);
             this.houses.push(house);
+            this.checkMapUpsize();
           }
         }
       }
 
-      // 4. Utility Network Flow Propagation (Power, Water, Sewage)
+      // 5. Repair & Extreme Weather / Disasters Update
+      this.updateRepairAndDisasters(dt);
+
+      // 6. Utility Network Flow Propagation (Power, Water, Sewage)
       this.simulateNetwork();
 
-      // 5. Update Houses & Generate Revenue
-      let fullySatisfiedCount = 0;
-      let revenueEarned = 0;
+      // 7. Update Houses & Award Instant +$50 Completion Bonus
+      let completeCount = 0;
+      let trickleEarned = 0;
       this.houses.forEach(h => {
         h.update(dt, (house, reason) => this.handleComplaint(house, reason), this.gracePeriodActive);
-        if (h.hasPower && h.hasWater && h.hasDrainage) {
-          fullySatisfiedCount++;
-          revenueEarned += CONFIG.REVENUE_PER_HAPPY_HOUSE_SEC * dt;
-        } else if (h.hasPower && h.hasWater) {
-          revenueEarned += (CONFIG.REVENUE_PER_HAPPY_HOUSE_SEC * 0.5) * dt;
+        const isHouseComplete = h.hasPower && h.hasWater && h.hasDrainage;
+        if (isHouseComplete) {
+          completeCount++;
+          trickleEarned += (CONFIG.REVENUE_PER_HAPPY_HOUSE_SEC || 0.8) * dt;
+          // POWATER CORP.pdf: "ทำให้บ้าน complete - 50 ทันที"
+          if (!h.completedBonusPaid) {
+            h.completedBonusPaid = true;
+            const bonus = CONFIG.HOUSE_COMPLETE_BONUS || 50;
+            this.money += bonus;
+            this.addFloatingText(`+$${bonus} บ้านสมบูรณ์!`, h.centerX, h.centerY - 28, '#06d6a0');
+            if (global.POWATER.soundManager) global.POWATER.soundManager.playUpgrade();
+          }
         }
       });
-      this.housesServedPeak = Math.max(this.housesServedPeak, fullySatisfiedCount);
-
-      if (revenueEarned > 0) {
-        this.money += revenueEarned;
+      this.completedHousesCount = completeCount;
+      this.housesServedPeak = Math.max(this.housesServedPeak, completeCount);
+      if (trickleEarned > 0) {
+        this.money += trickleEarned;
       }
 
-      // 6. Pollution Simulation
+      // 8. Pollution Simulation
       this.updatePollution(dt);
 
-      // 7. Update Map & Entities
-      this.map.update(dt, this.pollution, this.currentLevel.maxPollution);
+      // 9. Update Map & Entities
+      this.map.update(dt, this.pollution, this.currentLevel.maxPollution, this.isHighTide, this.isFloodActive);
       this.buildings.forEach(b => b.update(dt));
       this.connections.forEach(c => c.update(dt));
       this.floatingTexts = this.floatingTexts.filter(ft => ft.update(dt));
 
-      // 8. Win / Lose Checks
-      this.checkGameConditions();
+      // 10. Win / Lose Conditions (including 5-7 min hold timer & Flood timer)
+      this.checkGameConditions(dt);
     }
 
     updateTime(dt) {
@@ -394,16 +549,334 @@
         this.dayIndex = (this.dayIndex + 1) % this.dayNames.length;
         this.totalDaysPassed++;
 
-        // Daily government grant
-        const grant = 25 + (this.upgradeLevels.elec_cap - 1) * 5;
-        this.money += grant;
-        this.addFloatingText(`+$${grant} วันใหม่ (${this.dayNames[this.dayIndex]})`, CONFIG.CANVAS_WIDTH / 2, 80, '#ffd166');
-        if (global.POWATER.soundManager) global.POWATER.soundManager.playUpgrade();
+        // POWATER CORP.pdf: "[จำนวน บ้านที่ complete]*40/ต่อสัปดาห์"
+        if (this.totalDaysPassed % 7 === 0) {
+          this.weeksPassed++;
+          const completeHouses = this.houses.filter(h => h.hasPower && h.hasWater && h.hasDrainage).length;
+          const weeklyIncome = completeHouses * (CONFIG.WEEKLY_REVENUE_PER_COMPLETE_HOUSE || 40);
+          const baseGrant = 40;
+          const totalWeekly = weeklyIncome + baseGrant;
+          this.money += totalWeekly;
+          this.addFloatingText(
+            `📅 สัปดาห์ที่ ${this.weeksPassed}: +$${totalWeekly} (บ้านสมบูรณ์ ${completeHouses}x$40 + งบ $40)`,
+            CONFIG.CANVAS_WIDTH / 2,
+            85,
+            '#ffd166'
+          );
+          if (global.POWATER.soundManager) global.POWATER.soundManager.playUpgrade();
+        }
+
+        // Check Day-based Extreme Weather triggers (Every 15 days: High Tide / Blackout; Every 28 days: Flood)
+        this.onNewDayWeatherCheck();
       }
     }
 
+    updateDayNightCycle(dt) {
+      // POWATER CORP.pdf: "Day/Night Cycle: day 1 นาที, night 1 นาที"
+      const dayDur = CONFIG.DAY_DURATION_SECONDS || 60;
+      const nightDur = CONFIG.NIGHT_DURATION_SECONDS || 60;
+      const cycleDur = dayDur + nightDur;
+      this.dayNightTimer = (this.dayNightTimer + dt) % cycleDur;
+      const wasNight = this.isNight;
+      this.isNight = this.dayNightTimer >= dayDur;
+
+      if (this.isNight && !wasNight) {
+        this.addFloatingText('🌙 เข้าสู่เวลากลางคืน (Night Cycle - 1 นาที)', CONFIG.CANVAS_WIDTH / 2, 75, '#90e0ef');
+      } else if (!this.isNight && wasNight) {
+        this.addFloatingText('☀️ เข้าสู่เวลากลางวัน (Day Cycle - 1 นาที)', CONFIG.CANVAS_WIDTH / 2, 75, '#ffd166');
+      }
+
+      const targetAlpha = this.isNight ? 0.34 : 0.0;
+      this.nightAlpha += (targetAlpha - this.nightAlpha) * Math.min(1.0, dt * 1.8);
+    }
+
+    onNewDayWeatherCheck() {
+      const lvl = this.currentLevel || {};
+
+      // 1. Bangkok & Amsterdam: High Tide every 15 in-game days
+      if (lvl.hasHighTide && this.totalDaysPassed > 0 && this.totalDaysPassed % 15 === 0) {
+        this.triggerHighTide();
+      }
+
+      // 2. Rome: Blackout chance (12.5%) every 15 in-game days
+      if (lvl.hasBlackout && this.totalDaysPassed > 0 && this.totalDaysPassed % 15 === 0) {
+        // Roll 12.5% chance (or guarantee on Day 15 if first time so player experiences mechanic)
+        if (Math.random() < 0.125 || this.totalDaysPassed === 15) {
+          this.triggerRomeBlackout();
+        }
+      }
+
+      // 3. Amsterdam: Main Flood every 4 weeks (28 in-game days)
+      if (lvl.hasFlood && this.totalDaysPassed > 0 && this.totalDaysPassed % 28 === 0) {
+        this.triggerAmsterdamFlood();
+      }
+    }
+
+    updateRepairAndDisasters(dt) {
+      if (this.screenShakeTimer > 0) {
+        this.screenShakeTimer = Math.max(0, this.screenShakeTimer - dt);
+      }
+
+      // 1. Periodic Repair Breakdown (POWATER CORP.pdf: 30% chance every 2 minutes)
+      const repairInterval = CONFIG.REPAIR_CHECK_INTERVAL_SECONDS || 120;
+      const tideMultiplier = this.isHighTide ? 2.0 : 1.0;
+      this.repairCheckTimer += dt * tideMultiplier;
+      if (this.repairCheckTimer >= repairInterval) {
+        this.repairCheckTimer = 0;
+        const chance = CONFIG.REPAIR_BREAKDOWN_CHANCE || 0.30;
+        let brokeCount = 0;
+        this.buildings.forEach(b => {
+          if (b.config && b.config.canBreakDown && !b.isBroken) {
+            // During High Tide, riverside buildings have higher breakdown chance
+            const effChance = (this.isHighTide && b.config.mustBeNearWater) ? Math.min(0.65, chance * 1.8) : chance;
+            if (Math.random() < effChance) {
+              b.breakDown();
+              brokeCount++;
+            }
+          }
+        });
+        if (brokeCount > 0) {
+          this.addFloatingText(
+            `🔧 อุปกรณ์ขัดข้อง ${brokeCount} แห่ง! คลิกที่อุปกรณ์หรือกดปุ่ม REPAIR เพื่อซ่อมแซม`,
+            CONFIG.CANVAS_WIDTH / 2,
+            105,
+            '#ff5a5f'
+          );
+          if (global.POWATER.soundManager) global.POWATER.soundManager.playPollutionWarn();
+        }
+      }
+
+      // 2. High Tide duration countdown
+      if (this.isHighTide) {
+        this.highTideTimer -= dt;
+        if (this.highTideTimer <= 0) {
+          this.isHighTide = false;
+          this.addFloatingText('🌊 ระดับน้ำขึ้นกลับสู่สภาวะปกติแล้ว', CONFIG.CANVAS_WIDTH / 2, 95, '#06d6a0');
+        }
+      }
+
+      // 3. Tokyo & Amsterdam Earthquake (every 1 minute after Protecting Time)
+      if (!this.gracePeriodActive && this.currentLevel && this.currentLevel.hasEarthquake) {
+        this.earthquakeMinuteTimer += dt;
+        if (this.earthquakeMinuteTimer >= 60.0) {
+          this.earthquakeMinuteTimer -= 60.0;
+          this.minutesWithoutQuake++;
+
+          // POWATER CORP.pdf Tokyo Earthquake rule:
+          // Base 10-15% (12.5%). After 3 mins without quake, +5%/min. At 5 mins without quake, forced 100% quake!
+          // After forced quake, condition becomes +5% every minute.
+          let quakeChance = 0.125 + this.postGuaranteedQuakeBonus;
+          let forceQuake = false;
+
+          if (!this.guaranteedQuakeTriggered) {
+            if (this.minutesWithoutQuake >= 5) {
+              forceQuake = true;
+              this.guaranteedQuakeTriggered = true;
+            } else if (this.minutesWithoutQuake > 3) {
+              quakeChance += (this.minutesWithoutQuake - 3) * 0.05;
+            }
+          } else {
+            this.postGuaranteedQuakeBonus += 0.05;
+            quakeChance = 0.125 + this.postGuaranteedQuakeBonus;
+          }
+
+          if (forceQuake || Math.random() < quakeChance) {
+            this.minutesWithoutQuake = 0;
+            this.triggerEarthquake();
+          }
+        }
+      }
+
+      // 4. Rome Blackout countdown
+      if (this.isBlackoutActive) {
+        this.blackoutTimer -= dt;
+        if (this.blackoutTimer <= 0) {
+          this.isBlackoutActive = false;
+          this.houses.forEach(h => { h.usingCandle = false; });
+          this.addFloatingText('⚡ กระแสไฟฟ้าในกรุงโรมกลับมาใช้งานได้ตามปกติแล้ว!', CONFIG.CANVAS_WIDTH / 2, 95, '#06d6a0');
+        }
+      }
+
+      // 5. Amsterdam Flood countdown (Game Over if > 2 minutes / 120s)
+      if (this.isFloodActive) {
+        this.floodTimer += dt;
+        if (this.floodTimer >= this.floodMaxDuration) {
+          this.triggerGameOver('🌊 น้ำท่วมเมืองอัมสเตอร์ดัมเกิน 2 นาทีโดยไม่ได้สูบน้ำออก! (Flood Disaster)');
+          return;
+        }
+      }
+
+      // Update active disaster status banner text
+      const alerts = [];
+      if (this.isFloodActive) {
+        const rem = Math.max(0, Math.ceil(this.floodMaxDuration - this.floodTimer));
+        alerts.push(`🌊 FLOOD! สูบน้ำภายใน ${rem}s`);
+      }
+      if (this.isBlackoutActive) {
+        alerts.push(`🕯️ BLACKOUT! (${Math.ceil(this.blackoutTimer)}s)`);
+      }
+      if (this.isHighTide) {
+        alerts.push(`🌊 น้ำขึ้นสูง (${Math.ceil(this.highTideTimer)}s)`);
+      }
+      const brokenCount = this.buildings.filter(b => b.isBroken).length;
+      if (brokenCount > 0) {
+        alerts.push(`🔧 ต้องซ่อม ${brokenCount} จุด`);
+      }
+      this.activeDisasterText = alerts.join(' | ');
+    }
+
+    triggerHighTide() {
+      this.isHighTide = true;
+      this.highTideTimer = 25.0;
+      let broken = 0;
+      this.buildings.forEach(b => {
+        if (b.config && b.config.mustBeNearWater && !b.isBroken && Math.random() < 0.5) {
+          b.breakDown();
+          broken++;
+        }
+      });
+      this.addFloatingText(
+        `🌊 Extreme Weather: น้ำขึ้นสูง (High Tide)! อุปกรณ์ริมน้ำชำรุด ${broken} แห่ง!`,
+        CONFIG.CANVAS_WIDTH / 2,
+        95,
+        '#00b4d8'
+      );
+      if (global.POWATER.soundManager) global.POWATER.soundManager.playPollutionWarn();
+    }
+
+    triggerEarthquake() {
+      this.screenShakeTimer = 2.0;
+      let brokenCount = 0;
+      // POWATER CORP.pdf: "Need to Repair Every Water and Electric Pump"
+      this.buildings.forEach(b => {
+        if (b.config && (b.config.type === 'generator' || b.config.type === 'water_pump' || b.config.type === 'waste_filter')) {
+          b.breakDown();
+          brokenCount++;
+        }
+      });
+      this.addFloatingText(
+        `🌋 EARTHQUAKE! แผ่นดินไหวรุนแรง! เครื่องปั๊มน้ำและโรงไฟฟ้าเสียหาย ${brokenCount} แห่ง ต้องซ่อมทันที!`,
+        CONFIG.CANVAS_WIDTH / 2,
+        100,
+        '#e63946'
+      );
+      if (global.POWATER.soundManager) global.POWATER.soundManager.playComplaint();
+    }
+
+    triggerRomeBlackout() {
+      this.isBlackoutActive = true;
+      this.blackoutTimer = 25.0;
+      let candlesUsed = 0;
+      this.houses.forEach(h => {
+        if (this.candleStock > 0) {
+          this.candleStock--;
+          h.usingCandle = true;
+          candlesUsed++;
+        } else {
+          h.usingCandle = false;
+        }
+      });
+      this.addFloatingText(
+        `🕯️ ไฟดับครั้งใหญ่ในโรม! ใช้เทียนสำรองไป ${candlesUsed} กล่อง (คงเหลือ ${this.candleStock} กล่อง)`,
+        CONFIG.CANVAS_WIDTH / 2,
+        100,
+        '#ffd166'
+      );
+      if (global.POWATER.soundManager) global.POWATER.soundManager.playPollutionWarn();
+    }
+
+    triggerAmsterdamFlood() {
+      if (this.isFloodActive) return;
+      this.isFloodActive = true;
+      this.floodTimer = 0.0;
+      // If player already pre-purchased an emergency flood pump, auto-activate or prompt
+      if (this.floodPumpsOwned > 0) {
+        this.useEmergencyFloodPump();
+        return;
+      }
+      this.addFloatingText(
+        '🌊 ภัยพิบัติหลัก: น้ำท่วมใหญ่ใน Amsterdam! ต้องใช้เครื่องสูบน้ำ (500 EUR) ภายใน 2 นาที!',
+        CONFIG.CANVAS_WIDTH / 2,
+        100,
+        '#e63946'
+      );
+      if (global.POWATER.soundManager) global.POWATER.soundManager.playComplaint();
+    }
+
+    buyCandlePack(packId) {
+      const packs = (CONFIG.SPECIAL_ITEMS && CONFIG.SPECIAL_ITEMS.CANDLE_PACKS) || [];
+      const pack = packs.find(p => p.id === packId);
+      if (!pack) return false;
+      if (this.money < pack.cost) {
+        this.addFloatingText('งบประมาณไม่พอซื้อเทียนสำรอง!', CONFIG.CANVAS_WIDTH / 2, 100, '#e63946');
+        return false;
+      }
+      this.money -= pack.cost;
+      this.candleStock += pack.boxes;
+      // If blackout is currently active, distribute candles immediately to dark houses
+      if (this.isBlackoutActive) {
+        this.houses.forEach(h => {
+          if (!h.usingCandle && this.candleStock > 0) {
+            this.candleStock--;
+            h.usingCandle = true;
+          }
+        });
+      }
+      this.addFloatingText(`🕯️ ซื้อเทียน +${pack.boxes} กล่องสำเร็จ! (สต็อก: ${this.candleStock} กล่อง)`, CONFIG.CANVAS_WIDTH / 2, 100, '#ffd166');
+      if (global.POWATER.soundManager) global.POWATER.soundManager.playUpgrade();
+      return true;
+    }
+
+    useEmergencyFloodPump() {
+      const cost = (CONFIG.SPECIAL_ITEMS && CONFIG.SPECIAL_ITEMS.FLOOD_PUMP && CONFIG.SPECIAL_ITEMS.FLOOD_PUMP.cost) || 500;
+      if (this.floodPumpsOwned > 0) {
+        this.floodPumpsOwned--;
+        this.isFloodActive = false;
+        this.floodTimer = 0.0;
+        this.addFloatingText('🌊 สูบน้ำท่วมออกจากเมืองสำเร็จด้วยเครื่องสูบน้ำสำรอง!', CONFIG.CANVAS_WIDTH / 2, 100, '#06d6a0');
+        if (global.POWATER.soundManager) global.POWATER.soundManager.playWin();
+        return true;
+      }
+      if (this.money < cost) {
+        this.addFloatingText(`งบประมาณไม่พอซื้อเครื่องสูบน้ำฉุกเฉิน ($${cost})!`, CONFIG.CANVAS_WIDTH / 2, 100, '#e63946');
+        return false;
+      }
+      this.money -= cost;
+      if (this.isFloodActive) {
+        this.isFloodActive = false;
+        this.floodTimer = 0.0;
+        this.addFloatingText('🌊 ใช้เครื่องสูบน้ำฉุกเฉิน (500 EUR) สูบน้ำท่วมสำเร็จทันที!', CONFIG.CANVAS_WIDTH / 2, 100, '#06d6a0');
+        if (global.POWATER.soundManager) global.POWATER.soundManager.playWin();
+      } else {
+        this.floodPumpsOwned++;
+        this.addFloatingText(`🛟 ซื้อเครื่องสูบน้ำฉุกเฉินสำรองไว้แล้ว (${this.floodPumpsOwned} เครื่อง)`, CONFIG.CANVAS_WIDTH / 2, 100, '#06d6a0');
+        if (global.POWATER.soundManager) global.POWATER.soundManager.playUpgrade();
+      }
+      return true;
+    }
+
+    repairBuilding(building) {
+      if (!building || !building.isBroken) return false;
+      building.repair();
+      const c = building.getCenter();
+      this.addFloatingText('🔧 ซ่อมแซมสำเร็จ!', c.x, c.y - 25, '#06d6a0');
+      if (global.POWATER.soundManager) global.POWATER.soundManager.playUpgrade();
+      return true;
+    }
+
+    repairAllBroken() {
+      const broken = this.buildings.filter(b => b.isBroken);
+      if (broken.length === 0) {
+        this.addFloatingText('✅ อุปกรณ์ทุกเครื่องทำงานปกติ ไม่มีจุดที่ต้องซ่อม', CONFIG.CANVAS_WIDTH / 2, 100, '#06d6a0');
+        return 0;
+      }
+      broken.forEach(b => b.repair());
+      this.addFloatingText(`🔧 ซ่อมแซมอุปกรณ์ทั้งหมด ${broken.length} แห่งเรียบร้อย!`, CONFIG.CANVAS_WIDTH / 2, 100, '#06d6a0');
+      if (global.POWATER.soundManager) global.POWATER.soundManager.playUpgrade();
+      return broken.length;
+    }
+
     simulateNetwork() {
-      // Reset supply and drainage states
       this.houses.forEach(h => {
         h.hasPower = false;
         h.hasWater = false;
@@ -427,6 +900,13 @@
         this.simulateTypeNetwork(type);
       });
 
+      // Rome Blackout override: if Blackout is active, only houses with a Candle keep power!
+      if (this.isBlackoutActive) {
+        this.houses.forEach(h => {
+          h.hasPower = Boolean(h.usingCandle);
+        });
+      }
+
       // 2. Houses that consume clean water produce wastewater
       this.houses.forEach(h => {
         if (h.hasWater) {
@@ -441,17 +921,22 @@
     simulateTypeNetwork(type) {
       let sourceBuildings = [];
       if (type === 'power') {
-        sourceBuildings = this.buildings.filter(b => b.config.type === 'generator' && b.active);
+        sourceBuildings = this.buildings.filter(b => b.config.type === 'generator' && b.active && !b.isBroken);
       } else if (type === 'water') {
-        sourceBuildings = this.buildings.filter(b => b.config.type === 'water_pump' && b.active);
+        sourceBuildings = this.buildings.filter(b => b.config.type === 'water_pump' && b.active && !b.isBroken);
       }
 
       sourceBuildings.forEach(b => {
         if (b.config.type === 'generator') {
           b.capacity = Infinity;
         } else if (b.config.type === 'water_pump') {
-          const capMult = 1.0 + (this.upgradeLevels.water_cap - 1) * CONFIG.UPGRADES.WATER_PUMP_CAPACITY.bonusPerLevel;
-          b.capacity = Math.round(b.config.capacity * capMult);
+          // Rome (+): Unlimited house-to-house water chaining
+          if (this.currentLevel && this.currentLevel.unlimitedWaterChain) {
+            b.capacity = Infinity;
+          } else {
+            const capMult = 1.0 + (this.upgradeLevels.water_cap - 1) * CONFIG.UPGRADES.WATER_PUMP_CAPACITY.bonusPerLevel;
+            b.capacity = Math.round(b.config.capacity * capMult);
+          }
         }
       });
 
@@ -479,7 +964,6 @@
               visited.add(nextNode.id);
               queue.push(nextNode);
 
-              // Explicit boolean check: avoids ES6 prototype mismatch
               if (nextNode.isHouse || nextNode.entityType === 'house') {
                 let served = false;
                 if (type === 'power' && !nextNode.hasPower) {
@@ -505,19 +989,21 @@
     }
 
     simulateSewageNetwork() {
-      const wasteFilters = this.buildings.filter(b => b.config.type === 'waste_filter' && b.active);
+      const wasteFilters = this.buildings.filter(b => b.config.type === 'waste_filter' && b.active && !b.isBroken);
       const sewageConns = this.connections.filter(c => c.type === 'sewage');
 
       wasteFilters.forEach(filter => {
-        const capMult = 1.0 + (this.upgradeLevels.poll_red || 0) * 0.15;
-        filter.capacity = Math.round(filter.config.capacity * capMult);
+        const capMult = 1.0 + (this.upgradeLevels.poll_red || 0) * 0.15 + ((this.upgradeLevels.waste_cap || 1) - 1) * 0.25;
+        filter.capacity = (this.currentLevel && this.currentLevel.unlimitedWaterChain)
+          ? Infinity
+          : Math.round(filter.config.capacity * capMult);
         let remainingCap = filter.capacity;
 
         const visited = new Set();
         const queue = [filter];
         visited.add(filter.id);
 
-        while (queue.length > 0 && remainingCap > 0) {
+        while (queue.length > 0 && (remainingCap === Infinity || remainingCap > 0)) {
           const current = queue.shift();
 
           sewageConns.forEach(conn => {
@@ -537,7 +1023,7 @@
                 if (nextNode.producesWaste && !nextNode.hasDrainage) {
                   nextNode.hasDrainage = true;
                   filter.usedCapacity++;
-                  remainingCap--;
+                  if (remainingCap !== Infinity) remainingCap--;
                 } else if (!nextNode.producesWaste) {
                   nextNode.hasDrainage = true;
                 }
@@ -558,7 +1044,7 @@
 
       if (!this.pollutionStartedNotified) {
         this.pollutionStartedNotified = true;
-        this.addFloatingText('⚠️ ครบ 3 นาที: ระบบมลภาวะเริ่มทำงานแล้ว!', CONFIG.CANVAS_WIDTH / 2, 80, '#ffd166');
+        this.addFloatingText('⚠️ ครบ 3 นาที: ระบบคำนวณมลภาวะเริ่มทำงานแล้ว!', CONFIG.CANVAS_WIDTH / 2, 80, '#ffd166');
         if (global.POWATER.soundManager) global.POWATER.soundManager.playPollutionWarn();
       }
 
@@ -566,12 +1052,10 @@
       const rates = CONFIG.POLLUTION_RATES;
       const reductionFactor = Math.max(0.4, 1.0 - (this.upgradeLevels.poll_red * CONFIG.UPGRADES.POLLUTION_REDUCTION.bonusPerLevel));
 
-      // 1. Coal Generators (+0.3/s)
-      const activeCoalGens = this.buildings.filter(b => b.config.type === 'generator' && !b.config.clean && b.active);
+      const activeCoalGens = this.buildings.filter(b => b.config.type === 'generator' && !b.config.clean && b.active && !b.isBroken);
       delta += activeCoalGens.length * rates.ELECTRIC_GENERATOR * reductionFactor * dt;
 
-      // 2. Wastewater Outlet Discharge & Untreated Sewage
-      const activeOutlets = this.buildings.filter(b => b.config.type === 'waste_filter' && b.active && b.usedCapacity > 0);
+      const activeOutlets = this.buildings.filter(b => b.config.type === 'waste_filter' && b.active && !b.isBroken && b.usedCapacity > 0);
       const housesDrained = this.houses.filter(h => h.hasWater && h.hasDrainage).length;
       const housesUndrained = this.houses.filter(h => h.hasWater && !h.hasDrainage).length;
 
@@ -584,17 +1068,14 @@
         delta += housesUndrained * rates.UNTREATED_SEWAGE_PER_HOUSE * reductionFactor * dt;
       }
 
-      // 3. Air Filters (-0.2/s)
       const activeAirFilters = this.buildings.filter(b => b.config.type === 'air_filter' && b.active);
       delta -= activeAirFilters.length * rates.AIR_FILTER_REDUCTION * dt;
 
-      // 4. Natural River Dilution
       delta -= rates.NATURAL_DILUTION * dt;
 
       this.currentPollutionRate = dt > 0 ? (delta / dt) : 0;
       this.pollution = Math.max(0.0, this.pollution + delta);
 
-      // Sync with GDevelop Scene Variable
       if (this.runtimeScene && this.runtimeScene.getVariables) {
         try {
           const sceneVars = this.runtimeScene.getVariables();
@@ -613,6 +1094,12 @@
 
     handleComplaint(house, reason) {
       this.complaints++;
+      // POWATER CORP.pdf: "แต่หากถูกร้องเรียน Timer Reset"
+      if (this.winHoldTimer > 0) {
+        this.winHoldTimer = 0.0;
+        this.addFloatingText('⏱️ ถูกร้องเรียน! เวลาชนะ (Win Timer) ถูกรีเซ็ตเป็น 0:00!', CONFIG.CANVAS_WIDTH / 2, 120, '#e63946');
+      }
+
       this.complaintLog.push({
         id: this.complaints,
         houseId: house.id,
@@ -620,26 +1107,41 @@
         time: `${this.dayNames[this.dayIndex]} Day ${this.totalDaysPassed + 1}`
       });
 
-      this.addFloatingText(`⚠️ ร้องเรียน: ${reason} (${this.complaints}/${CONFIG.MAX_COMPLAINTS})`, house.centerX, house.centerY - 25, '#e63946');
+      const maxAllowed = this.maxComplaints || 3;
+      this.addFloatingText(`⚠️ ร้องเรียน: ${reason} (${this.complaints}/${maxAllowed})`, house.centerX, house.centerY - 25, '#e63946');
       if (global.POWATER.soundManager) global.POWATER.soundManager.playComplaint();
 
-      if (this.complaints >= CONFIG.MAX_COMPLAINTS) {
-        this.triggerGameOver('ประชาชนยื่นเรื่องร้องเรียนครบ 3 รอบ! (ขาดแคลนสาธารณูปโภคต่อเนื่อง)');
+      if (this.complaints >= maxAllowed) {
+        const msg = maxAllowed === 1
+          ? 'รัฐบาลอัมสเตอร์ดัมรับคำร้องเรียนไม่ได้! ถูกร้องเรียน 1 ครั้ง Game Over ทันที!'
+          : 'ประชาชนยื่นเรื่องร้องเรียนครบ 3 รอบ! (ขาดแคลนสาธารณูปโภคต่อเนื่อง)';
+        this.triggerGameOver(msg);
       }
     }
 
-    checkGameConditions() {
-      // Lose Condition: Pollution limit
+    checkGameConditions(dt = 0) {
+      // 1. Lose Condition: Pollution limit
       if (this.pollution >= this.currentLevel.maxPollution) {
         this.triggerGameOver(`ค่ามลภาวะสูงเกินขีดจำกัด (${this.pollution.toFixed(1)} / ${this.currentLevel.maxPollution.toFixed(1)}) จนเมืองเป็นพิษ!`);
         return;
       }
 
-      // Win Condition: Goal days & quota
-      if (this.currentLevel.id !== 'endless') {
-        if (this.totalDaysPassed >= this.currentLevel.goalDays && this.housesServedPeak >= this.currentLevel.targetHousesServed) {
+      // 2. Win Condition (POWATER CORP.pdf):
+      // "บ้าน > 15 หลังมีน้ำและไฟใช้ตลอดเวลาเป็นเวลา 5-7 นาที (หากเกิดการเสีย/Disaster หรือต้อง Repair เวลาจะ Pause ไว้ แต่หากถูกร้องเรียน Timer Reset)"
+      const hasBrokenEquipment = this.buildings.some(b => b.isBroken);
+      const hasActiveDisaster = this.isFloodActive || (this.isBlackoutActive && this.houses.some(h => !h.hasPower));
+      const suppliedHouses = this.houses.filter(h => h.hasPower && h.hasWater).length;
+
+      if (hasBrokenEquipment || hasActiveDisaster) {
+        this.winTimerState = 'PAUSED';
+      } else if (suppliedHouses >= this.winRequiredHouses) {
+        this.winTimerState = 'RUNNING';
+        this.winHoldTimer += dt;
+        if (this.winHoldTimer >= this.winTargetDuration) {
           this.triggerGameWon();
         }
+      } else {
+        this.winTimerState = 'WAITING';
       }
     }
 
@@ -662,12 +1164,14 @@
       const buildCfg = CONFIG.BUILDINGS[typeKey.toUpperCase()];
       if (!buildCfg) return false;
 
-      if (this.money < buildCfg.cost) {
-        this.addFloatingText('งบประมาณไม่พอ!', x, y - 20, '#e63946');
+      const actualCost = this.getBuildingCost(buildCfg);
+
+      if (this.money < actualCost) {
+        this.addFloatingText(`งบประมาณไม่พอ! (ต้องการ $${actualCost})`, x, y - 20, '#e63946');
         return false;
       }
 
-      if (buildCfg.mustBeNearWater && !this.map.isNearRiver(x, y, 65)) {
+      if (buildCfg.mustBeNearWater && !this.map.isNearRiver(x, y, 75)) {
         const lbl = buildCfg.type === 'waste_filter'
           ? 'ต้องสร้างจุดปล่อยน้ำเสียริมแม่น้ำเท่านั้น!'
           : 'ต้องสร้างปั๊มน้ำริมแม่น้ำเท่านั้น!';
@@ -682,18 +1186,18 @@
 
       const collided = [...this.buildings, ...this.houses].some(e => {
         const c = e.getCenter ? e.getCenter() : { x: e.centerX, y: e.centerY };
-        return Math.hypot(c.x - x, c.y - y) < 65;
+        return Math.hypot(c.x - x, c.y - y) < 60;
       });
       if (collided) {
         this.addFloatingText('พื้นที่ถูกใช้งานแล้ว!', x, y - 20, '#e63946');
         return false;
       }
 
-      this.money -= buildCfg.cost;
-      const building = this.createBuilding(typeKey, x, y);
+      this.money -= actualCost;
+      this.createBuilding(typeKey, x, y);
 
       if (global.POWATER.soundManager) global.POWATER.soundManager.playPlace();
-      this.addFloatingText(`-$${buildCfg.cost}`, x, y - 20, '#ffd166');
+      this.addFloatingText(`-$${actualCost}`, x, y - 20, '#ffd166');
       return true;
     }
 
@@ -701,7 +1205,7 @@
       if (!nodeA || !nodeB || nodeA.id === nodeB.id) return false;
 
       if ((nodeA.config && nodeA.config.type === 'air_filter') || (nodeB.config && nodeB.config.type === 'air_filter')) {
-        this.addFloatingText('เครื่องฟอกอากาศทำงานอัตโนมัติ ไม่ต้องต่อสาย!', (nodeA.getCenter().x + nodeB.getCenter().x) / 2, (nodeA.getCenter().y + nodeB.getCenter().y) / 2 - 20, '#2ec4b6');
+        this.addFloatingText('เครื่องกรองมลภาวะทำงานอัตโนมัติ ไม่ต้องต่อสาย!', (nodeA.getCenter().x + nodeB.getCenter().x) / 2, (nodeA.getCenter().y + nodeB.getCenter().y) / 2 - 20, '#2ec4b6');
         return false;
       }
 
@@ -757,7 +1261,6 @@
     }
 
     deleteAt(x, y) {
-      // 1. Delete connection near clicked point
       for (let i = this.connections.length - 1; i >= 0; i--) {
         const c = this.connections[i];
         const pts = c.getEndpoints();
@@ -773,17 +1276,17 @@
         }
       }
 
-      // 2. Delete building near clicked point (refund 50%)
       const bIdx = this.buildings.findIndex(b => {
         const c = b.getCenter();
         return Math.hypot(c.x - x, c.y - y) <= 40;
       });
       if (bIdx !== -1) {
         const b = this.buildings[bIdx];
-        const refund = Math.round(b.config.cost * 0.5);
+        const refund = Math.round(this.getBuildingCost(b.config) * 0.5);
         this.money += refund;
 
         this.connections = this.connections.filter(c => c.fromNode.id !== b.id && c.toNode.id !== b.id);
+        if (b.destroy) b.destroy();
         if (b.runtimeObject && this.runtimeScene) {
           try {
             b.runtimeObject.deleteFromScene(this.runtimeScene);
@@ -800,55 +1303,60 @@
     }
 
     distToSegment(px, py, x1, y1, x2, y2) {
-      const dx = x2 - x1;
-      const dy = y2 - y1;
-      const l2 = dx * dx + dy * dy;
+      const l2 = (x2 - x1) ** 2 + (y2 - y1) ** 2;
       if (l2 === 0) return Math.hypot(px - x1, py - y1);
-      let t = ((px - x1) * dx + (py - y1) * dy) / l2;
+      let t = ((px - x1) * (x2 - x1) + (py - y1) * (y2 - y1)) / l2;
       t = Math.max(0, Math.min(1, t));
-      return Math.hypot(px - (x1 + t * dx), py - (y1 + t * dy));
+      return Math.hypot(px - (x1 + t * (x2 - x1)), py - (y1 + t * (y2 - y1)));
     }
 
     getNodeAt(x, y) {
-      // 1. Check buildings (radius 42px generously covers 56x56 footprint)
       for (let i = 0; i < this.buildings.length; i++) {
         const b = this.buildings[i];
         const c = b.getCenter();
-        if (Math.hypot(c.x - x, c.y - y) <= 42) {
-          return b;
-        }
+        if (Math.hypot(c.x - x, c.y - y) <= 44) return b;
       }
-
-      // 2. Check houses (radius 56px covers 84x56 sprite + pins at 52px)
       for (let i = 0; i < this.houses.length; i++) {
         const h = this.houses[i];
         const c = h.getCenter();
-        if (Math.hypot(c.x - x, c.y - y) <= 56) {
-          return h;
-        }
+        if (Math.hypot(c.x - x, c.y - y) <= 50) return h;
       }
-
       return null;
     }
 
-    buyUpgrade(upgradeId) {
-      const upg = CONFIG.UPGRADES[upgradeId.toUpperCase()];
-      if (!upg) return false;
+    buyUpgrade(upgradeKey) {
+      let baseCost = 10;
+      let mult = 1.8;
+      let maxLvl = 5;
 
-      const curLv = this.upgradeLevels[upg.id] || 0;
-      if (curLv >= upg.maxLevel) return false;
+      if (upgradeKey === 'elec_cap') {
+        baseCost = 10; mult = 1.8; maxLvl = 5;
+      } else if (upgradeKey === 'poll_red') {
+        baseCost = 100; mult = 1.5; maxLvl = 10;
+      } else if (upgradeKey === 'water_cap') {
+        baseCost = 10; mult = 1.8; maxLvl = 5;
+      } else if (upgradeKey === 'waste_cap') {
+        baseCost = 25; mult = 1.6; maxLvl = 5;
+      }
 
-      const cost = Math.round(upg.baseCost * Math.pow(upg.costMult, curLv));
+      const curLvl = this.upgradeLevels[upgradeKey] || 0;
+      if (curLvl >= maxLvl) {
+        this.addFloatingText('อัปเกรดถึงระดับสูงสุดแล้ว (MAX)!', CONFIG.CANVAS_WIDTH / 2, 100, '#ffd166');
+        return false;
+      }
+
+      const cost = Math.round(baseCost * Math.pow(mult, Math.max(0, curLvl - (upgradeKey === 'poll_red' ? 0 : 1))));
+
       if (this.money < cost) {
-        this.addFloatingText('งบประมาณไม่พอ!', CONFIG.CANVAS_WIDTH / 2, 90, '#ff4d6d');
+        this.addFloatingText('งบประมาณไม่พออัปเกรด!', CONFIG.CANVAS_WIDTH / 2, 100, '#e63946');
         return false;
       }
 
       this.money -= cost;
-      this.upgradeLevels[upg.id] = curLv + 1;
+      this.upgradeLevels[upgradeKey] = curLvl + 1;
 
       if (global.POWATER.soundManager) global.POWATER.soundManager.playUpgrade();
-      this.addFloatingText(`อัปเกรดสำเร็จ: ${upg.name}!`, CONFIG.CANVAS_WIDTH / 2, 90, '#06d6a0');
+      this.addFloatingText(`อัปเกรดสำเร็จ! (Lv.${this.upgradeLevels[upgradeKey]})`, CONFIG.CANVAS_WIDTH / 2, 100, '#06d6a0');
       return true;
     }
 

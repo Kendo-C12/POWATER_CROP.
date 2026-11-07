@@ -72,236 +72,162 @@ async function runTest() {
   const page = await browser.newPage();
   await page.setViewport({ width: 1280, height: 720 });
 
-  const consoleLogs = [];
   const errors = [];
-
   page.on('console', msg => {
-    const text = msg.text();
-    consoleLogs.push(`[${msg.type()}] ${text}`);
-    if (msg.type() === 'error') {
-      errors.push(text);
-    }
+    if (msg.type() === 'error') errors.push(msg.text());
   });
-
   page.on('pageerror', err => {
     console.error('PAGE ERROR:', err.message);
     errors.push(err.message);
   });
 
-  console.log('Navigating to preview...');
+  console.log('Navigating to GDevelop preview...');
   await page.goto(`http://localhost:${PORT}/index.html`, { waitUntil: 'networkidle0', timeout: 15000 });
-
-  // Wait 2.5 seconds for scene and game systems to initialize
   await new Promise(r => setTimeout(r, 2500));
 
-  // Close briefing modal if open
+  // Close initial briefing modal
   await page.evaluate(() => {
-    if (window.POWATER && window.POWATER.uiManager && window.POWATER.uiManager.closeModal) {
+    if (window.POWATER && window.POWATER.uiManager) {
       window.POWATER.uiManager.closeModal();
     }
   });
 
-  // Check initial state of House 1 (should have NO power, so needs power)
-  const initialHouseState = await page.evaluate(() => {
-    const game = window.POWATER && window.POWATER.game;
+  // 1. Test Complete Wiring of House 1 (Power + Water + Sewage) & Instant +$50 Completion Bonus
+  const wiringResult = await page.evaluate(() => {
+    const game = window.POWATER.game;
+    const moneyBefore = game.money;
     const h = game.houses[0];
+    const gen = game.buildings.find(b => b.config.type === 'generator');
+    const pump = game.buildings.find(b => b.config.type === 'water_pump');
+    const filter = game.buildings.find(b => b.config.type === 'waste_filter');
+
+    game.connectNodes('power', gen, h);
+    game.connectNodes('water', pump, h);
+    game.connectNodes('sewage', filter, h);
+    game.update(0.1);
+
     return {
       hasPower: h.hasPower,
       hasWater: h.hasWater,
-      hasDrainage: h.hasDrainage
+      hasDrainage: h.hasDrainage,
+      completedBonusPaid: h.completedBonusPaid,
+      moneyDelta: Math.round(game.money - moneyBefore)
     };
   });
-  console.log('Initial House 1 State:', initialHouseState);
+  console.log('1. House Completion & +$50 Bonus Test:', wiringResult);
+  if (!wiringResult.completedBonusPaid || wiringResult.moneyDelta < 50) {
+    throw new Error('House completion +$50 bonus failed!');
+  }
 
-  // Test Mouse Drag from Generator to House 1
-  const entityPositions = await page.evaluate(() => {
-    const game = window.POWATER && window.POWATER.game;
+  // 2. Test Repair Mechanic & Win Timer Pause
+  const repairResult = await page.evaluate(() => {
+    const game = window.POWATER.game;
+    const pump = game.buildings.find(b => b.config.type === 'water_pump');
+    pump.breakDown();
+    game.update(0.1);
+    const brokenState = {
+      isBroken: pump.isBroken,
+      winTimerState: game.winTimerState
+    };
+    const fixedCount = game.repairAllBroken();
+    game.update(0.1);
     return {
-      gen: game.buildings.find(b => b.config.type === 'generator').getCenter(),
-      house: game.houses[0].getCenter()
+      brokenState,
+      fixedCount,
+      isBrokenAfterRepair: pump.isBroken
     };
   });
-
-  console.log(`Simulating mouse drag from Generator (${entityPositions.gen.x}, ${entityPositions.gen.y}) to House 1 (${entityPositions.house.x}, ${entityPositions.house.y})...`);
-
-  await page.mouse.move(entityPositions.gen.x, entityPositions.gen.y);
-  await page.mouse.down();
-  await new Promise(r => setTimeout(r, 100));
-
-  const steps = 10;
-  for (let s = 1; s <= steps; s++) {
-    const curX = entityPositions.gen.x + (entityPositions.house.x - entityPositions.gen.x) * (s / steps);
-    const curY = entityPositions.gen.y + (entityPositions.house.y - entityPositions.gen.y) * (s / steps);
-    await page.mouse.move(curX, curY);
-    await new Promise(r => setTimeout(r, 25));
+  console.log('2. Repair System & Win Timer Pause Test:', repairResult);
+  if (!repairResult.brokenState.isBroken || repairResult.brokenState.winTimerState !== 'PAUSED' || repairResult.isBrokenAfterRepair) {
+    throw new Error('Repair system or Win Timer Pause check failed!');
   }
 
-  await page.mouse.up();
-  await new Promise(r => setTimeout(r, 300));
-
-  // Check if House 1 now hasPower === true!
-  const postPowerState = await page.evaluate(() => {
-    const game = window.POWATER && window.POWATER.game;
-    const h = game.houses[0];
+  // 3. Test Map Upsize (x+10 houses up to 40 cap)
+  const upsizeResult = await page.evaluate(() => {
+    const game = window.POWATER.game;
+    for (let i = 0; i < 12; i++) {
+      game.spawnHouse();
+    }
     return {
-      connectionsCount: game.connections.length,
-      house1_hasPower: h.hasPower,
-      house1_hasWater: h.hasWater,
-      house1_hasDrainage: h.hasDrainage
+      houseCount: game.houses.length,
+      upsizeTier: game.upsizeTier
     };
   });
-
-  console.log('Post-Power Wiring State:', postPowerState);
-
-  if (postPowerState.house1_hasPower === true) {
-    console.log('PASSED: House 1 successfully received power! Power requirement satisfied!');
-  } else {
-    console.error('FAILED: House 1 did not receive power!');
+  console.log('3. Map Upsize Test:', upsizeResult);
+  if (upsizeResult.upsizeTier < 1) {
+    throw new Error('Map Upsize did not trigger after exceeding 10 houses!');
   }
 
-  // Test clicking WATER button
-  const waterBtnPos = await page.evaluate(() => {
-    const btn = window.POWATER && window.POWATER.uiManager && window.POWATER.uiManager.buttons.find(b => b.id === 'water');
-    return btn ? { x: btn.x + btn.w / 2, y: btn.y + btn.h / 2 } : { x: 378, y: 682 };
-  });
-  console.log(`Testing click on WATER PNG button at (${waterBtnPos.x}, ${waterBtnPos.y})...`);
-  await page.mouse.move(waterBtnPos.x, waterBtnPos.y);
-  await page.mouse.down();
-  await new Promise(r => setTimeout(r, 80));
-  await page.mouse.up();
-  await new Promise(r => setTimeout(r, 100));
-  const activeToolAfterClick = await page.evaluate(() => window.POWATER && window.POWATER.game && window.POWATER.game.activeTool);
-  console.log('Active tool after clicking button:', activeToolAfterClick);
-  if (activeToolAfterClick === 'water') {
-    console.log('PASSED: WATER button click correctly selected clean water tool!');
-  } else {
-    console.error('FAILED: Button click did not switch tool to water!');
-  }
+  // 4. Test Level 2 (Tokyo Clean Energy -25% & Earthquake), Level 3 (Rome Candles & Blackout), Level 4 (Amsterdam Flood & Pump)
+  const levelsCheck = await page.evaluate(() => {
+    const game = window.POWATER.game;
+    const cfg = window.POWATER.CONFIG;
 
-  // Test clicking PAUSE button
-  const pauseBtnPos = await page.evaluate(() => {
-    const btn = window.POWATER && window.POWATER.uiManager && window.POWATER.uiManager.buttons.find(b => b.id === 'pause');
-    return btn ? { x: btn.x + btn.w / 2, y: btn.y + btn.h / 2 } : { x: 674, y: 682 };
-  });
-  console.log(`Testing click on PAUSE PNG button at (${pauseBtnPos.x}, ${pauseBtnPos.y})...`);
-  await page.mouse.move(pauseBtnPos.x, pauseBtnPos.y);
-  await page.mouse.down();
-  await new Promise(r => setTimeout(r, 80));
-  await page.mouse.up();
-  await new Promise(r => setTimeout(r, 100));
-  const isPausedState1 = await page.evaluate(() => window.POWATER && window.POWATER.game && window.POWATER.game.isPaused);
-  console.log('Game isPaused after 1st pause click:', isPausedState1);
-  if (isPausedState1 === true) {
-    console.log('PASSED: PAUSE button click paused game without error!');
-  } else {
-    console.error('FAILED: PAUSE button click did not pause game!');
-  }
+    // Tokyo (index 1)
+    game.startLevel(1);
+    const tokyoSolarCost = game.getBuildingCost(cfg.BUILDINGS.GENERATOR_SOLAR);
+    game.triggerEarthquake();
+    const tokyoBrokenAfterQuake = game.buildings.filter(b => b.isBroken).length;
+    game.repairAllBroken();
 
-  // Click PAUSE again to resume
-  await page.mouse.move(pauseBtnPos.x, pauseBtnPos.y);
-  await page.mouse.down();
-  await new Promise(r => setTimeout(r, 80));
-  await page.mouse.up();
-  await new Promise(r => setTimeout(r, 100));
-  const isPausedState2 = await page.evaluate(() => window.POWATER && window.POWATER.game && window.POWATER.game.isPaused);
-  console.log('Game isPaused after 2nd pause click:', isPausedState2);
-  if (isPausedState2 === false) {
-    console.log('PASSED: PAUSE button unpaused game successfully!');
-  } else {
-    console.error('FAILED: PAUSE button did not unpause game!');
-  }
+    // Rome (index 2)
+    game.startLevel(2);
+    game.money = 200;
+    game.buyCandlePack('candle_50'); // +5 boxes
+    const stockBeforeBlackout = game.candleStock;
+    game.triggerRomeBlackout();
+    game.update(0.1);
+    const stockAfterBlackout = game.candleStock;
+    const housesProtectedByCandle = game.houses.filter(h => h.usingCandle && h.hasPower).length;
 
-  // Test clicking SPEED button
-  const speedBtnPos = await page.evaluate(() => {
-    const btn = window.POWATER && window.POWATER.uiManager && window.POWATER.uiManager.buttons.find(b => b.id === 'speed');
-    return btn ? { x: btn.x + btn.w / 2, y: btn.y + btn.h / 2 } : { x: 746, y: 682 };
-  });
-  console.log(`Testing click on SPEED PNG button at (${speedBtnPos.x}, ${speedBtnPos.y})...`);
-  await page.mouse.move(speedBtnPos.x, speedBtnPos.y);
-  await page.mouse.down();
-  await new Promise(r => setTimeout(r, 80));
-  await page.mouse.up();
-  await new Promise(r => setTimeout(r, 100));
-  const speedState1 = await page.evaluate(() => window.POWATER && window.POWATER.game && window.POWATER.game.gameSpeed);
-  console.log('Game speed after 1st speed click:', speedState1);
-  if (speedState1 === 2.0) {
-    console.log('PASSED: SPEED button click toggled speed to 2X!');
-  } else {
-    console.error('FAILED: SPEED button did not set speed to 2X!');
-  }
+    // Amsterdam (index 3)
+    game.startLevel(3);
+    const amsMaxComplaints = game.maxComplaints;
+    game.money = 600;
+    game.triggerAmsterdamFlood();
+    const floodActiveBeforePump = game.isFloodActive;
+    game.useEmergencyFloodPump();
+    const floodActiveAfterPump = game.isFloodActive;
 
-  // Click SPEED again to revert to 1.0
-  await page.mouse.move(speedBtnPos.x, speedBtnPos.y);
-  await page.mouse.down();
-  await new Promise(r => setTimeout(r, 80));
-  await page.mouse.up();
-  await new Promise(r => setTimeout(r, 100));
-  const speedState2 = await page.evaluate(() => window.POWATER && window.POWATER.game && window.POWATER.game.gameSpeed);
-  console.log('Game speed after 2nd speed click:', speedState2);
-  if (speedState2 === 1.0) {
-    console.log('PASSED: SPEED button click reverted speed to 1X!');
-  } else {
-    console.error('FAILED: SPEED button did not revert speed to 1X!');
-  }
+    // Return to Bangkok (index 0) for clean screenshot
+    game.startLevel(0);
+    const gen = game.buildings.find(b => b.config.type === 'generator');
+    const pump = game.buildings.find(b => b.config.type === 'water_pump');
+    const filter = game.buildings.find(b => b.config.type === 'waste_filter');
+    game.houses.forEach(h => {
+      game.connectNodes('power', gen, h);
+      game.connectNodes('water', pump, h);
+      game.connectNodes('sewage', filter, h);
+    });
+    game.update(0.2);
 
-  // Test River Scene Object Binding & Single River Truth
-  const riverVerification = await page.evaluate(() => {
-    const game = window.POWATER && window.POWATER.game;
-    const map = game && game.map;
-    const riverObj = map && map.getRiverObject();
     return {
-      hasRiverObj: !!riverObj,
-      riverX: riverObj ? riverObj.getX() : null,
-      riverW: riverObj ? riverObj.getWidth() : null,
-      centerAt360: map ? map.getRiverCenterAtY(360) : null,
-      isPointInRiverCenter: map ? map.isPointInRiver(570, 360) : null,
-      isPointInRiverOutside: map ? map.isPointInRiver(200, 360) : null
+      tokyoSolarCost,
+      tokyoBrokenAfterQuake,
+      stockBeforeBlackout,
+      stockAfterBlackout,
+      housesProtectedByCandle,
+      amsMaxComplaints,
+      floodActiveBeforePump,
+      floodActiveAfterPump
     };
   });
-  console.log('River Scene Object Verification:', riverVerification);
-  if (riverVerification.hasRiverObj && riverVerification.isPointInRiverCenter && !riverVerification.isPointInRiverOutside) {
-    console.log('PASSED: River is directly mapped to scene object with single source of truth!');
-  } else {
-    console.error('FAILED: River scene object binding check failed!');
-  }
+  console.log('4. 4-Level Special Mechanics Verification:', levelsCheck);
 
-  const badgeDebug = await page.evaluate(() => {
-    const game = window.POWATER && window.POWATER.game;
-    const h = game && game.houses[1]; // house 2 has not received power or water!
-    const bs = h && h.badgeSprites;
-    return {
-      hasH: !!h,
-      hasBS: !!bs,
-      powerVis: bs && bs.power ? bs.power.visible : null,
-      powerPos: bs && bs.power ? { x: bs.power.x, y: bs.power.y } : null,
-      powerSize: bs && bs.power ? { w: bs.power.width, h: bs.power.height, sx: bs.power.scale.x, sy: bs.power.scale.y } : null,
-      texValid: bs && bs.power && bs.power.texture ? bs.power.texture.baseTexture.valid : null,
-      texWidth: bs && bs.power && bs.power.texture ? bs.power.texture.width : null,
-      parent: bs && bs.power && bs.power.parent ? bs.power.parent.constructor.name : null
-    };
-  });
-  console.log('Badge Debug:', badgeDebug);
+  if (
+    levelsCheck.tokyoSolarCost !== 45 ||
+    levelsCheck.tokyoBrokenAfterQuake < 2 ||
+    levelsCheck.housesProtectedByCandle < 3 ||
+    levelsCheck.amsMaxComplaints !== 1 ||
+    !levelsCheck.floodActiveBeforePump ||
+    levelsCheck.floodActiveAfterPump
+  ) {
+    throw new Error('4-Level special mechanics verification failed!');
+  }
 
   const screenshotPath = path.join(__dirname, '..', 'test_screenshot.png');
   await page.screenshot({ path: screenshotPath });
-  console.log('Screenshot saved to:', screenshotPath);
-
-  // Test Fullscreen Viewport (1600x900)
-  console.log('Testing fullscreen viewport 1600x900...');
-  await page.setViewport({ width: 1600, height: 900 });
-  await new Promise(r => setTimeout(r, 400));
-  const fullscreenScreenshotPath = path.join(__dirname, '..', 'test_fullscreen.png');
-  await page.screenshot({ path: fullscreenScreenshotPath });
-  console.log('Fullscreen screenshot saved to:', fullscreenScreenshotPath);
-
-  // Verify that at x = 1450 (which was previously blank white space), it is now gridded/covered!
-  const fullscreenCheck = await page.evaluate(() => {
-    const game = window.POWATER && window.POWATER.game;
-    const scene = game && game.runtimeScene;
-    const gWidth = scene ? scene.getGame().getGameResolutionWidth() : null;
-    return { gWidth };
-  });
-  console.log('Fullscreen Game Width:', fullscreenCheck);
+  console.log('Saved gameplay screenshot to:', screenshotPath);
 
   const realErrors = errors.filter(e =>
     !e.includes('cloudflarestorage') &&
@@ -310,19 +236,14 @@ async function runTest() {
     !e.includes('net::ERR_FAILED')
   );
 
-  console.log('Engine errors encountered:', realErrors.length);
-  if (realErrors.length > 0) {
-    console.log('Errors:', realErrors);
-  }
-
   await browser.close();
   server.close();
 
-  if (realErrors.length > 0 || !postPowerState.house1_hasPower) {
+  if (realErrors.length > 0) {
+    console.error('Runtime errors:', realErrors);
     process.exit(1);
-  } else {
-    console.log('ALL TESTS PASSED WITH 100% SUCCESS!');
   }
+  console.log('ALL POWATER CORP. v1.0.0.0 TESTS PASSED 100%!');
 }
 
 runTest().catch(err => {

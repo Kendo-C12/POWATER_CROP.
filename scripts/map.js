@@ -1,5 +1,5 @@
-// POWATER CORP. - City Map & River Environment
-// Handles terrain grid, Chao Phraya river flow, dynamic pollution water coloring, and proximity checks
+// POWATER CORP. v1.0.0.0 - City Map, River Flow, High Tide & Flood Environment
+// Handles terrain grid, city river sprites, smooth animated water current ripples, High Tide & Flood visuals
 
 (function (global) {
   'use strict';
@@ -23,9 +23,11 @@
       this._riverWidth = (levelConfig && levelConfig.riverWidth) || 100;
       this.waterTime = 0;
       this.pollutionVisual = 0.0;
+      this.isHighTide = false;
+      this.isFloodActive = false;
       this.ripples = [];
 
-      for (let i = 0; i < 28; i++) {
+      for (let i = 0; i < 32; i++) {
         this.ripples.push({
           t: Math.random(),
           offsetFrac: (Math.random() - 0.5) * 0.75,
@@ -49,14 +51,14 @@
 
     getRiverDefaultX() {
       const id = (this.level && this.level.id) ? this.level.id.toLowerCase() : '';
-      if (id === 'venice') return 420;
+      if (id === 'rome' || id === 'venice') return 420;
       if (id === 'tokyo') return 460;
       return 490;
     }
 
     getRiverDefaultWidth() {
       const id = (this.level && this.level.id) ? this.level.id.toLowerCase() : '';
-      if (id === 'venice') return 400;
+      if (id === 'rome' || id === 'venice') return 400;
       if (id === 'tokyo') return 240;
       return 280;
     }
@@ -72,10 +74,14 @@
     getRiverWidth() {
       const riverObj = this.getRiverObject();
       const defW = this.getRiverDefaultWidth();
+      let baseW = this._riverWidth || 100;
       if (riverObj) {
-        return (this._riverWidth || 100) * (riverObj.getWidth() / defW);
+        baseW = baseW * (riverObj.getWidth() / defW);
       }
-      return this._riverWidth || 100;
+      if (this.isHighTide) {
+        baseW *= 1.18;
+      }
+      return baseW;
     }
 
     getRiverCenterAtY(y) {
@@ -96,7 +102,6 @@
           const p2 = pts[i + 1];
           if (y >= p1.y && y <= p2.y) {
             const frac = (y - p1.y) / (p2.y - p1.y);
-            // Smooth cosine spline matching the visual river curve in river.png
             const smoothFrac = (1 - Math.cos(frac * Math.PI)) / 2;
             const baseX = p1.x + (p2.x - p1.x) * smoothFrac;
             const localX = (baseX - defX) * scaleX;
@@ -113,11 +118,11 @@
       return Math.abs(x - rx) < (this.getRiverWidth() / 2);
     }
 
-    isNearRiver(x, y, maxDist = 65) {
+    isNearRiver(x, y, maxDist = 75) {
       const rx = this.getRiverCenterAtY(y);
       const halfW = this.getRiverWidth() / 2;
       const dist = Math.abs(x - rx);
-      return dist >= halfW && dist <= (halfW + maxDist);
+      return dist >= halfW * 0.85 && dist <= (halfW + maxDist);
     }
 
     checkLineIntersectsRiver(p1, p2) {
@@ -128,16 +133,19 @@
       return side1 !== side2;
     }
 
-    update(dt, currentPollution, maxPollution) {
+    update(dt, currentPollution, maxPollution, isHighTide = false, isFloodActive = false) {
       this.waterTime += dt;
+      this.isHighTide = isHighTide;
+      this.isFloodActive = isFloodActive;
       const targetVis = Math.min(1.0, currentPollution / Math.max(0.1, maxPollution));
       this.pollutionVisual += (targetVis - this.pollutionVisual) * dt * 2.0;
 
+      const speedMult = this.isHighTide ? 1.6 : 1.0;
       this.ripples.forEach(r => {
-        r.t += dt * r.speed;
+        r.t += dt * r.speed * speedMult;
         if (r.t > 1.0) {
           r.t = 0;
-          r.offsetFrac = Math.random() - 0.5;
+          r.offsetFrac = (Math.random() - 0.5) * 0.75;
         }
       });
     }
@@ -145,32 +153,47 @@
     render(pixiGfx) {
       if (!pixiGfx) return;
 
-      // Urban Grid lines are provided by the scene object 'grid_bg' (assets/grid_bg.png)!
-      // The scene object 'river' is the single source of truth for the river visual!
-      // No duplicate second river body is drawn here.
-
-      // 2. Dynamic river water tint on the scene object if present
+      // 1. Dynamic river water tint on the GDevelop scene object 'river'
       const riverObj = this.getRiverObject();
       if (riverObj && typeof riverObj.setColor === 'function') {
-        // Clean: 255;255;255 (normal sprite) -> Polluted: 130;150;75 (toxic murky brownish green)
         const rC = Math.round(255 - (255 - 130) * this.pollutionVisual);
         const gC = Math.round(255 - (255 - 150) * this.pollutionVisual);
         const bC = Math.round(255 - (255 - 75) * this.pollutionVisual);
         riverObj.setColor(`${rC};${gC};${bC}`);
       }
 
-      // 3. Smooth animated water droplets drifting down the zigzag current (from reference game Pre18-10)
+      // 2. High Tide glowing shoreline surge
       const riverW = this.getRiverWidth();
+      if (this.isHighTide) {
+        const pulse = 0.22 + Math.sin(this.waterTime * 4.0) * 0.08;
+        pixiGfx.lineStyle(14, 0x00b4d8, pulse);
+        for (let y = 0; y <= this.height; y += 24) {
+          const rx = this.getRiverCenterAtY(y);
+          if (y === 0) pixiGfx.moveTo(rx, y);
+          else pixiGfx.lineTo(rx, y);
+        }
+      }
+
+      // 3. Smooth animated water droplets drifting down the curvy river current
       this.ripples.forEach(r => {
         const ry = r.t * this.height;
         const rx = this.getRiverCenterAtY(ry) + (r.offsetFrac || 0) * (riverW * 0.65);
-        const rColor = this.pollutionVisual > 0.5 ? 0xb4dc64 : 0xe0fbfc;
-        const alpha = (this.pollutionVisual > 0.5 ? 0.16 : 0.22) * (1.0 - this.pollutionVisual * 0.3);
+        const rColor = this.pollutionVisual > 0.5 ? 0xb4dc64 : (this.isHighTide ? 0x90e0ef : 0xe0fbfc);
+        const alpha = (this.pollutionVisual > 0.5 ? 0.18 : 0.26) * (1.0 - this.pollutionVisual * 0.3);
 
+        pixiGfx.lineStyle(0);
         pixiGfx.beginFill(rColor, alpha);
-        pixiGfx.drawEllipse(rx, ry, r.size, r.size * 0.3);
+        pixiGfx.drawEllipse(rx, ry, r.size, r.size * 0.32);
         pixiGfx.endFill();
       });
+
+      // 4. Amsterdam Flood Rising Water Overlay
+      if (this.isFloodActive) {
+        const waveAlpha = 0.25 + Math.sin(this.waterTime * 3.5) * 0.08;
+        pixiGfx.beginFill(0x0077b6, waveAlpha);
+        pixiGfx.drawRect(0, 44, this.width, this.height - 44);
+        pixiGfx.endFill();
+      }
     }
   }
 

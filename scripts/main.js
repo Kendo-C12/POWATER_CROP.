@@ -1,12 +1,13 @@
-// POWATER CORP. - Main Game Controller & GDevelop RuntimeScene Integration
-// Coordinates GameEngine, Dual-Layer PixiJS Scene Rendering, User Input, and UI Overlay
+// POWATER CORP. v1.0.0.0 - Main Game Controller & GDevelop RuntimeScene Integration
+// Coordinates GameEngine, Dual-Layer PixiJS Scene Rendering, Day/Night Cycle Lighting,
+// Earthquake Screen Shake, Click-to-Repair, Keybinds, and UI Overlay
 
 (function (global) {
   'use strict';
 
   global.POWATER = global.POWATER || {};
   if (global.POWATER.GameController) {
-    return; // Prevent prototype invalidation on repeated frame execution
+    return;
   }
 
   class GameController {
@@ -29,15 +30,35 @@
       this.lastTime = 0;
       this.currentRuntimeScene = null;
       this.currentSceneName = '';
+      this.keyListenerBound = false;
     }
 
     init(runtimeScene) {
       this.reinitScene(runtimeScene);
     }
 
+    bindKeyboardShortcuts() {
+      if (this.keyListenerBound || typeof window === 'undefined') return;
+      this.keyListenerBound = true;
+      window.addEventListener('keydown', (e) => {
+        if (!this.game || !this.ui) return;
+        const key = (e.key || '').toLowerCase();
+        if (key === '1') this.ui.selectTool('power');
+        else if (key === '2') this.ui.selectTool('water');
+        else if (key === '3') this.ui.selectTool('sewage');
+        else if (key === '4') this.ui.selectTool('build_solar');
+        else if (key === '5') this.ui.selectTool('build_air_filter');
+        else if (key === 'r') this.game.repairAllBroken();
+        else if (key === 'i') this.ui.showSpecialItemsModal();
+        else if (key === 'u') this.ui.showUpgradesModal();
+        else if (key === ' ') this.game.togglePause();
+      });
+    }
+
     reinitScene(runtimeScene) {
       this.currentRuntimeScene = runtimeScene;
       this.currentSceneName = runtimeScene ? runtimeScene.getName() : 'Main';
+      this.bindKeyboardShortcuts();
 
       // 1. Initialize Audio Engine
       if (!global.POWATER.soundManager) {
@@ -64,12 +85,12 @@
       // 4. Initialize PixiJS Graphics & Drawing UI Layers
       this.setupPixiLayers(runtimeScene);
 
-      // 5. Detect and Start Level matching Scene Name
+      // 5. Detect and Start Level matching Scene Name (Bangkok, Tokyo, Rome, Amsterdam)
       const sName = this.currentSceneName.toLowerCase();
       let levelIdx = 0;
-      if (sName.includes('venice')) levelIdx = 1;
-      else if (sName.includes('tokyo')) levelIdx = 2;
-      else if (sName.includes('endless') || sName.includes('metropolis')) levelIdx = 3;
+      if (sName.includes('tokyo')) levelIdx = 1;
+      else if (sName.includes('rome') || sName.includes('venice')) levelIdx = 2;
+      else if (sName.includes('amsterdam') || sName.includes('endless') || sName.includes('metropolis')) levelIdx = 3;
 
       this.game.startLevel(levelIdx);
       this.ui.showLevelBriefing(this.game.currentLevel);
@@ -86,7 +107,7 @@
           const container = renderer.getRendererObject ? renderer.getRendererObject() : null;
 
           if (container && typeof PIXI !== 'undefined' && PIXI.Graphics) {
-            // Layer 1: Wires & River (Z=2, beneath buildings and houses)
+            // Layer 1: Wires & River Ripples (Z=2, beneath buildings and houses)
             const gfxWires = new PIXI.Graphics();
             if (renderer.addRendererObject) {
               renderer.addRendererObject(gfxWires, 2);
@@ -96,7 +117,7 @@
             this.pixiGfxWires = gfxWires;
             runtimeScene._powaterPixiGfxWires = gfxWires;
 
-            // Layer 2: Status Rings, Pins, Hover Rings & Live Drag Wire (Z=6, above buildings and houses)
+            // Layer 2: Status Rings, Pins, Day/Night Lighting & Live Drag Wire (Z=6)
             const gfxOverlay = new PIXI.Graphics();
             if (renderer.addRendererObject) {
               renderer.addRendererObject(gfxOverlay, 6);
@@ -106,7 +127,7 @@
             this.pixiGfxOverlay = gfxOverlay;
             runtimeScene._powaterPixiGfxOverlay = gfxOverlay;
 
-            // Layer 2.5: Utility PNG Badges (Z=7, above houses and status rings)
+            // Layer 2.5: Utility, Candle & Repair PNG Badges (Z=7)
             const badgeContainer = new PIXI.Container();
             if (renderer.addRendererObject) {
               renderer.addRendererObject(badgeContainer, 7);
@@ -116,7 +137,7 @@
             this.pixiBadgeContainer = badgeContainer;
             runtimeScene._powaterPixiBadgeContainer = badgeContainer;
 
-            // Layer 3: In-Game Drawn UI (Buttons, Top HUD, Modals) (Z=10, top of scene)
+            // Layer 3: In-Game HUD, Floating Texts & Modals (Z=10)
             const uiContainer = new PIXI.Container();
             if (renderer.addRendererObject) {
               renderer.addRendererObject(uiContainer, 10);
@@ -146,7 +167,7 @@
       this.lastTime = now;
       this.pulseTime += dt * 3.0;
 
-      // 1. Input Coordinates (Layer-converted world coordinates)
+      // 1. Input Coordinates
       const inputManager = runtimeScene.getGame().getInputManager();
       let mouseX = 0;
       let mouseY = 0;
@@ -166,13 +187,12 @@
       this.currentMouseY = mouseY;
       this.game.currentPointerPos = { x: mouseX, y: mouseY };
 
-      // 2. In-Game Drawing UI Update & Click Consumption
+      // 2. In-Game UI Update & Click Consumption
       let uiHandled = false;
       if (this.ui && this.ui.update) {
         uiHandled = this.ui.update(dt, mouseX, mouseY, isMouseDown, this.wasMouseDown);
       }
 
-      // If mouse is interacting with UI buttons or inside modal, do not process world clicks/drags
       if (uiHandled) {
         this.selectedNode = null;
         this.dragStartNode = null;
@@ -199,21 +219,33 @@
       if (isMouseDown && !this.wasMouseDown) {
         if (global.POWATER.soundManager) global.POWATER.soundManager.resume();
 
+        // 0. If clicked on a Broken Building (or using Repair tool), repair it immediately!
+        if (hitNode && hitNode.isBroken) {
+          this.game.repairBuilding(hitNode);
+          this.ui.updateHUD();
+        }
+        else if (this.game.activeTool === 'repair') {
+          if (hitNode && hitNode.isBuilding) {
+            if (hitNode.isBroken) this.game.repairBuilding(hitNode);
+            else this.game.addFloatingText('✅ อุปกรณ์ทำงานปกติ ไม่ต้องซ่อม', hitNode.getCenter().x, hitNode.getCenter().y - 20, '#06d6a0');
+          } else {
+            this.game.repairAllBroken();
+          }
+          this.ui.updateHUD();
+        }
         // 1. Demolish tool
-        if (this.game.activeTool === 'delete') {
+        else if (this.game.activeTool === 'delete') {
           this.game.deleteAt(mouseX, mouseY);
           this.ui.updateHUD();
         }
         // 2. Clicked on a Node: Start drag or click-to-connect!
         else if (hitNode) {
-          // If we already had a selected node from a previous click, connect them!
           if (this.selectedNode && this.selectedNode.id !== hitNode.id) {
             this.handleConnect(this.selectedNode, hitNode);
             this.selectedNode = null;
             this.dragStartNode = null;
             this.isDragging = false;
           } else {
-            // Auto-select corresponding tool
             if (hitNode.config && hitNode.config.type === 'generator') {
               this.ui.selectTool('power');
             } else if (hitNode.config && hitNode.config.type === 'water_pump') {
@@ -221,7 +253,7 @@
             } else if (hitNode.config && hitNode.config.type === 'waste_filter') {
               this.ui.selectTool('sewage');
             } else if (hitNode.config && hitNode.config.type === 'air_filter') {
-              this.game.addFloatingText('🍃 เครื่องฟอกอากาศ: ลดมลภาวะ -0.2/วิ', hitNode.getCenter().x, hitNode.getCenter().y - 20, '#2ec4b6');
+              this.game.addFloatingText('🍃 เครื่องกรองมลภาวะ: ลดมลภาวะ -0.2/วิ', hitNode.getCenter().x, hitNode.getCenter().y - 20, '#2ec4b6');
             } else if (hitNode.isHouse || hitNode.entityType === 'house') {
               if (!['power', 'water', 'sewage'].includes(this.game.activeTool)) {
                 if (hitNode.hasWater && !hitNode.hasDrainage) this.ui.selectTool('sewage');
@@ -238,19 +270,19 @@
             this.dragStartY = mouseY;
           }
         }
-        // 3. Clicked on empty terrain:
+        // 3. Clicked on empty terrain: Place selected building
         else {
           this.selectedNode = null;
           this.dragStartNode = null;
           this.isDragging = false;
 
-          if (this.game.activeTool.startsWith('build_')) {
+          if (this.game.activeTool && (this.game.activeTool.startsWith('build_') || this.game.activeTool === 'solar' || this.game.activeTool === 'air_filter')) {
             let typeKey = '';
             if (this.game.activeTool === 'build_gen') typeKey = 'generator_coal';
-            else if (this.game.activeTool === 'build_solar') typeKey = 'generator_solar';
+            else if (this.game.activeTool === 'build_solar' || this.game.activeTool === 'solar') typeKey = 'generator_solar';
             else if (this.game.activeTool === 'build_pump') typeKey = 'water_pump';
             else if (this.game.activeTool === 'build_filter') typeKey = 'waste_filter';
-            else if (this.game.activeTool === 'build_air_filter') typeKey = 'air_filter';
+            else if (this.game.activeTool === 'build_air_filter' || this.game.activeTool === 'air_filter') typeKey = 'air_filter';
 
             if (typeKey) {
               this.game.placeBuilding(typeKey, mouseX, mouseY);
@@ -265,7 +297,6 @@
           const dragDist = Math.hypot(mouseX - this.dragStartX, mouseY - this.dragStartY);
           const endNode = this.game.getNodeAt(mouseX, mouseY);
 
-          // If dragged a distance and ended over another node, complete the connection!
           if (dragDist > 15 && endNode && endNode.id !== this.dragStartNode.id) {
             this.handleConnect(this.dragStartNode, endNode);
             this.selectedNode = null;
@@ -278,11 +309,11 @@
       }
       this.wasMouseDown = isMouseDown;
 
-      // 2. Simulation Step
+      // 3. Simulation Step
       this.game.update(dt);
       this.ui.updateHUD();
 
-      // 3. Render Graphics
+      // 4. Render Graphics
       this.render();
     }
 
@@ -312,21 +343,61 @@
       gfxW.clear();
       gfxO.clear();
 
-      // === LAYER 1 (Underneath objects): River & Wires ===
-      // 1. Render Map & River
-      this.game.map.render(gfxW);
+      // Apply Earthquake Screen Shake if active
+      if (this.currentRuntimeScene && this.currentRuntimeScene.getLayer) {
+        const baseLayer = this.currentRuntimeScene.getLayer('');
+        if (baseLayer && typeof baseLayer.setCameraX === 'function') {
+          if (this.game.screenShakeTimer > 0) {
+            const jx = (Math.random() - 0.5) * 14;
+            const jy = (Math.random() - 0.5) * 14;
+            baseLayer.setCameraX(640 + jx);
+            baseLayer.setCameraY(360 + jy);
+          } else {
+            baseLayer.setCameraX(640);
+            baseLayer.setCameraY(360);
+          }
+        }
+      }
 
-      // 2. Render Established Connections
+      // === LAYER 1 (Underneath objects): River & Wires ===
+      this.game.map.render(gfxW);
       this.game.connections.forEach(conn => conn.render(gfxW));
 
-      // === LAYER 2 (Above objects): Status Rings, Pins, Preview Lines & Hover Rings ===
-      // 3. Render House Status Rings & Pins
+      // === LAYER 2 (Above objects): Day/Night Overlay, Status Rings, Badges & Preview Wires ===
+      // 1. Day/Night Cycle Ambient Night Overlay (POWATER CORP.pdf: Day 1m, Night 1m)
+      if (this.game.nightAlpha > 0.01) {
+        gfxO.lineStyle(0);
+        gfxO.beginFill(0x05081c, this.game.nightAlpha);
+        gfxO.drawRect(0, 44, 1280, 676);
+        gfxO.endFill();
+
+        // Warm night light halos around powered houses & candle-lit houses
+        this.game.houses.forEach(h => {
+          if (h.hasPower || h.usingCandle) {
+            const hc = h.getCenter();
+            const haloCol = h.usingCandle ? 0xff9f1c : 0xffd166;
+            gfxO.beginFill(haloCol, this.game.nightAlpha * 0.45);
+            gfxO.drawCircle(hc.x, hc.y, 58);
+            gfxO.endFill();
+          }
+        });
+      }
+
+      // 2. Rome Blackout Dimming Effect
+      if (this.game.isBlackoutActive) {
+        gfxO.lineStyle(0);
+        gfxO.beginFill(0x03020a, 0.28);
+        gfxO.drawRect(0, 44, 1280, 676);
+        gfxO.endFill();
+      }
+
+      // 3. Render House Status Rings & PNG Badges
       this.game.houses.forEach(house => house.render(gfxO, this.pixiBadgeContainer));
 
-      // 4. Render Building Footprints & Indicators
-      this.game.buildings.forEach(building => building.render(gfxO));
+      // 4. Render Building Footprints & Repair PNG Badges
+      this.game.buildings.forEach(building => building.render(gfxO, this.pixiBadgeContainer));
 
-      // 5. Selected Node Highlight (Click-to-Connect)
+      // 5. Selected Node Highlight
       const activeSource = (this.isDragging && this.dragStartNode) ? this.dragStartNode : this.selectedNode;
       if (activeSource) {
         const sc = activeSource.getCenter();
@@ -335,7 +406,7 @@
         gfxO.drawCircle(sc.x, sc.y, pulseR);
       }
 
-      // 6. Live Dragging Preview Wire (Above everything!)
+      // 6. Live Dragging Preview Wire
       if (this.isDragging && this.dragStartNode) {
         const p1 = this.dragStartNode.getCenter();
         const p2 = { x: this.currentMouseX, y: this.currentMouseY };
@@ -344,24 +415,20 @@
         if (this.game.activeTool === 'water') wireColor = 0x00b4d8;
         else if (this.game.activeTool === 'sewage') wireColor = 0xc77dff;
 
-        // Outer dark casing
         gfxO.lineStyle(7, 0x1a1334, 0.75);
         gfxO.moveTo(p1.x, p1.y);
         gfxO.lineTo(p2.x, p2.y);
 
-        // Core bright wire
         gfxO.lineStyle(3.5, wireColor, 1.0);
         gfxO.moveTo(p1.x, p1.y);
         gfxO.lineTo(p2.x, p2.y);
 
-        // Terminals
         gfxO.lineStyle(1.5, 0xffffff, 1.0);
         gfxO.beginFill(wireColor, 1.0);
         gfxO.drawCircle(p1.x, p1.y, 6.0);
         gfxO.drawCircle(p2.x, p2.y, 5.0);
         gfxO.endFill();
 
-        // Target hover pulsating ring
         const targetNode = this.game.getNodeAt(p2.x, p2.y);
         if (targetNode && targetNode.id !== this.dragStartNode.id) {
           const tc = targetNode.getCenter();
