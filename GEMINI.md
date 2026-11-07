@@ -97,6 +97,8 @@ All buildings, houses, rivers, HUD bars, toolbar docks, buttons, and status badg
 
 ## 7. Changelog
 
+- **`v1.0.0.1` (2026-11-08)**:
+  - Fixed GDevelop Diagnostic Report (`Missing scene variables: Pollution_total, Polltution_per_second`) by declaring both scene variables on all 4 layouts (`Main`, `Tokyo`, `Rome`, `Amsterdam`) in `scripts/sync_project.py` and `POWATER CROPS..json`.
 - **`v1.0.0.0` (2026-11-08)**:
   - Upgraded game mechanics from `b1.5` demo to full `POWATER CORP.pdf` `v1.0.0.0` specification.
   - Added new real PNG assets (`river_rome.png`, `river_amsterdam.png`, `btn_repair.png`, `btn_special.png`, `badge_repair.png`, `badge_candle.png`, `icon_day.png`, `icon_night.png`, `logo_powater.png`, expanded `toolbar_dock.png`).

@@ -376,7 +376,20 @@
         "gameEditorMode": "instances-editor"
       },
       "objectsGroups": [],
-      "variables": [],
+      "variables": [
+        {
+          "name": "Pollution_total",
+          "persistentUuid": "5e7fb4e1-6cfe-4a1a-a421-main00000000",
+          "type": "number",
+          "value": 0
+        },
+        {
+          "name": "Polltution_per_second",
+          "persistentUuid": "6e8fb4e1-6cfe-4a1a-a421-main11111111",
+          "type": "number",
+          "value": 0
+        }
+      ],
       "instances": [
         {
           "angle": 0,
@@ -6932,7 +6945,20 @@
         "gameEditorMode": "instances-editor"
       },
       "objectsGroups": [],
-      "variables": [],
+      "variables": [
+        {
+          "name": "Pollution_total",
+          "persistentUuid": "5e7fb4e1-6cfe-4a1a-a421-tokyo0000000",
+          "type": "number",
+          "value": 0
+        },
+        {
+          "name": "Polltution_per_second",
+          "persistentUuid": "6e8fb4e1-6cfe-4a1a-a421-tokyo1111111",
+          "type": "number",
+          "value": 0
+        }
+      ],
       "instances": [
         {
           "angle": 0,
@@ -13488,7 +13514,20 @@
         "gameEditorMode": "instances-editor"
       },
       "objectsGroups": [],
-      "variables": [],
+      "variables": [
+        {
+          "name": "Pollution_total",
+          "persistentUuid": "5e7fb4e1-6cfe-4a1a-a421-rome00000000",
+          "type": "number",
+          "value": 0
+        },
+        {
+          "name": "Polltution_per_second",
+          "persistentUuid": "6e8fb4e1-6cfe-4a1a-a421-rome11111111",
+          "type": "number",
+          "value": 0
+        }
+      ],
       "instances": [
         {
           "angle": 0,
@@ -20044,7 +20083,20 @@
         "gameEditorMode": "instances-editor"
       },
       "objectsGroups": [],
-      "variables": [],
+      "variables": [
+        {
+          "name": "Pollution_total",
+          "persistentUuid": "5e7fb4e1-6cfe-4a1a-a421-amsterdam000",
+          "type": "number",
+          "value": 0
+        },
+        {
+          "name": "Polltution_per_second",
+          "persistentUuid": "6e8fb4e1-6cfe-4a1a-a421-amsterdam111",
+          "type": "number",
+          "value": 0
+        }
+      ],
       "instances": [
         {
           "angle": 0,

@@ -425,7 +425,20 @@ def create_layout(name, title, river_image, river_w, river_h, river_inst, level_
             'gameEditorMode': 'instances-editor'
         },
         'objectsGroups': [],
-        'variables': [],
+        'variables': [
+            {
+                'name': 'Pollution_total',
+                'persistentUuid': f'5e7fb4e1-6cfe-4a1a-a421-{name.lower()[:12].ljust(12, "0")}',
+                'type': 'number',
+                'value': 0
+            },
+            {
+                'name': 'Polltution_per_second',
+                'persistentUuid': f'6e8fb4e1-6cfe-4a1a-a421-{name.lower()[:12].ljust(12, "1")}',
+                'type': 'number',
+                'value': 0
+            }
+        ],
         'instances': insts,
         'objects': build_layout_objects(river_image, river_w, river_h),
         'objectsFolderStructure': {'folderName': '__ROOT__'},
