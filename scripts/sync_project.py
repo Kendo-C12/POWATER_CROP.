@@ -20,7 +20,7 @@ props['adaptGameResolutionAtRuntime'] = False
 props['sizeOnStartupMode'] = ""
 props['windowWidth'] = 1280
 props['windowHeight'] = 720
-props['version'] = '1.0.2.0'
+props['version'] = '1.0.2.1'
 props['name'] = 'POWATER CORP.'
 
 # 2. Update Resources (All real PNG assets)
@@ -324,30 +324,30 @@ def build_layout_objects(river_image='river.png', river_w=280, river_h=720):
         ('waste_filter', 'Orange barrel.png', 140, 140),
         ('air_filter', 'AirFilter.png', 140, 140),
         ('river', river_image, river_w, river_h),
-        ('btn_power', 'btn_power.png', 128, 96),
-        ('btn_water', 'btn_water.png', 128, 96),
-        ('btn_drain', 'btn_drain.png', 128, 96),
-        ('btn_solar', 'btn_solar.png', 128, 96),
-        ('btn_filter', 'btn_filter.png', 128, 96),
-        ('btn_repair', 'btn_repair.png', 128, 96),
-        ('btn_special', 'btn_special.png', 128, 96),
-        ('btn_pause', 'btn_pause.png', 128, 96),
-        ('btn_speed', 'btn_speed.png', 128, 96),
-        ('btn_upgrade', 'btn_upgrade.png', 128, 96),
-        ('btn_sdgs', 'btn_sdgs.png', 128, 96),
-        ('btn_guide', 'btn_guide.png', 128, 96),
+        ('btn_power', 'btn_power.png', 256, 192),
+        ('btn_water', 'btn_water.png', 256, 192),
+        ('btn_drain', 'btn_drain.png', 256, 192),
+        ('btn_solar', 'btn_solar.png', 256, 192),
+        ('btn_filter', 'btn_filter.png', 256, 192),
+        ('btn_repair', 'btn_repair.png', 256, 192),
+        ('btn_special', 'btn_special.png', 256, 192),
+        ('btn_pause', 'btn_pause.png', 256, 192),
+        ('btn_speed', 'btn_speed.png', 256, 192),
+        ('btn_upgrade', 'btn_upgrade.png', 256, 192),
+        ('btn_sdgs', 'btn_sdgs.png', 256, 192),
+        ('btn_guide', 'btn_guide.png', 256, 192),
         ('grid_bg', 'grid_bg.png', 1280, 720),
         ('hud_bar', 'hud_bar.png', 1280, 44),
         ('toolbar_dock', 'toolbar_dock.png', 880, 56),
-        ('logo_powater', 'logo_powater.png', 64, 64),
-        ('icon_day', 'icon_day.png', 48, 48),
-        ('icon_night', 'icon_night.png', 48, 48),
+        ('logo_powater', 'logo_powater.png', 128, 128),
+        ('icon_day', 'icon_day.png', 128, 128),
+        ('icon_night', 'icon_night.png', 128, 128),
         ('badge_power', 'badge_power.png', 48, 48),
         ('badge_water', 'badge_water.png', 48, 48),
         ('badge_drain', 'badge_drain.png', 48, 48),
-        ('badge_repair', 'badge_repair.png', 48, 48),
-        ('badge_candle', 'badge_candle.png', 48, 48),
-        ('btn_video_help', 'icon_video_help.png', 48, 32)
+        ('badge_repair', 'badge_repair.png', 128, 128),
+        ('badge_candle', 'badge_candle.png', 128, 128),
+        ('btn_video_help', 'icon_video_help.png', 144, 96)
     ]
     for bname, bimg, bw, bh in base_buildings:
         objs.append(make_sprite_object(bname, bimg, bw, bh))

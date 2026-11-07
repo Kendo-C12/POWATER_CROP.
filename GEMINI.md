@@ -1,8 +1,8 @@
-# POWATER CORP. (`v1.0.2.0`) — GDevelop 5 Project Documentation (`GEMINI.md`)
+# POWATER CORP. (`v1.0.2.1`) — GDevelop 5 Project Documentation (`GEMINI.md`)
 
 > **Team Green Gang**: Sukrit Limpakanon, Aristt Mahakitsiri, Gantinan Satjariyakul  
 > **Engine**: GDevelop 5 (`POWATER CROPS..json`) + Real PNG Sprite Assets + PixiJS Procedural River/Conduit Rendering  
-> **Version Naming**: `1.x.y.z` (`x` = Major Version, `y` = Small Addition Within Major Version, `z` = Bug Fixes) — Current: **`v1.0.2.0`**
+> **Version Naming**: `1.x.y.z` (`x` = Major Version, `y` = Small Addition Within Major Version, `z` = Bug Fixes) — Current: **`v1.0.2.1`**
 
 ---
 
@@ -101,6 +101,9 @@ All buildings, houses, rivers, HUD bars, toolbar docks, buttons, and status badg
 
 ## 7. Changelog
 
+- **`v1.0.2.1` (2026-11-08)**:
+  - Fixed blurry text and buttons when zoomed in by upgrading all 12 toolbar button PNGs (`btn_*.png` at `256x192`), video help badges (`icon_video_help.png` at `144x96`), and status icons (`128x128`) in `scripts/generate_assets.py` to **4x High-Definition Anti-Aliased Vector (Signed Distance Field)** sprites.
+  - Upgraded all runtime `PIXI.Text` instances in `scripts/ui.js` to **4x Retina supersampling (`resolution = 4`, `roundPixels = true`)** with pooled text caching and live crisp vector toolbar button faces & labels.
 - **`v1.0.2.0` (2026-11-08)**:
   - Added a **Small & Fast Interactive Scene Tutorial** (`Tutorial` GDevelop layout + `🎓 Fast Tutorial (60s)` button in the Level Select modal) with a 4-step interactive coach banner, animated Manhattan guide paths, and `⏭️ Auto-Step` demonstration.
   - Added clickable **`icon_video_help.png` (`[▶]`) sprite buttons directly above all 10 feature buttons** on the bottom toolbar (`Power`, `Water`, `Sewage`, `Solar`, `Filter`, `Repair`, `Items`, `Upgrades`, `SDGs`, `Guide`). Clicking any `[▶]` icon opens a looping 60 FPS animated video player showing how to use that feature, along with a one-click button to immediately activate/use the feature.

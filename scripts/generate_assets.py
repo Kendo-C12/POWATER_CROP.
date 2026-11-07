@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 """
-POWATER CORP. v1.0.0.0 - Real PNG Asset Generator
-Generates crisp RGBA PNG sprites for GDevelop 5 objects, rivers, badges, toolbar buttons, and icons.
+POWATER CORP. v1.0.2.1 - High-Definition Anti-Aliased Vector PNG Asset Generator
+Generates crisp 4x HD RGBA PNG sprites (using Signed Distance Field / anti-aliased
+vector stroke geometry) for GDevelop 5 objects, rivers, badges, toolbar buttons, and icons
+so they never look blurry or pixelated when zoomed in.
 """
 import os
 import math
@@ -35,64 +37,165 @@ def write_png(filepath, width, height, rgba_bytes):
         f.write(make_chunk(b'IEND', b''))
 
 
-# Clean 5x7 pixel font for crisp button labels
-FONT_5X7 = {
-    'A': ["01110", "10001", "10001", "11111", "10001", "10001", "10001"],
-    'B': ["11110", "10001", "10001", "11110", "10001", "10001", "11110"],
-    'C': ["01111", "10000", "10000", "10000", "10000", "10000", "01111"],
-    'D': ["11110", "10001", "10001", "10001", "10001", "10001", "11110"],
-    'E': ["11111", "10000", "10000", "11110", "10000", "10000", "11111"],
-    'F': ["11111", "10000", "10000", "11110", "10000", "10000", "10000"],
-    'G': ["01111", "10000", "10000", "10111", "10001", "10001", "01111"],
-    'H': ["10001", "10001", "10001", "11111", "10001", "10001", "10001"],
-    'I': ["11111", "00100", "00100", "00100", "00100", "00100", "11111"],
-    'K': ["10001", "10010", "10100", "11000", "10100", "10010", "10001"],
-    'L': ["10000", "10000", "10000", "10000", "10000", "10000", "11111"],
-    'M': ["10001", "11011", "10101", "10101", "10001", "10001", "10001"],
-    'N': ["10001", "11001", "10101", "10011", "10001", "10001", "10001"],
-    'O': ["01110", "10001", "10001", "10001", "10001", "10001", "01110"],
-    'P': ["11110", "10001", "10001", "11110", "10000", "10000", "10000"],
-    'R': ["11110", "10001", "10001", "11110", "10100", "10010", "10001"],
-    'S': ["01111", "10000", "10000", "01110", "00001", "00001", "11110"],
-    'T': ["11111", "00100", "00100", "00100", "00100", "00100", "00100"],
-    'U': ["10001", "10001", "10001", "10001", "10001", "10001", "01110"],
-    'V': ["10001", "10001", "10001", "10001", "10001", "01010", "00100"],
-    'W': ["10001", "10001", "10001", "10101", "10101", "11011", "10001"],
-    'X': ["10001", "10001", "01010", "00100", "01010", "10001", "10001"],
-    'Y': ["10001", "10001", "01010", "00100", "00100", "00100", "00100"],
-    '[': ["01110", "01000", "01000", "01000", "01000", "01000", "01110"],
-    ']': ["01110", "00010", "00010", "00010", "00010", "00010", "01110"],
-    ' ': ["00000", "00000", "00000", "00000", "00000", "00000", "00000"],
+def blend_pixel(buf, w, h, x, y, r, g, b, alpha):
+    """Alpha-blends a pixel at (x, y) into buf."""
+    if x < 0 or x >= w or y < 0 or y >= h or alpha <= 0.0:
+        return
+    if alpha > 1.0:
+        alpha = 1.0
+    idx = (y * w + x) * 4
+    dst_r = buf[idx]
+    dst_g = buf[idx + 1]
+    dst_b = buf[idx + 2]
+    dst_a = buf[idx + 3] / 255.0
+
+    out_a = alpha + dst_a * (1.0 - alpha)
+    if out_a > 1e-5:
+        out_r = (r * alpha + dst_r * dst_a * (1.0 - alpha)) / out_a
+        out_g = (g * alpha + dst_g * dst_a * (1.0 - alpha)) / out_a
+        out_b = (b * alpha + dst_b * dst_a * (1.0 - alpha)) / out_a
+        buf[idx] = int(min(255, max(0, out_r)))
+        buf[idx + 1] = int(min(255, max(0, out_g)))
+        buf[idx + 2] = int(min(255, max(0, out_b)))
+        buf[idx + 3] = int(min(255, max(0, out_a * 255.0)))
+
+
+def draw_aa_segment(buf, w, h, x1, y1, x2, y2, thickness, color):
+    """Draws an anti-aliased round-capped capsule segment using Signed Distance Field."""
+    r, g, b, a = color
+    base_alpha = a / 255.0
+    half_t = thickness * 0.5
+    pad = int(math.ceil(half_t + 2.0))
+    min_x = max(0, int(min(x1, x2)) - pad)
+    max_x = min(w - 1, int(max(x1, x2)) + pad)
+    min_y = max(0, int(min(y1, y2)) - pad)
+    max_y = min(h - 1, int(max(y1, y2)) + pad)
+
+    dx = x2 - x1
+    dy = y2 - y1
+    seg_len_sq = dx * dx + dy * dy
+
+    for py in range(min_y, max_y + 1):
+        for px in range(min_x, max_x + 1):
+            if seg_len_sq < 1e-6:
+                dist = math.hypot(px - x1, py - y1)
+            else:
+                t = ((px - x1) * dx + (py - y1) * dy) / seg_len_sq
+                if t < 0.0:
+                    t = 0.0
+                elif t > 1.0:
+                    t = 1.0
+                proj_x = x1 + t * dx
+                proj_y = y1 + t * dy
+                dist = math.hypot(px - proj_x, py - proj_y)
+            if dist <= half_t + 1.0:
+                cov = min(1.0, max(0.0, half_t + 0.5 - dist))
+                blend_pixel(buf, w, h, px, py, r, g, b, cov * base_alpha)
+
+
+def draw_aa_circle(buf, w, h, cx, cy, radius, fill_color=None, stroke_color=None, stroke_w=0.0):
+    """Draws an anti-aliased filled and/or stroked circle."""
+    max_r = radius + stroke_w * 0.5 + 2.0
+    min_x = max(0, int(cx - max_r))
+    max_x = min(w - 1, int(cx + max_r))
+    min_y = max(0, int(cy - max_r))
+    max_y = min(h - 1, int(cy + max_r))
+
+    for py in range(min_y, max_y + 1):
+        for px in range(min_x, max_x + 1):
+            d = math.hypot(px - cx, py - cy)
+            if fill_color is not None and d <= radius + 1.0:
+                cov = min(1.0, max(0.0, radius + 0.5 - d))
+                fr, fg, fb, fa = fill_color
+                blend_pixel(buf, w, h, px, py, fr, fg, fb, cov * (fa / 255.0))
+            if stroke_color is not None and stroke_w > 0.0:
+                sd = abs(d - radius)
+                half_s = stroke_w * 0.5
+                if sd <= half_s + 1.0:
+                    cov = min(1.0, max(0.0, half_s + 0.5 - sd))
+                    sr, sg, sb, sa = stroke_color
+                    blend_pixel(buf, w, h, px, py, sr, sg, sb, cov * (sa / 255.0))
+
+
+# Smooth Vector Stroke Font (Normalized in [0..1] x [0..1] glyph box)
+# Every character is defined by crisp vector line segments so scaling to any resolution is 100% sharp!
+VECTOR_GLYPHS = {
+    'A': [(0.05, 1.0, 0.5, 0.0), (0.95, 1.0, 0.5, 0.0), (0.2, 0.65, 0.8, 0.65)],
+    'B': [(0.1, 0.0, 0.1, 1.0), (0.1, 0.0, 0.75, 0.0), (0.75, 0.0, 0.9, 0.15), (0.9, 0.15, 0.9, 0.35),
+          (0.9, 0.35, 0.75, 0.5), (0.1, 0.5, 0.75, 0.5), (0.75, 0.5, 0.92, 0.65), (0.92, 0.65, 0.92, 0.85),
+          (0.92, 0.85, 0.75, 1.0), (0.75, 1.0, 0.1, 1.0)],
+    'C': [(0.9, 0.18, 0.7, 0.0), (0.7, 0.0, 0.3, 0.0), (0.3, 0.0, 0.1, 0.2), (0.1, 0.2, 0.1, 0.8),
+          (0.1, 0.8, 0.3, 1.0), (0.3, 1.0, 0.7, 1.0), (0.7, 1.0, 0.9, 0.82)],
+    'D': [(0.1, 0.0, 0.1, 1.0), (0.1, 0.0, 0.65, 0.0), (0.65, 0.0, 0.9, 0.22), (0.9, 0.22, 0.9, 0.78),
+          (0.9, 0.78, 0.65, 1.0), (0.65, 1.0, 0.1, 1.0)],
+    'E': [(0.1, 0.0, 0.1, 1.0), (0.1, 0.0, 0.9, 0.0), (0.1, 0.5, 0.75, 0.5), (0.1, 1.0, 0.9, 1.0)],
+    'F': [(0.1, 0.0, 0.1, 1.0), (0.1, 0.0, 0.9, 0.0), (0.1, 0.5, 0.75, 0.5)],
+    'G': [(0.9, 0.18, 0.7, 0.0), (0.7, 0.0, 0.3, 0.0), (0.3, 0.0, 0.1, 0.2), (0.1, 0.2, 0.1, 0.8),
+          (0.1, 0.8, 0.3, 1.0), (0.3, 1.0, 0.75, 1.0), (0.75, 1.0, 0.9, 0.82), (0.9, 0.82, 0.9, 0.52),
+          (0.55, 0.52, 0.9, 0.52)],
+    'H': [(0.1, 0.0, 0.1, 1.0), (0.9, 0.0, 0.9, 1.0), (0.1, 0.5, 0.9, 0.5)],
+    'I': [(0.2, 0.0, 0.8, 0.0), (0.5, 0.0, 0.5, 1.0), (0.2, 1.0, 0.8, 1.0)],
+    'K': [(0.1, 0.0, 0.1, 1.0), (0.88, 0.0, 0.1, 0.52), (0.28, 0.4, 0.9, 1.0)],
+    'L': [(0.12, 0.0, 0.12, 1.0), (0.12, 1.0, 0.9, 1.0)],
+    'M': [(0.08, 1.0, 0.08, 0.0), (0.08, 0.0, 0.5, 0.55), (0.5, 0.55, 0.92, 0.0), (0.92, 0.0, 0.92, 1.0)],
+    'N': [(0.1, 1.0, 0.1, 0.0), (0.1, 0.0, 0.9, 1.0), (0.9, 1.0, 0.9, 0.0)],
+    'O': [(0.3, 0.0, 0.7, 0.0), (0.7, 0.0, 0.9, 0.2), (0.9, 0.2, 0.9, 0.8), (0.9, 0.8, 0.7, 1.0),
+          (0.7, 1.0, 0.3, 1.0), (0.3, 1.0, 0.1, 0.8), (0.1, 0.8, 0.1, 0.2), (0.1, 0.2, 0.3, 0.0)],
+    'P': [(0.1, 0.0, 0.1, 1.0), (0.1, 0.0, 0.72, 0.0), (0.72, 0.0, 0.9, 0.16), (0.9, 0.16, 0.9, 0.38),
+          (0.9, 0.38, 0.72, 0.54), (0.72, 0.54, 0.1, 0.54)],
+    'R': [(0.1, 0.0, 0.1, 1.0), (0.1, 0.0, 0.72, 0.0), (0.72, 0.0, 0.9, 0.16), (0.9, 0.16, 0.9, 0.38),
+          (0.9, 0.38, 0.72, 0.52), (0.72, 0.52, 0.1, 0.52), (0.52, 0.52, 0.9, 1.0)],
+    'S': [(0.88, 0.16, 0.7, 0.0), (0.7, 0.0, 0.28, 0.0), (0.28, 0.0, 0.1, 0.16), (0.1, 0.16, 0.1, 0.34),
+          (0.1, 0.34, 0.28, 0.48), (0.28, 0.48, 0.72, 0.52), (0.72, 0.52, 0.9, 0.66), (0.9, 0.66, 0.9, 0.84),
+          (0.9, 0.84, 0.72, 1.0), (0.72, 1.0, 0.28, 1.0), (0.28, 1.0, 0.1, 0.84)],
+    'T': [(0.05, 0.0, 0.95, 0.0), (0.5, 0.0, 0.5, 1.0)],
+    'U': [(0.1, 0.0, 0.1, 0.78), (0.1, 0.78, 0.3, 1.0), (0.3, 1.0, 0.7, 1.0), (0.7, 1.0, 0.9, 0.78),
+          (0.9, 0.78, 0.9, 0.0)],
+    'V': [(0.08, 0.0, 0.5, 1.0), (0.92, 0.0, 0.5, 1.0)],
+    'W': [(0.05, 0.0, 0.26, 1.0), (0.26, 1.0, 0.5, 0.45), (0.5, 0.45, 0.74, 1.0), (0.74, 1.0, 0.95, 0.0)],
+    'X': [(0.1, 0.0, 0.9, 1.0), (0.9, 0.0, 0.1, 1.0)],
+    'Y': [(0.1, 0.0, 0.5, 0.5), (0.9, 0.0, 0.5, 0.5), (0.5, 0.5, 0.5, 1.0)],
+    '1': [(0.25, 0.2, 0.55, 0.0), (0.55, 0.0, 0.55, 1.0), (0.2, 1.0, 0.85, 1.0)],
+    '2': [(0.12, 0.22, 0.3, 0.0), (0.3, 0.0, 0.72, 0.0), (0.72, 0.0, 0.9, 0.2), (0.9, 0.2, 0.9, 0.38),
+          (0.9, 0.38, 0.1, 1.0), (0.1, 1.0, 0.92, 1.0)],
+    '3': [(0.12, 0.15, 0.3, 0.0), (0.3, 0.0, 0.72, 0.0), (0.72, 0.0, 0.88, 0.18), (0.88, 0.18, 0.88, 0.35),
+          (0.88, 0.35, 0.68, 0.48), (0.4, 0.48, 0.68, 0.48), (0.68, 0.48, 0.9, 0.65), (0.9, 0.65, 0.9, 0.84),
+          (0.9, 0.84, 0.72, 1.0), (0.72, 1.0, 0.28, 1.0), (0.28, 1.0, 0.1, 0.84)],
+    '4': [(0.72, 0.0, 0.1, 0.68), (0.1, 0.68, 0.92, 0.68), (0.72, 0.0, 0.72, 1.0)],
+    '5': [(0.88, 0.0, 0.15, 0.0), (0.15, 0.0, 0.12, 0.45), (0.12, 0.45, 0.7, 0.45), (0.7, 0.45, 0.9, 0.62),
+          (0.9, 0.62, 0.9, 0.84), (0.9, 0.84, 0.7, 1.0), (0.7, 1.0, 0.25, 1.0), (0.25, 1.0, 0.1, 0.85)],
+    '0': [(0.3, 0.0, 0.7, 0.0), (0.7, 0.0, 0.9, 0.2), (0.9, 0.2, 0.9, 0.8), (0.9, 0.8, 0.7, 1.0),
+          (0.7, 1.0, 0.3, 1.0), (0.3, 1.0, 0.1, 0.8), (0.1, 0.8, 0.1, 0.2), (0.1, 0.2, 0.3, 0.0)],
+    '$': [(0.85, 0.18, 0.7, 0.06), (0.7, 0.06, 0.3, 0.06), (0.3, 0.06, 0.15, 0.2), (0.15, 0.2, 0.15, 0.36),
+          (0.15, 0.36, 0.3, 0.48), (0.3, 0.48, 0.7, 0.52), (0.7, 0.52, 0.85, 0.65), (0.85, 0.65, 0.85, 0.82),
+          (0.85, 0.82, 0.7, 0.94), (0.7, 0.94, 0.3, 0.94), (0.3, 0.94, 0.15, 0.82), (0.5, 0.0, 0.5, 1.0)],
+    '[': [(0.75, 0.0, 0.35, 0.0), (0.35, 0.0, 0.35, 1.0), (0.35, 1.0, 0.75, 1.0)],
+    ']': [(0.25, 0.0, 0.65, 0.0), (0.65, 0.0, 0.65, 1.0), (0.65, 1.0, 0.25, 1.0)],
+    '+': [(0.5, 0.2, 0.5, 0.8), (0.2, 0.5, 0.8, 0.5)],
+    '/': [(0.8, 0.0, 0.2, 1.0)],
+    ' ': []
 }
 
 
-def draw_text(buf, w, h, text, cx, cy, scale, color):
+def draw_vector_text(buf, w, h, text, cx, cy, char_w, char_h, stroke_w, color, letter_gap=None):
+    """Draws smooth anti-aliased vector text centered at (cx, cy)."""
     text = text.upper()
-    char_w = 5 * scale
-    char_h = 7 * scale
-    gap = 1 * scale
-    total_w = len(text) * char_w + max(0, len(text) - 1) * gap
-    start_x = int(cx - total_w / 2)
-    start_y = int(cy - char_h / 2)
+    if letter_gap is None:
+        letter_gap = char_w * 0.32
+    total_w = len(text) * char_w + max(0, len(text) - 1) * letter_gap
+    start_x = cx - total_w * 0.5
+    start_y = cy - char_h * 0.5
 
-    r, g, b, a = color
     for idx, ch in enumerate(text):
-        glyph = FONT_5X7.get(ch, FONT_5X7[' '])
-        ox = start_x + idx * (char_w + gap)
-        for gy in range(7):
-            row = glyph[gy]
-            for gx in range(5):
-                if row[gx] == '1':
-                    for sy in range(scale):
-                        for sx in range(scale):
-                            px = ox + gx * scale + sx
-                            py = start_y + gy * scale + sy
-                            if 0 <= px < w and 0 <= py < h:
-                                i = (py * w + px) * 4
-                                buf[i] = r
-                                buf[i + 1] = g
-                                buf[i + 2] = b
-                                buf[i + 3] = a
+        segs = VECTOR_GLYPHS.get(ch, [])
+        ox = start_x + idx * (char_w + letter_gap)
+        for x1, y1, x2, y2 in segs:
+            draw_aa_segment(
+                buf, w, h,
+                ox + x1 * char_w, start_y + y1 * char_h,
+                ox + x2 * char_w, start_y + y2 * char_h,
+                stroke_w, color
+            )
 
 
 def generate_river_png(filename, img_w, img_h, origin_x, path_points, river_w, palette):
@@ -147,213 +250,200 @@ def generate_river_png(filename, img_w, img_h, origin_x, path_points, river_w, p
     print(f'Generated {filename} ({img_w}x{img_h})')
 
 
-def generate_button_png(filename, title, subtitle, accent_rgb):
-    """Generates a 128x96 toolbar button matching btn_power.png / btn_upgrade.png."""
-    w, h = 128, 96
+def generate_hd_button_png(filename, title, subtitle, accent_rgb):
+    """Generates a crisp 256x192 (4x HD) anti-aliased toolbar button PNG."""
+    w, h = 256, 192
     buf = bytearray(w * h * 4)
     ar, ag, ab = accent_rgb
-    bg_r, bg_g, bg_b = (28, 25, 54)
-    radius = 16
+    bg_r, bg_g, bg_b = (26, 22, 50)
+    radius = 28.0
+    border_t = 6.0
 
     for y in range(h):
         for x in range(w):
-            # Rounded rect distance check
-            dx = max(0, radius - x, x - (w - 1 - radius))
-            dy = max(0, radius - y, y - (h - 1 - radius))
+            dx = max(0.0, radius - x, x - (w - 1 - radius))
+            dy = max(0.0, radius - y, y - (h - 1 - radius))
             dist = math.hypot(dx, dy)
-            if dist <= radius:
+            if dist <= radius + 1.0:
+                cov = min(1.0, max(0.0, radius + 0.5 - dist))
                 idx = (y * w + x) * 4
-                is_border = (dist >= radius - 4) or (x < 4) or (x >= w - 4) or (y < 4) or (y >= h - 4)
-                is_header = (y < 16)
-                if is_border or is_header:
+                edge_dist = min(x, w - 1 - x, y, h - 1 - y, radius - dist)
+                is_header = (y < 26)
+                if edge_dist <= border_t or is_header:
                     buf[idx] = ar
                     buf[idx + 1] = ag
                     buf[idx + 2] = ab
-                    buf[idx + 3] = 255
+                    buf[idx + 3] = int(255 * cov)
                 else:
-                    buf[idx] = bg_r
-                    buf[idx + 1] = bg_g
-                    buf[idx + 2] = bg_b
-                    buf[idx + 3] = 255
+                    # Subtle vertical gradient
+                    grad = 1.0 - (y / float(h)) * 0.18
+                    buf[idx] = int(bg_r * grad)
+                    buf[idx + 1] = int(bg_g * grad)
+                    buf[idx + 2] = int(bg_b * grad)
+                    buf[idx + 3] = int(255 * cov)
 
-    draw_text(buf, w, h, title, w // 2, 42, 3, (255, 255, 255, 255))
-    draw_text(buf, w, h, subtitle, w // 2, 72, 2, (ar, ag, ab, 255))
+    # Crisp anti-aliased vector title & subtitle
+    title_char_w = 22.0 if len(title) <= 6 else 18.5
+    draw_vector_text(
+        buf, w, h, title,
+        cx=w * 0.5, cy=84.0,
+        char_w=title_char_w, char_h=34.0,
+        stroke_w=5.2,
+        color=(255, 255, 255, 255),
+        letter_gap=title_char_w * 0.30
+    )
+
+    sub_char_w = 14.5 if len(subtitle) <= 8 else 12.5
+    draw_vector_text(
+        buf, w, h, subtitle,
+        cx=w * 0.5, cy=146.0,
+        char_w=sub_char_w, char_h=22.0,
+        stroke_w=3.6,
+        color=(ar, ag, ab, 255),
+        letter_gap=sub_char_w * 0.28
+    )
+
     write_png(os.path.join(ASSETS_DIR, filename), w, h, buf)
-    print(f'Generated {filename} ({w}x{h})')
+    print(f'Generated HD {filename} ({w}x{h})')
 
 
 def generate_badge_repair():
-    """Generates badge_repair.png (48x48) circular alert badge with wrench icon."""
-    w, h = 48, 48
+    """Generates HD badge_repair.png (128x128) circular alert badge with anti-aliased wrench icon."""
+    w, h = 128, 128
     buf = bytearray(w * h * 4)
-    cx, cy = 23.5, 23.5
-    for y in range(h):
-        for x in range(w):
-            d = math.hypot(x - cx, y - cy)
-            idx = (y * w + x) * 4
-            if d <= 22.0:
-                if d >= 18.0:
-                    buf[idx:idx + 4] = bytes((255, 90, 95, 255))
-                else:
-                    buf[idx:idx + 4] = bytes((38, 18, 35, 255))
-            # Diagonal wrench shaft
-            if abs((x - cx) - (y - cy)) <= 2.8 and abs((x - cx) + (y - cy)) <= 14.0:
-                buf[idx:idx + 4] = bytes((255, 183, 3, 255))
-            # Wrench head
-            if math.hypot(x - 16, y - 16) <= 5.5 and math.hypot(x - 14, y - 14) >= 2.2:
-                buf[idx:idx + 4] = bytes((255, 209, 102, 255))
-            if math.hypot(x - 31, y - 31) <= 5.0 and math.hypot(x - 33, y - 33) >= 2.2:
-                buf[idx:idx + 4] = bytes((255, 209, 102, 255))
-
+    cx, cy = 63.5, 63.5
+    draw_aa_circle(buf, w, h, cx, cy, 56.0, fill_color=(38, 18, 35, 255), stroke_color=(255, 90, 95, 255), stroke_w=10.0)
+    # Wrench shaft & jaws
+    draw_aa_segment(buf, w, h, 42, 86, 86, 42, 13.0, (255, 183, 3, 255))
+    draw_aa_circle(buf, w, h, 86, 42, 16.0, fill_color=(255, 209, 102, 255))
+    draw_aa_circle(buf, w, h, 92, 36, 8.0, fill_color=(38, 18, 35, 255))
+    draw_aa_circle(buf, w, h, 42, 86, 14.0, fill_color=(255, 209, 102, 255))
+    draw_aa_circle(buf, w, h, 36, 92, 7.0, fill_color=(38, 18, 35, 255))
     write_png(os.path.join(ASSETS_DIR, 'badge_repair.png'), w, h, buf)
-    print('Generated badge_repair.png (48x48)')
+    print('Generated HD badge_repair.png (128x128)')
 
 
 def generate_badge_candle():
-    """Generates badge_candle.png (48x48) circular badge with glowing candle icon."""
-    w, h = 48, 48
+    """Generates HD badge_candle.png (128x128) circular badge with glowing candle icon."""
+    w, h = 128, 128
     buf = bytearray(w * h * 4)
-    cx, cy = 23.5, 23.5
-    for y in range(h):
-        for x in range(w):
-            d = math.hypot(x - cx, y - cy)
-            idx = (y * w + x) * 4
-            if d <= 22.0:
-                if d >= 18.0:
-                    buf[idx:idx + 4] = bytes((255, 209, 102, 255))
-                else:
-                    buf[idx:idx + 4] = bytes((28, 22, 48, 255))
-            # Candle body
-            if 19 <= x <= 28 and 24 <= y <= 37:
-                buf[idx:idx + 4] = bytes((248, 249, 250, 255))
-            # Candle wick
-            if 23 <= x <= 24 and 21 <= y < 24:
-                buf[idx:idx + 4] = bytes((108, 117, 125, 255))
-            # Flame teardrop
-            fx = (x - 23.5) / 4.5
-            fy = (y - 16.0) / 6.0
-            if fx * fx + fy * fy <= 1.0:
-                if fx * fx + fy * fy <= 0.35:
-                    buf[idx:idx + 4] = bytes((255, 255, 220, 255))
-                else:
-                    buf[idx:idx + 4] = bytes((255, 159, 28, 255))
-
+    cx, cy = 63.5, 63.5
+    draw_aa_circle(buf, w, h, cx, cy, 56.0, fill_color=(28, 22, 48, 255), stroke_color=(255, 209, 102, 255), stroke_w=10.0)
+    # Candle body
+    draw_aa_segment(buf, w, h, 63.5, 68, 63.5, 98, 24.0, (248, 249, 250, 255))
+    # Wick
+    draw_aa_segment(buf, w, h, 63.5, 56, 63.5, 66, 4.0, (140, 148, 160, 255))
+    # Flame outer & inner
+    draw_aa_segment(buf, w, h, 63.5, 34, 63.5, 48, 16.0, (255, 159, 28, 255))
+    draw_aa_segment(buf, w, h, 63.5, 38, 63.5, 48, 9.0, (255, 255, 220, 255))
     write_png(os.path.join(ASSETS_DIR, 'badge_candle.png'), w, h, buf)
-    print('Generated badge_candle.png (48x48)')
+    print('Generated HD badge_candle.png (128x128)')
 
 
 def generate_day_night_icons():
-    """Generates icon_day.png and icon_night.png (48x48)."""
-    w, h = 48, 48
-    # Day Sun Icon
+    """Generates HD icon_day.png and icon_night.png (128x128)."""
+    w, h = 128, 128
+    cx, cy = 63.5, 63.5
     buf_day = bytearray(w * h * 4)
-    cx, cy = 23.5, 23.5
-    for y in range(h):
-        for x in range(w):
-            d = math.hypot(x - cx, y - cy)
-            idx = (y * w + x) * 4
-            if d <= 12.0:
-                buf_day[idx:idx + 4] = bytes((255, 209, 102, 255))
-            elif 14.5 <= d <= 20.5:
-                ang = math.atan2(y - cy, x - cx)
-                ray = abs(math.sin(ang * 4))
-                if ray > 0.82:
-                    buf_day[idx:idx + 4] = bytes((255, 183, 3, 255))
+    for i in range(8):
+        ang = i * (math.pi / 4.0)
+        x1 = cx + math.cos(ang) * 38.0
+        y1 = cy + math.sin(ang) * 38.0
+        x2 = cx + math.cos(ang) * 54.0
+        y2 = cy + math.sin(ang) * 54.0
+        draw_aa_segment(buf_day, w, h, x1, y1, x2, y2, 7.5, (255, 183, 3, 255))
+    draw_aa_circle(buf_day, w, h, cx, cy, 28.0, fill_color=(255, 209, 102, 255))
     write_png(os.path.join(ASSETS_DIR, 'icon_day.png'), w, h, buf_day)
-    print('Generated icon_day.png (48x48)')
+    print('Generated HD icon_day.png (128x128)')
 
-    # Night Crescent Moon Icon
     buf_night = bytearray(w * h * 4)
     for y in range(h):
         for x in range(w):
-            d1 = math.hypot(x - 22.0, y - 24.0)
-            d2 = math.hypot(x - 28.5, y - 19.5)
-            idx = (y * w + x) * 4
-            if d1 <= 15.0 and d2 >= 12.5:
-                buf_night[idx:idx + 4] = bytes((144, 224, 239, 255))
+            d1 = math.hypot(x - 58.0, y - 64.0)
+            d2 = math.hypot(x - 76.0, y - 52.0)
+            if d1 <= 40.0 and d2 >= 33.0:
+                cov1 = min(1.0, max(0.0, 40.5 - d1))
+                cov2 = min(1.0, max(0.0, d2 - 32.5))
+                blend_pixel(buf_night, w, h, x, y, 144, 224, 239, cov1 * cov2)
     write_png(os.path.join(ASSETS_DIR, 'icon_night.png'), w, h, buf_night)
-    print('Generated icon_night.png (48x48)')
+    print('Generated HD icon_night.png (128x128)')
 
 
 def generate_logo_powater():
-    """Generates logo_powater.png (64x64) matching the POWATER CORP. lightning water-drop logo."""
-    w, h = 64, 64
+    """Generates HD logo_powater.png (128x128)."""
+    w, h = 128, 128
     buf = bytearray(w * h * 4)
-    cx, cy = 31.5, 35.0
-    for y in range(h):
-        for x in range(w):
-            idx = (y * w + x) * 4
-            # Teardrop water shape
-            dy = (y - 10) / 46.0
-            if 0 <= dy <= 1.0:
-                max_rx = 22.0 * math.sin(dy * math.pi * 0.85)
-                if abs(x - cx) <= max_rx:
-                    buf[idx:idx + 4] = bytes((0, 180, 216, 255))
-            # Lightning bolt cutout / highlight in center
-            # Upper bolt segment & lower bolt segment
-            in_bolt = False
-            if 16 <= y <= 34:
-                bx = 36 - (y - 16) * 0.55
-                if abs(x - bx) <= 4.5:
-                    in_bolt = True
-            if 30 <= y <= 50:
-                bx = 33 - (y - 30) * 0.55
-                if abs(x - bx) <= 4.0:
-                    in_bolt = True
-            if in_bolt:
-                buf[idx:idx + 4] = bytes((255, 255, 255, 255))
-
+    draw_aa_circle(buf, w, h, 64, 64, 56.0, fill_color=(16, 28, 58, 255), stroke_color=(0, 180, 216, 255), stroke_w=8.0)
+    # Lightning bolt
+    draw_aa_segment(buf, w, h, 72, 26, 50, 66, 11.0, (255, 209, 102, 255))
+    draw_aa_segment(buf, w, h, 50, 66, 74, 66, 11.0, (255, 209, 102, 255))
+    draw_aa_segment(buf, w, h, 74, 66, 54, 104, 11.0, (0, 180, 216, 255))
     write_png(os.path.join(ASSETS_DIR, 'logo_powater.png'), w, h, buf)
-    print('Generated logo_powater.png (64x64)')
+    print('Generated HD logo_powater.png (128x128)')
 
 
 def generate_toolbar_dock():
     """Generates toolbar_dock.png (880x56) rounded dock tray with section dividers."""
     w, h = 880, 56
     buf = bytearray(w * h * 4)
-    radius = 12
+    radius = 12.0
     for y in range(h):
         for x in range(w):
-            dx = max(0, radius - x, x - (w - 1 - radius))
-            dy = max(0, radius - y, y - (h - 1 - radius))
+            dx = max(0.0, radius - x, x - (w - 1 - radius))
+            dy = max(0.0, radius - y, y - (h - 1 - radius))
             dist = math.hypot(dx, dy)
-            if dist <= radius:
+            if dist <= radius + 1.0:
+                cov = min(1.0, max(0.0, radius + 0.5 - dist))
                 idx = (y * w + x) * 4
-                is_border = (dist >= radius - 2) or (x < 2) or (x >= w - 2) or (y < 2) or (y >= h - 2)
+                is_border = (dist >= radius - 2.0) or (x < 2) or (x >= w - 2) or (y < 2) or (y >= h - 2)
                 is_divider = (8 <= y <= h - 9) and (x in (218, 434, 580))
                 if is_border or is_divider:
-                    buf[idx:idx + 4] = bytes((72, 202, 228, 180))
+                    buf[idx:idx + 4] = bytes((72, 202, 228, int(190 * cov)))
                 else:
-                    buf[idx:idx + 4] = bytes((24, 20, 44, 235))
+                    buf[idx:idx + 4] = bytes((24, 20, 44, int(238 * cov)))
     write_png(os.path.join(ASSETS_DIR, 'toolbar_dock.png'), w, h, buf)
     print('Generated toolbar_dock.png (880x56)')
 
 
 def generate_video_help_icon():
-    """Generates icon_video_help.png (48x32) clickable video tutorial badge above feature buttons."""
-    w, h = 48, 32
+    """Generates HD icon_video_help.png (144x96, 4x HD of 36x24) clickable video tutorial badge."""
+    w, h = 144, 96
     buf = bytearray(w * h * 4)
-    radius = 8
+    radius = 22.0
+    border_t = 5.0
     for y in range(h):
         for x in range(w):
-            dx = max(0, radius - x, x - (w - 1 - radius))
-            dy = max(0, radius - y, y - (h - 1 - radius))
+            dx = max(0.0, radius - x, x - (w - 1 - radius))
+            dy = max(0.0, radius - y, y - (h - 1 - radius))
             dist = math.hypot(dx, dy)
-            if dist <= radius:
+            if dist <= radius + 1.0:
+                cov = min(1.0, max(0.0, radius + 0.5 - dist))
                 idx = (y * w + x) * 4
-                is_border = (dist >= radius - 2.5) or (x < 2) or (x >= w - 2) or (y < 2) or (y >= h - 2)
-                if is_border:
-                    buf[idx:idx + 4] = bytes((0, 180, 216, 255))
+                edge_dist = min(x, w - 1 - x, y, h - 1 - y, radius - dist)
+                if edge_dist <= border_t:
+                    buf[idx:idx + 4] = bytes((0, 180, 216, int(255 * cov)))
                 else:
-                    buf[idx:idx + 4] = bytes((20, 16, 42, 240))
-            # Play triangle in center
-            if 9 <= y <= 22:
-                half_span = (7.0 - abs(y - 15.5)) * 1.15
-                if 19 <= x <= 19 + half_span:
-                    idx = (y * w + x) * 4
-                    buf[idx:idx + 4] = bytes((255, 209, 102, 255))
+                    buf[idx:idx + 4] = bytes((20, 16, 42, int(245 * cov)))
+
+    # Smooth anti-aliased Play triangle on left + "VID" label on right
+    for py in range(24, 73):
+        half_span = (24.0 - abs(py - 48.0)) * 1.15
+        for px in range(32, 68):
+            if px <= 34.0 + half_span:
+                cov = min(1.0, max(0.0, (34.5 + half_span) - px))
+                blend_pixel(buf, w, h, px, py, 255, 209, 102, cov)
+
+    draw_vector_text(
+        buf, w, h, 'VID',
+        cx=96.0, cy=48.0,
+        char_w=14.0, char_h=24.0,
+        stroke_w=3.8,
+        color=(144, 224, 239, 255),
+        letter_gap=4.0
+    )
+
     write_png(os.path.join(ASSETS_DIR, 'icon_video_help.png'), w, h, buf)
-    print('Generated icon_video_help.png (48x32)')
+    print('Generated HD icon_video_help.png (144x96)')
 
 
 if __name__ == '__main__':
@@ -388,16 +478,28 @@ if __name__ == '__main__':
     )
     generate_river_png('river_amsterdam.png', 280, 720, 490, amsterdam_path, 90, amsterdam_palette)
 
-    # 3. Toolbar Buttons for Repair & Special Items
-    generate_button_png('btn_repair.png', 'REPAIR', '[R] FIX', (255, 90, 95))
-    generate_button_png('btn_special.png', 'ITEMS', '[I] SHOP', (6, 214, 160))
+    # 3. All 12 Toolbar Buttons in 4x HD (256x192) with Anti-Aliased Vector Typography
+    all_buttons = [
+        ('btn_power.png', 'POWER', '[1] WIRE', (255, 183, 3)),
+        ('btn_water.png', 'WATER', '[2] PIPE', (0, 180, 216)),
+        ('btn_drain.png', 'DRAIN', '[3] SEWAGE', (157, 78, 221)),
+        ('btn_solar.png', 'SOLAR', '[4] $60', (255, 209, 102)),
+        ('btn_filter.png', 'FILTER', '[5] $40', (6, 214, 160)),
+        ('btn_repair.png', 'REPAIR', '[R] FIX', (255, 90, 95)),
+        ('btn_special.png', 'ITEMS', '[I] SHOP', (6, 214, 160)),
+        ('btn_pause.png', 'PAUSE', '[SPACE]', (173, 181, 189)),
+        ('btn_speed.png', 'SPEED', '1X / 2X', (173, 181, 189)),
+        ('btn_upgrade.png', 'UPGRADE', '[U] TECH', (255, 209, 102)),
+        ('btn_sdgs.png', 'SDGS', 'ROADMAP', (0, 180, 216)),
+        ('btn_guide.png', 'LEVELS', 'BRIEFING', (72, 202, 228))
+    ]
+    for fname, title, sub, col in all_buttons:
+        generate_hd_button_png(fname, title, sub, col)
 
-    # 4. Badges & Icons
+    # 4. HD Badges & Icons
     generate_badge_repair()
     generate_badge_candle()
     generate_day_night_icons()
     generate_logo_powater()
     generate_toolbar_dock()
     generate_video_help_icon()
-
-
