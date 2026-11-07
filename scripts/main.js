@@ -406,7 +406,7 @@
         gfxO.drawCircle(sc.x, sc.y, pulseR);
       }
 
-      // 6. Live Dragging Preview Wire
+      // 6. Live Dragging Preview Wire (Manhattan + two 45-degree corner turns)
       if (this.isDragging && this.dragStartNode) {
         const p1 = this.dragStartNode.getCenter();
         const p2 = { x: this.currentMouseX, y: this.currentMouseY };
@@ -415,13 +415,24 @@
         if (this.game.activeTool === 'water') wireColor = 0x00b4d8;
         else if (this.game.activeTool === 'sewage') wireColor = 0xc77dff;
 
+        const previewPath = (global.POWATER.ConnectionEntity && global.POWATER.ConnectionEntity.buildManhattanPoints)
+          ? global.POWATER.ConnectionEntity.buildManhattanPoints(p1, p2, 0, 22)
+          : { points: [p1, p2] };
+        const pts = (previewPath && previewPath.points) || [p1, p2];
+
+        const drawPreviewPoly = () => {
+          if (pts.length < 2) return;
+          gfxO.moveTo(pts[0].x, pts[0].y);
+          for (let i = 1; i < pts.length; i++) {
+            gfxO.lineTo(pts[i].x, pts[i].y);
+          }
+        };
+
         gfxO.lineStyle(7, 0x1a1334, 0.75);
-        gfxO.moveTo(p1.x, p1.y);
-        gfxO.lineTo(p2.x, p2.y);
+        drawPreviewPoly();
 
         gfxO.lineStyle(3.5, wireColor, 1.0);
-        gfxO.moveTo(p1.x, p1.y);
-        gfxO.lineTo(p2.x, p2.y);
+        drawPreviewPoly();
 
         gfxO.lineStyle(1.5, 0xffffff, 1.0);
         gfxO.beginFill(wireColor, 1.0);

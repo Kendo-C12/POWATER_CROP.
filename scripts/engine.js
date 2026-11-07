@@ -1266,8 +1266,17 @@
         const pts = c.getEndpoints();
         if (!pts) continue;
 
-        const dist = this.distToSegment(x, y, pts.x1, pts.y1, pts.x2, pts.y2);
-        if (dist < 15) {
+        let minDist = Infinity;
+        if (pts.points && pts.points.length >= 2) {
+          for (let s = 0; s < pts.points.length - 1; s++) {
+            const d = this.distToSegment(x, y, pts.points[s].x, pts.points[s].y, pts.points[s + 1].x, pts.points[s + 1].y);
+            if (d < minDist) minDist = d;
+          }
+        } else {
+          minDist = this.distToSegment(x, y, pts.x1, pts.y1, pts.x2, pts.y2);
+        }
+
+        if (minDist < 15) {
           const typeLabel = c.type === 'power' ? 'สายไฟ' : (c.type === 'water' ? 'ท่อน้ำดี' : 'ท่อระบายน้ำ');
           this.connections.splice(i, 1);
           if (global.POWATER.soundManager) global.POWATER.soundManager.playClick();

@@ -378,34 +378,157 @@
       this.pulsePhase += dt * 4.0;
     }
 
+    static buildManhattanPoints(p1, p2, offset = 0, maxChamfer = 22) {
+      if (!p1 || !p2) return null;
+      const dx = p2.x - p1.x;
+      const dy = p2.y - p1.y;
+      const adx = Math.abs(dx);
+      const ady = Math.abs(dy);
+      const sx = dx >= 0 ? 1 : -1;
+      const sy = dy >= 0 ? 1 : -1;
+
+      // Chamfer size creates two 45-degree turns at the Manhattan corner
+      const chamfer = Math.min(maxChamfer, adx * 0.42, ady * 0.42);
+      let basePts;
+      if (chamfer < 2) {
+        basePts = [
+          { x: p1.x, y: p1.y },
+          { x: p2.x, y: p2.y }
+        ];
+      } else {
+        basePts = [
+          { x: p1.x, y: p1.y },
+          { x: p2.x - sx * chamfer, y: p1.y },
+          { x: p2.x, y: p1.y + sy * chamfer },
+          { x: p2.x, y: p2.y }
+        ];
+      }
+
+      // Filter out any zero-length consecutive points
+      const cleanBase = [basePts[0]];
+      for (let i = 1; i < basePts.length; i++) {
+        const prev = cleanBase[cleanBase.length - 1];
+        if (Math.hypot(basePts[i].x - prev.x, basePts[i].y - prev.y) > 0.5) {
+          cleanBase.push(basePts[i]);
+        }
+      }
+      if (cleanBase.length < 2) {
+        cleanBase.push({ x: p2.x, y: p2.y });
+      }
+
+      // Compute segment normals for parallel multi-utility offset
+      const normals = [];
+      for (let i = 0; i < cleanBase.length - 1; i++) {
+        const sdx = cleanBase[i + 1].x - cleanBase[i].x;
+        const sdy = cleanBase[i + 1].y - cleanBase[i].y;
+        const len = Math.hypot(sdx, sdy) || 1;
+        normals.push({ x: -sdy / len, y: sdx / len });
+      }
+
+      const pts = [];
+      for (let k = 0; k < cleanBase.length; k++) {
+        let nx = 0, ny = 0;
+        if (k === 0) {
+          nx = normals[0].x;
+          ny = normals[0].y;
+        } else if (k === cleanBase.length - 1) {
+          nx = normals[normals.length - 1].x;
+          ny = normals[normals.length - 1].y;
+        } else {
+          const nA = normals[k - 1];
+          const nB = normals[k];
+          const dot = nA.x * nB.x + nA.y * nB.y;
+          const scale = 1.0 / Math.max(0.5, 1.0 + dot);
+          nx = (nA.x + nB.x) * scale;
+          ny = (nA.y + nB.y) * scale;
+        }
+        pts.push({
+          x: cleanBase[k].x + nx * offset,
+          y: cleanBase[k].y + ny * offset
+        });
+      }
+
+      let totalDist = 0;
+      const segLengths = [];
+      for (let i = 0; i < pts.length - 1; i++) {
+        const d = Math.hypot(pts[i + 1].x - pts[i].x, pts[i + 1].y - pts[i].y);
+        segLengths.push(d);
+        totalDist += d;
+      }
+
+      return {
+        points: pts,
+        segLengths: segLengths,
+        x1: pts[0].x,
+        y1: pts[0].y,
+        x2: pts[pts.length - 1].x,
+        y2: pts[pts.length - 1].y,
+        dist: totalDist || 1
+      };
+    }
+
+    static getPointAlongPath(pathData, frac) {
+      if (!pathData || !pathData.points || pathData.points.length === 0) return { x: 0, y: 0 };
+      const pts = pathData.points;
+      if (pts.length === 1) return pts[0];
+      const targetD = Math.max(0, Math.min(1, frac)) * pathData.dist;
+      let acc = 0;
+      for (let i = 0; i < pathData.segLengths.length; i++) {
+        const segLen = pathData.segLengths[i];
+        if (acc + segLen >= targetD || i === pathData.segLengths.length - 1) {
+          const localT = segLen > 0 ? (targetD - acc) / segLen : 0;
+          return {
+            x: pts[i].x + (pts[i + 1].x - pts[i].x) * localT,
+            y: pts[i].y + (pts[i + 1].y - pts[i].y) * localT
+          };
+        }
+        acc += segLen;
+      }
+      return pts[pts.length - 1];
+    }
+
     getEndpoints() {
       const p1 = this.fromNode ? this.fromNode.getCenter() : null;
       const p2 = this.toNode ? this.toNode.getCenter() : null;
       if (!p1 || !p2) return null;
 
-      const dx = p2.x - p1.x;
-      const dy = p2.y - p1.y;
-      const dist = Math.hypot(dx, dy) || 1;
-      const nx = -dy / dist;
-      const ny = dx / dist;
+      // Canonical ordering by node ID so Power/Water/Sewage between the same two nodes share the exact same corner
+      const swap = String(this.fromNode.id) > String(this.toNode.id);
+      const startPt = swap ? p2 : p1;
+      const endPt = swap ? p1 : p2;
 
       let offset = 0;
-      if (this.type === 'power') offset = -6;
-      else if (this.type === 'sewage') offset = 6;
+      if (this.type === 'power') offset = -7;
+      else if (this.type === 'sewage') offset = 7;
 
-      return {
-        x1: p1.x + nx * offset,
-        y1: p1.y + ny * offset,
-        x2: p2.x + nx * offset,
-        y2: p2.y + ny * offset,
-        dist: dist
-      };
+      const pathData = ConnectionEntity.buildManhattanPoints(startPt, endPt, offset, 22);
+      if (!pathData) return null;
+
+      // If we swapped for canonical corner, reverse points so flow pulses travel from fromNode -> toNode
+      if (swap) {
+        pathData.points.reverse();
+        pathData.segLengths.reverse();
+        pathData.x1 = pathData.points[0].x;
+        pathData.y1 = pathData.points[0].y;
+        pathData.x2 = pathData.points[pathData.points.length - 1].x;
+        pathData.y2 = pathData.points[pathData.points.length - 1].y;
+      }
+      return pathData;
+    }
+
+    drawPolyline(pixiGfx, pts) {
+      if (!pts || pts.length < 2) return;
+      pixiGfx.moveTo(pts[0].x, pts[0].y);
+      for (let i = 1; i < pts.length; i++) {
+        pixiGfx.lineTo(pts[i].x, pts[i].y);
+      }
     }
 
     render(pixiGfx) {
       if (!pixiGfx) return;
-      const pts = this.getEndpoints();
-      if (!pts) return;
+      const pathData = this.getEndpoints();
+      if (!pathData || !pathData.points) return;
+      const pts = pathData.points;
 
       const pipeCfg = (CONFIG.PIPES && CONFIG.PIPES[this.type.toUpperCase()]) || {
         color: '#ffb703',
@@ -416,36 +539,37 @@
       const colorInt = parseInt(pipeCfg.color.replace('#', '0x'), 16);
       const glowInt = parseInt(pipeCfg.glowColor.replace('#', '0x'), 16);
 
+      // 1. Under-river cable casing if crossing river
       if (this.crossesRiver) {
         pixiGfx.lineStyle(pipeCfg.lineWidth + 4, 0x0077b6, 0.35);
-        pixiGfx.moveTo(pts.x1, pts.y1);
-        pixiGfx.lineTo(pts.x2, pts.y2);
+        this.drawPolyline(pixiGfx, pts);
       }
 
+      // 2. Glow Line along Manhattan + 2x45-degree corner path
       pixiGfx.lineStyle(pipeCfg.lineWidth + 2, this.active ? glowInt : 0x4a4e69, this.active ? 0.6 : 0.25);
-      pixiGfx.moveTo(pts.x1, pts.y1);
-      pixiGfx.lineTo(pts.x2, pts.y2);
+      this.drawPolyline(pixiGfx, pts);
 
+      // 3. Core Conduit Wire
       pixiGfx.lineStyle(pipeCfg.lineWidth, this.active ? colorInt : 0x3d3a50, 0.95);
-      pixiGfx.moveTo(pts.x1, pts.y1);
-      pixiGfx.lineTo(pts.x2, pts.y2);
+      this.drawPolyline(pixiGfx, pts);
 
+      // 4. Corner joint nodes & Terminal dots
       pixiGfx.lineStyle(1.5, 0xffffff, 0.85);
       pixiGfx.beginFill(colorInt, 1.0);
-      pixiGfx.drawCircle(pts.x1, pts.y1, 4.0);
-      pixiGfx.drawCircle(pts.x2, pts.y2, 4.0);
+      pixiGfx.drawCircle(pathData.x1, pathData.y1, 4.0);
+      pixiGfx.drawCircle(pathData.x2, pathData.y2, 4.0);
       pixiGfx.endFill();
 
+      // 5. Animated Energy/Water Flow Pulses following the Manhattan + 45° corner path
       if (this.active) {
-        const numPulses = Math.max(1, Math.floor(pts.dist / 45));
+        const numPulses = Math.max(1, Math.floor(pathData.dist / 50));
         for (let i = 0; i < numPulses; i++) {
           const prog = (this.pulsePhase / 8.0 + i / numPulses) % 1.0;
-          const px = pts.x1 + (pts.x2 - pts.x1) * prog;
-          const py = pts.y1 + (pts.y2 - pts.y1) * prog;
+          const pos = ConnectionEntity.getPointAlongPath(pathData, prog);
 
           pixiGfx.lineStyle(1, 0xffffff, 0.9);
           pixiGfx.beginFill(glowInt, 0.9);
-          pixiGfx.drawCircle(px, py, 2.5);
+          pixiGfx.drawCircle(pos.x, pos.y, 2.5);
           pixiGfx.endFill();
         }
       }

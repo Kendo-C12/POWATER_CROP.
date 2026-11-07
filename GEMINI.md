@@ -97,6 +97,8 @@ All buildings, houses, rivers, HUD bars, toolbar docks, buttons, and status badg
 
 ## 7. Changelog
 
+- **`v1.0.1.0` (2026-11-08)**:
+  - Upgraded utility conduits and live drag preview wires in `scripts/entities.js`, `scripts/engine.js`, and `scripts/main.js` to use **Manhattan routing with chamfered corners (two 45-degree turns at the corner)**, parallel mitered offsets for Power/Water/Sewage lines, and path-following flow pulses.
 - **`v1.0.0.1` (2026-11-08)**:
   - Fixed GDevelop Diagnostic Report (`Missing scene variables: Pollution_total, Polltution_per_second`) by declaring both scene variables on all 4 layouts (`Main`, `Tokyo`, `Rome`, `Amsterdam`) in `scripts/sync_project.py` and `POWATER CROPS..json`.
 - **`v1.0.0.0` (2026-11-08)**:
