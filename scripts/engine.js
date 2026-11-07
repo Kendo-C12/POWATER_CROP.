@@ -108,6 +108,11 @@
       this.housesServedPeak = 0;
       this.completedHousesCount = 0;
 
+      // Fast Interactive Scene Tutorial State
+      this.isTutorialMode = false;
+      this.tutorialStep = 0;
+      this.tutorialStepTimer = 0.0;
+
       // Tools & Dragging
       this.activeTool = 'power';
       this.dragStartNode = null;
@@ -205,6 +210,9 @@
       this.isFloodActive = false;
       this.floodTimer = 0.0;
       this.floodPumpsOwned = 0;
+      this.isTutorialMode = false;
+      this.tutorialStep = 0;
+      this.tutorialStepTimer = 0.0;
 
       // Clean existing runtime objects if any
       if (this.runtimeScene) {
@@ -234,6 +242,77 @@
 
       if (global.POWATER.soundManager) {
         global.POWATER.soundManager.resume();
+      }
+    }
+
+    startTutorial() {
+      this.startLevel(0);
+      this.currentLevel = CONFIG.TUTORIAL_LEVEL || this.currentLevel;
+      this.isTutorialMode = true;
+      this.tutorialStep = 1;
+      this.tutorialStepTimer = 0.0;
+      this.money = 300;
+      this.activeTool = 'power';
+
+      // Keep only 1 house for fast 30-second interactive tutorial
+      while (this.houses.length > 1) {
+        const extra = this.houses.pop();
+        if (extra.destroy) extra.destroy();
+        if (extra.runtimeObject && this.runtimeScene) {
+          try { extra.runtimeObject.deleteFromScene(this.runtimeScene); } catch (e) {}
+        }
+      }
+      this.addFloatingText('🎓 เริ่มโหมดฝึกสอนด่วน (Fast Scene Tutorial)! ทำตามลูกศรแนะนำได้เลย', CONFIG.CANVAS_WIDTH / 2, 115, '#06d6a0');
+    }
+
+    updateTutorial(dt) {
+      if (!this.isTutorialMode || this.tutorialStep <= 0) return;
+      this.tutorialStepTimer += dt;
+      const h0 = this.houses[0];
+      const pump = this.buildings.find(b => b.config && b.config.type === 'water_pump');
+      if (!h0) return;
+
+      if (this.tutorialStep === 1 && h0.hasPower) {
+        this.tutorialStep = 2;
+        this.tutorialStepTimer = 0;
+        this.activeTool = 'water';
+        this.addFloatingText('✅ ขั้นที่ 1 สำเร็จ! ตอนนี้ลากท่อน้ำดีสีฟ้าจากปั๊มน้ำไปที่บ้าน', CONFIG.CANVAS_WIDTH / 2, 115, '#00b4d8');
+        if (global.POWATER.soundManager) global.POWATER.soundManager.playUpgrade();
+      } else if (this.tutorialStep === 2 && h0.hasWater) {
+        this.tutorialStep = 3;
+        this.tutorialStepTimer = 0;
+        this.activeTool = 'sewage';
+        this.addFloatingText('✅ ขั้นที่ 2 สำเร็จ! ตอนนี้ลากท่อน้ำเสียสีม่วงจากบ้านไปที่ถังบำบัดริมน้ำ', CONFIG.CANVAS_WIDTH / 2, 115, '#c77dff');
+        if (global.POWATER.soundManager) global.POWATER.soundManager.playUpgrade();
+      } else if (this.tutorialStep === 3 && h0.hasDrainage) {
+        this.tutorialStep = 4;
+        this.tutorialStepTimer = 0;
+        this.activeTool = 'repair';
+        if (pump) pump.breakDown();
+        this.addFloatingText('✅ บ้านสมบูรณ์ รับ +$50! ตอนนี้ลองซ่อมเครื่องปั๊มน้ำที่เสีย (คลิกที่ปั๊มหรือกดปุ่ม REPAIR)', CONFIG.CANVAS_WIDTH / 2, 115, '#ff5a5f');
+        if (global.POWATER.soundManager) global.POWATER.soundManager.playPollutionWarn();
+      } else if (this.tutorialStep === 4 && pump && !pump.isBroken) {
+        this.tutorialStep = 5;
+        this.tutorialStepTimer = 0;
+        this.addFloatingText('🎉 ฝึกสอนสำเร็จครบทุกขั้นตอน! คลิกปุ่ม [▶] เหนือไอคอนเพื่อดูวิดีโอฟีเจอร์ หรือเริ่มด่านจริงได้เลย!', CONFIG.CANVAS_WIDTH / 2, 115, '#06d6a0');
+        if (global.POWATER.soundManager) global.POWATER.soundManager.playWin();
+      }
+    }
+
+    skipTutorialStep() {
+      if (!this.isTutorialMode) return;
+      const h0 = this.houses[0];
+      const gen = this.buildings.find(b => b.config && b.config.type === 'generator');
+      const pump = this.buildings.find(b => b.config && b.config.type === 'water_pump');
+      const filter = this.buildings.find(b => b.config && b.config.type === 'waste_filter');
+      if (this.tutorialStep === 1 && gen && h0) {
+        this.connectNodes('power', gen, h0);
+      } else if (this.tutorialStep === 2 && pump && h0) {
+        this.connectNodes('water', pump, h0);
+      } else if (this.tutorialStep === 3 && filter && h0) {
+        this.connectNodes('sewage', h0, filter);
+      } else if (this.tutorialStep === 4) {
+        this.repairAllBroken();
       }
     }
 
@@ -538,7 +617,8 @@
       this.connections.forEach(c => c.update(dt));
       this.floatingTexts = this.floatingTexts.filter(ft => ft.update(dt));
 
-      // 10. Win / Lose Conditions (including 5-7 min hold timer & Flood timer)
+      // 10. Win / Lose Conditions & Fast Tutorial Coach
+      this.updateTutorial(dt);
       this.checkGameConditions(dt);
     }
 

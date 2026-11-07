@@ -20,7 +20,7 @@ props['adaptGameResolutionAtRuntime'] = False
 props['sizeOnStartupMode'] = ""
 props['windowWidth'] = 1280
 props['windowHeight'] = 720
-props['version'] = '1.0.0.0'
+props['version'] = '1.0.2.0'
 props['name'] = 'POWATER CORP.'
 
 # 2. Update Resources (All real PNG assets)
@@ -60,7 +60,8 @@ assets = [
     ('btn_speed.png', 'assets/btn_speed.png'),
     ('btn_upgrade.png', 'assets/btn_upgrade.png'),
     ('btn_sdgs.png', 'assets/btn_sdgs.png'),
-    ('btn_guide.png', 'assets/btn_guide.png')
+    ('btn_guide.png', 'assets/btn_guide.png'),
+    ('icon_video_help.png', 'assets/icon_video_help.png')
 ]
 
 for name, file_path in assets:
@@ -345,7 +346,8 @@ def build_layout_objects(river_image='river.png', river_w=280, river_h=720):
         ('badge_water', 'badge_water.png', 48, 48),
         ('badge_drain', 'badge_drain.png', 48, 48),
         ('badge_repair', 'badge_repair.png', 48, 48),
-        ('badge_candle', 'badge_candle.png', 48, 48)
+        ('badge_candle', 'badge_candle.png', 48, 48),
+        ('btn_video_help', 'icon_video_help.png', 48, 32)
     ]
     for bname, bimg, bw, bh in base_buildings:
         objs.append(make_sprite_object(bname, bimg, bw, bh))
@@ -385,7 +387,18 @@ def make_base_instances():
         { 'name': 'btn_speed', 'x': 768, 'y': 658, 'width': 64, 'height': 48, 'zOrder': 10, 'persistentUuid': 'inst-btn-speed', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
         { 'name': 'btn_upgrade', 'x': 844, 'y': 658, 'width': 64, 'height': 48, 'zOrder': 10, 'persistentUuid': 'inst-btn-upgrade', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
         { 'name': 'btn_sdgs', 'x': 912, 'y': 658, 'width': 64, 'height': 48, 'zOrder': 10, 'persistentUuid': 'inst-btn-sdgs', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
-        { 'name': 'btn_guide', 'x': 980, 'y': 658, 'width': 64, 'height': 48, 'zOrder': 10, 'persistentUuid': 'inst-btn-guide', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] }
+        { 'name': 'btn_guide', 'x': 980, 'y': 658, 'width': 64, 'height': 48, 'zOrder': 10, 'persistentUuid': 'inst-btn-guide', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
+        # 10 Clickable Feature Video Demo Icons ([▶]) directly above each feature button
+        { 'name': 'btn_video_help', 'x': 222, 'y': 626, 'width': 36, 'height': 24, 'zOrder': 10, 'persistentUuid': 'inst-vid-power', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
+        { 'name': 'btn_video_help', 'x': 290, 'y': 626, 'width': 36, 'height': 24, 'zOrder': 10, 'persistentUuid': 'inst-vid-water', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
+        { 'name': 'btn_video_help', 'x': 358, 'y': 626, 'width': 36, 'height': 24, 'zOrder': 10, 'persistentUuid': 'inst-vid-drain', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
+        { 'name': 'btn_video_help', 'x': 434, 'y': 626, 'width': 36, 'height': 24, 'zOrder': 10, 'persistentUuid': 'inst-vid-solar', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
+        { 'name': 'btn_video_help', 'x': 502, 'y': 626, 'width': 36, 'height': 24, 'zOrder': 10, 'persistentUuid': 'inst-vid-filter', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
+        { 'name': 'btn_video_help', 'x': 570, 'y': 626, 'width': 36, 'height': 24, 'zOrder': 10, 'persistentUuid': 'inst-vid-repair', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
+        { 'name': 'btn_video_help', 'x': 638, 'y': 626, 'width': 36, 'height': 24, 'zOrder': 10, 'persistentUuid': 'inst-vid-special', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
+        { 'name': 'btn_video_help', 'x': 858, 'y': 626, 'width': 36, 'height': 24, 'zOrder': 10, 'persistentUuid': 'inst-vid-upgrade', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
+        { 'name': 'btn_video_help', 'x': 926, 'y': 626, 'width': 36, 'height': 24, 'zOrder': 10, 'persistentUuid': 'inst-vid-sdgs', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
+        { 'name': 'btn_video_help', 'x': 994, 'y': 626, 'width': 36, 'height': 24, 'zOrder': 10, 'persistentUuid': 'inst-vid-guide', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] }
     ]
 
 
@@ -542,8 +555,24 @@ amsterdam_houses = [
 ]
 layout_amsterdam = create_layout('Amsterdam', '4. Amsterdam, Netherlands', 'river_amsterdam.png', 280, 720, amsterdam_river, amsterdam_buildings, amsterdam_houses)
 
-# Set all 4 layouts in project
-project['layouts'] = [layout_main, layout_tokyo, layout_rome, layout_amsterdam]
+# Level 0: Dedicated Fast Scene Tutorial (60-Second Interactive Step-by-Step Guide)
+tutorial_river = {
+    'angle': 0, 'customSize': True, 'height': 720, 'layer': '', 'locked': False,
+    'name': 'river', 'persistentUuid': 'inst-river-tutorial', 'width': 280, 'x': 490, 'y': 0, 'zOrder': 1,
+    'numberProperties': [], 'stringProperties': [], 'initialVariables': []
+}
+tutorial_buildings = [
+    { 'name': 'generator', 'x': 832, 'y': 212, 'width': 56, 'height': 56, 'zOrder': 4, 'persistentUuid': 'inst-tut-gen', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
+    { 'name': 'water_pump', 'x': 652, 'y': 232, 'width': 56, 'height': 56, 'zOrder': 4, 'persistentUuid': 'inst-tut-pump', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
+    { 'name': 'waste_filter', 'x': 702, 'y': 432, 'width': 56, 'height': 56, 'zOrder': 4, 'persistentUuid': 'inst-tut-filter', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] }
+]
+tutorial_houses = [
+    { 'name': 'house', 'x': 838, 'y': 342, 'width': 84, 'height': 56, 'zOrder': 3, 'persistentUuid': 'inst-tut-h1', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] }
+]
+layout_tutorial = create_layout('Tutorial', '0. Fast Scene Tutorial', 'river.png', 280, 720, tutorial_river, tutorial_buildings, tutorial_houses)
+
+# Set all 5 layouts in project (Main, Tutorial, Tokyo, Rome, Amsterdam)
+project['layouts'] = [layout_main, layout_tutorial, layout_tokyo, layout_rome, layout_amsterdam]
 
 # Write back to POWATER CROPS..json
 with open(project_path, 'w', encoding='utf-8') as f:

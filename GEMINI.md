@@ -1,8 +1,8 @@
-# POWATER CORP. (`v1.0.0.0`) — GDevelop 5 Project Documentation (`GEMINI.md`)
+# POWATER CORP. (`v1.0.2.0`) — GDevelop 5 Project Documentation (`GEMINI.md`)
 
 > **Team Green Gang**: Sukrit Limpakanon, Aristt Mahakitsiri, Gantinan Satjariyakul  
 > **Engine**: GDevelop 5 (`POWATER CROPS..json`) + Real PNG Sprite Assets + PixiJS Procedural River/Conduit Rendering  
-> **Version Naming**: `1.x.y.z` (`x` = Major Version, `y` = Small Addition Within Major Version, `z` = Bug Fixes) — Current: **`v1.0.0.0`**
+> **Version Naming**: `1.x.y.z` (`x` = Major Version, `y` = Small Addition Within Major Version, `z` = Bug Fixes) — Current: **`v1.0.2.0`**
 
 ---
 
@@ -42,6 +42,9 @@
    - Features smooth ambient night lighting (`nightAlpha`), warm glowing window halos around powered/candle-lit houses, and dynamic `icon_day.png` / `icon_night.png` HUD indicators.
 3. **Map Upsize System**:
    - Every **`x + 10` houses** (`10`, `20`, `30`), the city triggers a **Map Upsize** (`upsizeTier` 1–3), expanding playable spawn bounds and scaling footprints until capped at **40 houses maximum (`จนตันที่ 40 หลัง`)**.
+4. **Fast Interactive Scene Tutorial (`Tutorial` Scene) & Feature Video Demos (`v1.0.2.0`)**:
+   - **Fast 60-Second Scene Tutorial**: Accessible via the dedicated GDevelop `Tutorial` scene or the `🎓 Fast Tutorial (60s)` button in the Level Select modal. Guides players step-by-step through wiring Power, Water, and Sewage (awarding `+$50`) and repairing a broken pump with `[R]` or click-to-repair, complete with animated Manhattan guide paths and an `⏭️ Auto-Step` button.
+   - **Clickable `[▶]` Video Icons Above Every Feature Button**: Each feature button on the bottom toolbar (`Power`, `Water`, `Sewage`, `Solar`, `Eco Filter`, `Repair`, `Special Items`, `Upgrades`, `SDGs`, `Guide`) has a clickable `icon_video_help.png` (`[▶]`) sprite badge directly above it (`y = 626`). Clicking any `[▶]` icon opens an interactive 60 FPS looping video preview demonstrating how that feature works, with play/pause controls, scrubber bar, and a **`⚡ Use This Feature Now`** button to immediately activate it.
 
 ---
 
@@ -69,6 +72,7 @@ All buildings, houses, rivers, HUD bars, toolbar docks, buttons, and status badg
 - **Toolbar & HUD Sprites (`assets/`)**:
   - `grid_bg.png` (`1280x720`), `hud_bar.png` (`1280x44`), `toolbar_dock.png` (`880x56`)
   - 12 Toolbar Buttons: `btn_power.png`, `btn_water.png`, `btn_drain.png`, `btn_solar.png`, `btn_filter.png`, `btn_repair.png`, `btn_special.png`, `btn_pause.png`, `btn_speed.png`, `btn_upgrade.png`, `btn_sdgs.png`, `btn_guide.png`
+  - 10 Feature Video Demo Icons above toolbar buttons: `icon_video_help.png` (`btn_video_help` sprite object, `48x32`)
 
 ---
 
@@ -97,6 +101,9 @@ All buildings, houses, rivers, HUD bars, toolbar docks, buttons, and status badg
 
 ## 7. Changelog
 
+- **`v1.0.2.0` (2026-11-08)**:
+  - Added a **Small & Fast Interactive Scene Tutorial** (`Tutorial` GDevelop layout + `🎓 Fast Tutorial (60s)` button in the Level Select modal) with a 4-step interactive coach banner, animated Manhattan guide paths, and `⏭️ Auto-Step` demonstration.
+  - Added clickable **`icon_video_help.png` (`[▶]`) sprite buttons directly above all 10 feature buttons** on the bottom toolbar (`Power`, `Water`, `Sewage`, `Solar`, `Filter`, `Repair`, `Items`, `Upgrades`, `SDGs`, `Guide`). Clicking any `[▶]` icon opens a looping 60 FPS animated video player showing how to use that feature, along with a one-click button to immediately activate/use the feature.
 - **`v1.0.1.0` (2026-11-08)**:
   - Upgraded utility conduits and live drag preview wires in `scripts/entities.js`, `scripts/engine.js`, and `scripts/main.js` to use **Manhattan routing with chamfered corners (two 45-degree turns at the corner)**, parallel mitered offsets for Power/Water/Sewage lines, and path-following flow pulses.
 - **`v1.0.0.1` (2026-11-08)**:

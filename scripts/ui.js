@@ -1,6 +1,6 @@
-// POWATER CORP. v1.0.0.0 - In-Game UI, Real PNG Sprite HUD & Modal Manager
-// Integrates GDevelop PNG Sprite buttons/icons with PixiJS telemetry, Win Timer, Day/Night icon,
-// Special Items Shop (Rome Candles Bulk Restock & Amsterdam 500 EUR Flood Pump), Repair, Upgrades, and Roadmap
+// POWATER CORP. v1.0.2.0 - In-Game UI, Interactive Fast Tutorial Coach & Feature Video Player
+// Includes clickable [▶] Video Help icons above every feature button, a 60 FPS procedural
+// Feature Video Player modal, and an interactive Fast Scene Tutorial coach bar.
 
 (function (global) {
   'use strict';
@@ -16,11 +16,19 @@
       this.gfx = null;
       this.modalContainer = null;
       this.modalGfx = null;
-      this.activeModal = null; // null | 'briefing' | 'upgrades' | 'special_items' | 'sdgs' | 'gameover' | 'victory' | 'grace_ended'
+      this.activeModal = null; // null | 'briefing' | 'upgrades' | 'special_items' | 'sdgs' | 'feature_video' | 'gameover' | 'victory' | 'grace_ended'
       this.modalData = {};
       this.hoveredButtonId = null;
+      this.hoveredVideoBtnId = null;
+
+      // Feature Video Player state
+      this.videoTime = 0.0;
+      this.videoDuration = 6.0;
+      this.videoPaused = false;
 
       this.buttons = [];
+      this.videoButtons = [];
+      this.tutorialButtons = [];
       this.modalButtons = [];
       this.setupButtonLayout();
     }
@@ -39,26 +47,40 @@
       const tbH = 48;
       const tbW = 64;
 
-      // 12 Toolbar Buttons matching the 12 GDevelop PNG Sprite instances on the dock tray (x: 200..1080)
+      // 12 Toolbar Buttons matching the 12 GDevelop PNG Sprite instances on the dock tray
       this.buttons = [
-        // Utility Wiring Tools
-        { id: 'power', objectName: 'btn_power', type: 'tool', toolId: 'power', x: 208, y: tbY, w: tbW, h: tbH, color: 0xffb703 },
-        { id: 'water', objectName: 'btn_water', type: 'tool', toolId: 'water', x: 276, y: tbY, w: tbW, h: tbH, color: 0x00b4d8 },
-        { id: 'sewage', objectName: 'btn_drain', type: 'tool', toolId: 'sewage', x: 344, y: tbY, w: tbW, h: tbH, color: 0x9d4edd },
-        // Buildings & Repair / Special Items
-        { id: 'solar', objectName: 'btn_solar', type: 'build', buildId: 'build_solar', x: 420, y: tbY, w: tbW, h: tbH, color: 0xffd166 },
-        { id: 'air_filter', objectName: 'btn_filter', type: 'build', buildId: 'build_air_filter', x: 488, y: tbY, w: tbW, h: tbH, color: 0x06d6a0 },
-        { id: 'repair', objectName: 'btn_repair', type: 'action', action: 'repairToolOrAll', x: 556, y: tbY, w: tbW, h: tbH, color: 0xff5a5f },
-        { id: 'special', objectName: 'btn_special', type: 'action', action: 'openSpecialItems', x: 624, y: tbY, w: tbW, h: tbH, color: 0x06d6a0 },
-        // Simulation & Info Controls
+        { id: 'power', objectName: 'btn_power', videoKey: 'power', type: 'tool', toolId: 'power', x: 208, y: tbY, w: tbW, h: tbH, color: 0xffb703 },
+        { id: 'water', objectName: 'btn_water', videoKey: 'water', type: 'tool', toolId: 'water', x: 276, y: tbY, w: tbW, h: tbH, color: 0x00b4d8 },
+        { id: 'sewage', objectName: 'btn_drain', videoKey: 'sewage', type: 'tool', toolId: 'sewage', x: 344, y: tbY, w: tbW, h: tbH, color: 0x9d4edd },
+        { id: 'solar', objectName: 'btn_solar', videoKey: 'solar', type: 'build', buildId: 'build_solar', x: 420, y: tbY, w: tbW, h: tbH, color: 0xffd166 },
+        { id: 'air_filter', objectName: 'btn_filter', videoKey: 'air_filter', type: 'build', buildId: 'build_air_filter', x: 488, y: tbY, w: tbW, h: tbH, color: 0x06d6a0 },
+        { id: 'repair', objectName: 'btn_repair', videoKey: 'repair', type: 'action', action: 'repairToolOrAll', x: 556, y: tbY, w: tbW, h: tbH, color: 0xff5a5f },
+        { id: 'special', objectName: 'btn_special', videoKey: 'special', type: 'action', action: 'openSpecialItems', x: 624, y: tbY, w: tbW, h: tbH, color: 0x06d6a0 },
         { id: 'pause', objectName: 'btn_pause', type: 'action', action: 'togglePause', x: 700, y: tbY, w: tbW, h: tbH, color: 0xadb5bd },
         { id: 'speed', objectName: 'btn_speed', type: 'action', action: 'toggleSpeed', x: 768, y: tbY, w: tbW, h: tbH, color: 0xadb5bd },
-        { id: 'upgrades', objectName: 'btn_upgrade', type: 'action', action: 'openUpgrades', x: 844, y: tbY, w: tbW, h: tbH, color: 0xffd166 },
-        { id: 'sdgs', objectName: 'btn_sdgs', type: 'action', action: 'openSdgs', x: 912, y: tbY, w: tbW, h: tbH, color: 0x00b4d8 },
-        { id: 'guide', objectName: 'btn_guide', type: 'action', action: 'openGuide', x: 980, y: tbY, w: tbW, h: tbH, color: 0x48cae4 },
-        // Top-left Logo click area
+        { id: 'upgrades', objectName: 'btn_upgrade', videoKey: 'upgrades', type: 'action', action: 'openUpgrades', x: 844, y: tbY, w: tbW, h: tbH, color: 0xffd166 },
+        { id: 'sdgs', objectName: 'btn_sdgs', videoKey: 'sdgs', type: 'action', action: 'openSdgs', x: 912, y: tbY, w: tbW, h: tbH, color: 0x00b4d8 },
+        { id: 'guide', objectName: 'btn_guide', videoKey: 'guide', type: 'action', action: 'openGuide', x: 980, y: tbY, w: tbW, h: tbH, color: 0x48cae4 },
         { id: 'logo', type: 'action', action: 'openGuide', x: 8, y: 6, w: 185, h: 32 }
       ];
+
+      // Clickable Video Demo Icons [▶] directly ABOVE each feature button (y = 626)
+      this.videoButtons = [];
+      for (let i = 0; i < this.buttons.length; i++) {
+        const b = this.buttons[i];
+        if (b.videoKey) {
+          this.videoButtons.push({
+            id: `vid_${b.videoKey}`,
+            videoKey: b.videoKey,
+            parentBtnId: b.id,
+            x: b.x + 14,
+            y: 626,
+            w: 36,
+            h: 24,
+            color: b.color || 0x00b4d8
+          });
+        }
+      }
     }
 
     setupPixi(container) {
@@ -68,7 +90,7 @@
         container.removeChildren();
       }
 
-      // 1. Base Graphics Layer for Top HUD, Disaster Banners, and Button Selection Glows
+      // 1. Base Graphics Layer for Top HUD, Tutorial Coach Bar, and Button Selection Glows
       this.gfx = new PIXI.Graphics();
       container.addChild(this.gfx);
 
@@ -76,7 +98,6 @@
       this.textContainer = new PIXI.Container();
       container.addChild(this.textContainer);
 
-      // Real PNG Logo Sprite in Top-Left HUD
       try {
         this.sprLogo = new PIXI.Sprite(PIXI.Texture.from('logo_powater.png'));
         this.sprLogo.width = 24;
@@ -84,7 +105,6 @@
         this.sprLogo.position.set(14, 10);
         this.textContainer.addChild(this.sprLogo);
 
-        // Real PNG Day/Night Cycle Icon Sprite in Top HUD
         this.sprDayNight = new PIXI.Sprite(PIXI.Texture.from('icon_day.png'));
         this.sprDayNight.width = 22;
         this.sprDayNight.height = 22;
@@ -101,7 +121,7 @@
       this.txtMoney.position.set(206, 13);
       this.textContainer.addChild(this.txtMoney);
 
-      this.txtServed = new PIXI.Text('🏘️ 0/3 (Cap 40)', { fontFamily: font, fontSize: 12, fontWeight: 'bold', fill: 0x06d6a0 });
+      this.txtServed = new PIXI.Text('🏘️ 0/3 (Up:0)', { fontFamily: font, fontSize: 12, fontWeight: 'bold', fill: 0x06d6a0 });
       this.txtServed.position.set(322, 14);
       this.textContainer.addChild(this.txtServed);
 
@@ -126,7 +146,11 @@
       this.txtDisasterBanner.position.set(640, 62);
       this.textContainer.addChild(this.txtDisasterBanner);
 
-      // Floating Texts Container (rendered in PixiJS so all notifications are visible!)
+      // Tutorial Coach Dynamic Texts Container
+      this.tutorialUIContainer = new PIXI.Container();
+      container.addChild(this.tutorialUIContainer);
+
+      // Floating Texts Container
       this.floatingTextContainer = new PIXI.Container();
       container.addChild(this.floatingTextContainer);
 
@@ -163,9 +187,13 @@
       if (!this.game) return;
 
       if (this.txtLogo) {
-        const rawName = this.game.currentLevel ? (this.game.currentLevel.name || 'Bangkok') : 'POWATER';
-        const cleanCity = rawName.replace(/^\d+\.\s*/, '').split(',')[0].toUpperCase();
-        this.txtLogo.text = `${cleanCity} v1.0`;
+        if (this.game.isTutorialMode) {
+          this.txtLogo.text = '🎓 TUTORIAL v1.0';
+        } else {
+          const rawName = this.game.currentLevel ? (this.game.currentLevel.name || 'Bangkok') : 'POWATER';
+          const cleanCity = rawName.replace(/^\d+\.\s*/, '').split(',')[0].toUpperCase();
+          this.txtLogo.text = `${cleanCity} v1.0`;
+        }
       }
       if (this.txtMoney) {
         this.txtMoney.text = `💰 $${Math.floor(this.game.money)}`;
@@ -213,14 +241,17 @@
         } catch (e) {}
       }
       if (this.txtDisasterBanner) {
-        this.txtDisasterBanner.text = this.game.activeDisasterText || '';
+        this.txtDisasterBanner.text = this.game.isTutorialMode ? '' : (this.game.activeDisasterText || '');
       }
     }
 
     update(dt, mouseX, mouseY, isMouseDown, wasMouseDown) {
       this.updateHUD();
+      if (!this.videoPaused) {
+        this.videoTime = (this.videoTime + dt) % this.videoDuration;
+      }
 
-      // Sync button positions from GDevelop scene objects if moved by user in scene editor
+      // Sync button positions from GDevelop scene objects
       if (this.game && this.game.runtimeScene && this.game.runtimeScene.getObjects) {
         for (let i = 0; i < this.buttons.length; i++) {
           const btn = this.buttons[i];
@@ -233,6 +264,15 @@
               btn.w = obj.getWidth();
               btn.h = obj.getHeight();
             }
+          }
+        }
+        // Keep video icons aligned right above their parent buttons
+        for (let i = 0; i < this.videoButtons.length; i++) {
+          const vb = this.videoButtons[i];
+          const parent = this.buttons.find(b => b.id === vb.parentBtnId);
+          if (parent) {
+            vb.x = parent.x + (parent.w - vb.w) / 2;
+            vb.y = parent.y - 28;
           }
         }
       }
@@ -250,7 +290,40 @@
         return true;
       }
 
-      // 2. Check Hover and Clicks on Toolbar & HUD Buttons
+      // 2. Check Clicks on Fast Tutorial Coach Bar Buttons if in Tutorial Mode
+      if (this.game && this.game.isTutorialMode && justClicked) {
+        for (let i = 0; i < this.tutorialButtons.length; i++) {
+          const tb = this.tutorialButtons[i];
+          if (mouseX >= tb.x && mouseX <= tb.x + tb.w && mouseY >= tb.y && mouseY <= tb.y + tb.h) {
+            if (global.POWATER.soundManager) global.POWATER.soundManager.playClick();
+            if (tb.id === 'tut_auto_step') {
+              this.game.skipTutorialStep();
+            } else if (tb.id === 'tut_start_bangkok') {
+              this.switchToLevelIndex(0);
+            }
+            return true;
+          }
+        }
+      }
+
+      // 3. Check Hover and Clicks on Video Demo Icons [▶] Above Feature Buttons
+      let hoveredVidBtn = null;
+      for (let i = 0; i < this.videoButtons.length; i++) {
+        const vb = this.videoButtons[i];
+        if (mouseX >= vb.x && mouseX <= vb.x + vb.w && mouseY >= vb.y && mouseY <= vb.y + vb.h) {
+          hoveredVidBtn = vb;
+          break;
+        }
+      }
+      this.hoveredVideoBtnId = hoveredVidBtn ? hoveredVidBtn.id : null;
+
+      if (hoveredVidBtn && justClicked) {
+        if (global.POWATER.soundManager) global.POWATER.soundManager.playClick();
+        this.showFeatureVideoModal(hoveredVidBtn.videoKey);
+        return true;
+      }
+
+      // 4. Check Hover and Clicks on Toolbar & HUD Buttons
       let hoveredBtn = null;
       for (let i = 0; i < this.buttons.length; i++) {
         const btn = this.buttons[i];
@@ -267,12 +340,84 @@
         clickConsumed = true;
       }
 
-      // 3. Render Top HUD, Floating Texts & Button Selection Glows
+      // 5. Render Top HUD, Video Icons, Tutorial Coach Bar, & Floating Texts
       this.renderToolbarAndHUD(mouseX, mouseY);
+      this.renderTutorialCoachBar(mouseX, mouseY);
       this.renderFloatingTexts();
 
-      const inUIZone = mouseY < 44 || (mouseY >= 646 && mouseX >= 195 && mouseX <= 1065);
+      const inUIZone = mouseY < 44 || (mouseY >= 624 && mouseX >= 195 && mouseX <= 1065);
       return clickConsumed || inUIZone;
+    }
+
+    renderTutorialCoachBar(mouseX, mouseY) {
+      if (!this.tutorialUIContainer) return;
+      this.tutorialUIContainer.removeChildren();
+      this.tutorialButtons = [];
+
+      if (!this.game || !this.game.isTutorialMode) return;
+
+      const g = this.gfx;
+      const font = 'system-ui, -apple-system, Segoe UI, Roboto, sans-serif';
+      const step = this.game.tutorialStep || 1;
+
+      const barX = 160, barY = 48, barW = 960, barH = 44;
+      g.lineStyle(2, 0x06d6a0, 0.95);
+      g.beginFill(0x131d38, 0.94);
+      g.drawRoundedRect(barX, barY, barW, barH, 8);
+      g.endFill();
+
+      let stepMsg = '';
+      if (step === 1) {
+        stepMsg = '🎓 ขั้นที่ 1/4: ลากสายไฟ (สีเหลือง) จาก โรงปั่นไฟ ไปยัง บ้านตัวอย่าง (หรือคลิก [▶] เหนือปุ่ม POWER เพื่อดูวิดีโอ)';
+      } else if (step === 2) {
+        stepMsg = '🎓 ขั้นที่ 2/4: ลากท่อน้ำดี (สีฟ้า) จาก เครื่องปั๊มน้ำริมแม่น้ำ ไปยัง บ้านตัวอย่าง';
+      } else if (step === 3) {
+        stepMsg = '🎓 ขั้นที่ 3/4: ลากท่อระบายน้ำ (สีม่วง) จาก บ้าน ไปยัง ถังบำบัดริมแม่น้ำ เพื่อรับโบนัส +$50 ทันที!';
+      } else if (step === 4) {
+        stepMsg = '🎓 ขั้นที่ 4/4: เครื่องปั๊มน้ำเสียแล้ว (ขึ้นประแจแดง)! คลิกที่เครื่องปั๊มน้ำ หรือกดปุ่ม REPAIR [R] เพื่อซ่อมทันที!';
+      } else {
+        stepMsg = '🎉 ฝึกสอนสำเร็จครบ 100%! ลองคลิกไอคอน [▶] เหนือปุ่มด้านล่างเพื่อดูวิดีโอสาธิตทุกฟีเจอร์ หรือเริ่มด่าน Bangkok ได้เลย!';
+      }
+
+      const txt = new PIXI.Text(stepMsg, {
+        fontFamily: font, fontSize: 12.5, fontWeight: 'bold', fill: 0xffffff
+      });
+      txt.position.set(barX + 16, barY + 13);
+      this.tutorialUIContainer.addChild(txt);
+
+      // Auto-complete current step button (if steps 1..4)
+      if (step >= 1 && step <= 4) {
+        const autoBtn = { id: 'tut_auto_step', x: barX + barW - 275, y: barY + 6, w: 125, h: 32 };
+        this.tutorialButtons.push(autoBtn);
+        const isHov = (mouseX >= autoBtn.x && mouseX <= autoBtn.x + autoBtn.w && mouseY >= autoBtn.y && mouseY <= autoBtn.y + autoBtn.h);
+        g.lineStyle(1.5, 0xffd166, 0.9);
+        g.beginFill(isHov ? 0xffb703 : 0x282048, 0.95);
+        g.drawRoundedRect(autoBtn.x, autoBtn.y, autoBtn.w, autoBtn.h, 6);
+        g.endFill();
+
+        const autoTxt = new PIXI.Text('⏭️ ทำขั้นตอนนี้ให้', {
+          fontFamily: font, fontSize: 11, fontWeight: 'bold', fill: isHov ? 0x120d24 : 0xffd166
+        });
+        autoTxt.anchor.set(0.5);
+        autoTxt.position.set(autoBtn.x + autoBtn.w / 2, autoBtn.y + autoBtn.h / 2);
+        this.tutorialUIContainer.addChild(autoTxt);
+      }
+
+      // Start Bangkok Level 1 Button
+      const goBtn = { id: 'tut_start_bangkok', x: barX + barW - 142, y: barY + 6, w: 134, h: 32 };
+      this.tutorialButtons.push(goBtn);
+      const isGoHov = (mouseX >= goBtn.x && mouseX <= goBtn.x + goBtn.w && mouseY >= goBtn.y && mouseY <= goBtn.y + goBtn.h);
+      g.lineStyle(1.5, 0x06d6a0, 1.0);
+      g.beginFill(isGoHov ? 0x00b4d8 : 0x06d6a0, 1.0);
+      g.drawRoundedRect(goBtn.x, goBtn.y, goBtn.w, goBtn.h, 6);
+      g.endFill();
+
+      const goTxt = new PIXI.Text('🚀 เริ่มด่าน Bangkok', {
+        fontFamily: font, fontSize: 11, fontWeight: 'bold', fill: 0x120d24
+      });
+      goTxt.anchor.set(0.5);
+      goTxt.position.set(goBtn.x + goBtn.w / 2, goBtn.y + goBtn.h / 2);
+      this.tutorialUIContainer.addChild(goTxt);
     }
 
     renderFloatingTexts() {
@@ -307,34 +452,42 @@
       } else if (btn.type === 'build') {
         this.selectTool(btn.buildId);
       } else if (btn.type === 'action') {
-        switch (btn.action) {
-          case 'repairToolOrAll':
-            if (this.game) {
-              const fixed = this.game.repairAllBroken();
-              if (fixed === 0) {
-                this.selectTool('repair');
-              }
+        this.triggerAction(btn.action);
+      }
+    }
+
+    triggerAction(actionName) {
+      switch (actionName) {
+        case 'repairToolOrAll':
+          if (this.game) {
+            const fixed = this.game.repairAllBroken();
+            if (fixed === 0) {
+              this.selectTool('repair');
             }
-            break;
-          case 'openSpecialItems':
-            this.showSpecialItemsModal();
-            break;
-          case 'togglePause':
-            if (this.game) this.game.togglePause();
-            break;
-          case 'toggleSpeed':
-            if (this.game) this.game.toggleSpeed();
-            break;
-          case 'openUpgrades':
-            this.showUpgradesModal();
-            break;
-          case 'openSdgs':
-            this.showSdgsModal();
-            break;
-          case 'openGuide':
-            this.showLevelBriefing(this.game.currentLevel);
-            break;
-        }
+          }
+          break;
+        case 'openSpecialItems':
+          this.showSpecialItemsModal();
+          break;
+        case 'togglePause':
+          if (this.game) this.game.togglePause();
+          break;
+        case 'toggleSpeed':
+          if (this.game) this.game.toggleSpeed();
+          break;
+        case 'openUpgrades':
+          this.showUpgradesModal();
+          break;
+        case 'openSdgs':
+          this.showSdgsModal();
+          break;
+        case 'openGuide':
+          this.showLevelBriefing(this.game.currentLevel);
+          break;
+        case 'startFastTutorial':
+          this.closeModal();
+          if (this.game) this.game.startTutorial();
+          break;
       }
     }
 
@@ -355,13 +508,13 @@
         g.endFill();
       };
 
-      drawStatPill(8, 6, 185, 32);    // Logo + Level
-      drawStatPill(198, 6, 112, 32);  // Money
-      drawStatPill(314, 6, 148, 32);  // Houses & Upsize
-      drawStatPill(466, 6, 190, 32);  // Win Timer
-      drawStatPill(660, 6, 172, 32);  // Pollution
-      drawStatPill(836, 6, 216, 32);  // Day/Night + Clock
-      drawStatPill(1056, 6, 214, 32); // Strikes
+      drawStatPill(8, 6, 185, 32);
+      drawStatPill(198, 6, 112, 32);
+      drawStatPill(314, 6, 148, 32);
+      drawStatPill(466, 6, 190, 32);
+      drawStatPill(660, 6, 172, 32);
+      drawStatPill(836, 6, 216, 32);
+      drawStatPill(1056, 6, 214, 32);
 
       // Pollution Bar Draw
       const curP = this.game.pollution || 0;
@@ -385,8 +538,8 @@
         g.endFill();
       }
 
-      // Complaint Pips (Strikes - 1 pip in Amsterdam, 3 in others)
-      const maxComplaints = this.game.maxComplaints || CONFIG.MAX_COMPLAINTS || 3;
+      // Complaint Pips
+      const maxComplaints = Math.min(3, this.game.maxComplaints || CONFIG.MAX_COMPLAINTS || 3);
       const curComplaints = this.game.complaints || 0;
       for (let i = 0; i < maxComplaints; i++) {
         const pipX = 1145 + (i * 24);
@@ -399,7 +552,7 @@
       }
 
       // Active Disaster Banner background below HUD
-      if (this.game.activeDisasterText) {
+      if (!this.game.isTutorialMode && this.game.activeDisasterText) {
         g.lineStyle(1.5, 0xff5a5f, 0.9);
         g.beginFill(0x3b0d1e, 0.9);
         g.drawRoundedRect(380, 48, 520, 28, 6);
@@ -430,9 +583,31 @@
           g.drawRoundedRect(btn.x - 2, btn.y - 2, btn.w + 4, btn.h + 4, 8);
         }
       }
+
+      // Render Hover Highlights on the Video Demo Icons [▶] Above Feature Buttons
+      for (let i = 0; i < this.videoButtons.length; i++) {
+        const vb = this.videoButtons[i];
+        const isHov = (this.hoveredVideoBtnId === vb.id);
+        if (isHov) {
+          g.lineStyle(2, 0xffd166, 1.0);
+          g.beginFill(0xffd166, 0.25);
+          g.drawRoundedRect(vb.x - 2, vb.y - 2, vb.w + 4, vb.h + 4, 6);
+          g.endFill();
+        }
+      }
     }
 
     // --- MODALS ---
+
+    showFeatureVideoModal(videoKey) {
+      const videos = CONFIG.FEATURE_VIDEOS || {};
+      const vData = videos[videoKey] || videos.power;
+      this.activeModal = 'feature_video';
+      this.modalData = { videoKey: videoKey, video: vData };
+      this.videoTime = 0.0;
+      this.videoPaused = false;
+      if (this.modalContainer) this.modalContainer.visible = true;
+    }
 
     showLevelBriefing(level) {
       this.activeModal = 'briefing';
@@ -524,7 +699,9 @@
       txtX.position.set(closeBtn.x + closeBtn.w / 2, closeBtn.y + closeBtn.h / 2);
       this.modalTextContainer.addChild(txtX);
 
-      if (this.activeModal === 'briefing') {
+      if (this.activeModal === 'feature_video') {
+        this.renderFeatureVideoContent(mx, my, mw, mh, mouseX, mouseY);
+      } else if (this.activeModal === 'briefing') {
         this.renderBriefingContent(mx, my, mw, mh, mouseX, mouseY);
       } else if (this.activeModal === 'upgrades') {
         this.renderUpgradesContent(mx, my, mw, mh, mouseX, mouseY);
@@ -541,44 +718,346 @@
       }
     }
 
+    // --- 60 FPS ANIMATED FEATURE VIDEO PLAYER MODAL ---
+    renderFeatureVideoContent(mx, my, mw, mh, mouseX, mouseY) {
+      const font = 'system-ui, -apple-system, Segoe UI, Roboto, sans-serif';
+      const g = this.modalGfx;
+      const vKey = this.modalData.videoKey || 'power';
+      const vInfo = this.modalData.video || (CONFIG.FEATURE_VIDEOS && CONFIG.FEATURE_VIDEOS.power) || {};
+
+      const title = new PIXI.Text(vInfo.title || '🎬 วิดีโอสาธิตการใช้งานฟีเจอร์', {
+        fontFamily: font, fontSize: 15, fontWeight: 'bold', fill: 0xffd166
+      });
+      title.position.set(mx + 20, my + 14);
+      this.modalTextContainer.addChild(title);
+
+      const subTxt = new PIXI.Text(vInfo.subtitle || '', {
+        fontFamily: font, fontSize: 12, fill: 0x90e0ef
+      });
+      subTxt.position.set(mx + 24, my + 58);
+      this.modalTextContainer.addChild(subTxt);
+
+      // Video Player Viewport Frame (520 x 220)
+      const vx = mx + 80;
+      const vy = my + 84;
+      const vw = 520;
+      const vh = 220;
+
+      g.lineStyle(2, 0x48cae4, 0.85);
+      g.beginFill(0x0d1226, 1.0);
+      g.drawRoundedRect(vx, vy, vw, vh, 10);
+      g.endFill();
+
+      // Subtle blueprint grid inside video viewport
+      g.lineStyle(1, 0x1e294b, 0.55);
+      for (let gx = vx + 40; gx < vx + vw; gx += 40) {
+        g.moveTo(gx, vy + 2);
+        g.lineTo(gx, vy + vh - 30);
+      }
+      for (let gy = vy + 40; gy < vy + vh - 30; gy += 40) {
+        g.moveTo(vx + 2, gy);
+        g.lineTo(vx + vw - 2, gy);
+      }
+
+      // Normalized video playback progress t in [0..1] over 6.0 seconds
+      const t = (this.videoTime % this.videoDuration) / this.videoDuration;
+      this.drawAnimatedFeatureScene(g, vKey, vx, vy, vw, vh - 30, t);
+
+      // Video Player Control Bar at bottom of viewport
+      const ctrlY = vy + vh - 28;
+      g.lineStyle(0);
+      g.beginFill(0x181f3c, 0.96);
+      g.drawRoundedRect(vx + 2, ctrlY, vw - 4, 26, 6);
+      g.endFill();
+
+      // Play/Pause toggle button on video bar
+      const playBtn = { id: 'vid_toggle_play', x: vx + 8, y: ctrlY + 3, w: 54, h: 20 };
+      this.modalButtons.push(playBtn);
+      g.lineStyle(1, 0x48cae4, 0.7);
+      g.beginFill(0x222c52, 0.95);
+      g.drawRoundedRect(playBtn.x, playBtn.y, playBtn.w, playBtn.h, 4);
+      g.endFill();
+
+      const playTxt = new PIXI.Text(this.videoPaused ? '▶ PLAY' : '⏸ PAUSE', {
+        fontFamily: font, fontSize: 10, fontWeight: 'bold', fill: 0xffd166
+      });
+      playTxt.anchor.set(0.5);
+      playTxt.position.set(playBtn.x + playBtn.w / 2, playBtn.y + playBtn.h / 2);
+      this.modalTextContainer.addChild(playTxt);
+
+      // Scrubber Progress Bar
+      const scrubX = vx + 72, scrubY = ctrlY + 9, scrubW = vw - 165, scrubH = 8;
+      g.lineStyle(1, 0x48cae4, 0.4);
+      g.beginFill(0x090c1a, 0.9);
+      g.drawRoundedRect(scrubX, scrubY, scrubW, scrubH, 4);
+      g.endFill();
+
+      g.lineStyle(0);
+      g.beginFill(0x06d6a0, 1.0);
+      g.drawRoundedRect(scrubX, scrubY, Math.max(6, scrubW * t), scrubH, 4);
+      g.endFill();
+
+      const timeLbl = new PIXI.Text(`00:0${Math.floor(this.videoTime)} / 00:06`, {
+        fontFamily: font, fontSize: 10, fontWeight: 'bold', fill: 0xadb5bd
+      });
+      timeLbl.position.set(vx + vw - 84, ctrlY + 6);
+      this.modalTextContainer.addChild(timeLbl);
+
+      // Step-by-Step Instructions Box below Video
+      const steps = vInfo.steps || [];
+      const stepBoxY = vy + vh + 12;
+      g.lineStyle(1, 0x48cae4, 0.3);
+      g.beginFill(0x1a1334, 0.92);
+      g.drawRoundedRect(mx + 30, stepBoxY, mw - 60, 96, 8);
+      g.endFill();
+
+      const stepsTxt = new PIXI.Text(steps.join('\n'), {
+        fontFamily: font, fontSize: 12, fill: 0xe9ecef, lineHeight: 24, wordWrap: true, wordWrapWidth: mw - 90
+      });
+      stepsTxt.position.set(mx + 45, stepBoxY + 12);
+      this.modalTextContainer.addChild(stepsTxt);
+
+      // Bottom Action Button: "Use This Feature Now!"
+      const useAct = vInfo.useAction || { type: 'tool', value: 'power', label: '⚡ ใช้งานฟีเจอร์นี้ทันที!' };
+      const useBtn = { id: 'vid_use_feature', useAction: useAct, x: mx + mw / 2 - 150, y: my + mh - 54, w: 300, h: 42 };
+      this.modalButtons.push(useBtn);
+      const isUseHover = (mouseX >= useBtn.x && mouseX <= useBtn.x + useBtn.w && mouseY >= useBtn.y && mouseY <= useBtn.y + useBtn.h);
+
+      g.lineStyle(2, 0x06d6a0, 1.0);
+      g.beginFill(isUseHover ? 0x00b4d8 : 0x06d6a0, 1.0);
+      g.drawRoundedRect(useBtn.x, useBtn.y, useBtn.w, useBtn.h, 8);
+      g.endFill();
+
+      const useBtnTxt = new PIXI.Text(useAct.label, {
+        fontFamily: font, fontSize: 13, fontWeight: 'bold', fill: 0x120d24
+      });
+      useBtnTxt.anchor.set(0.5);
+      useBtnTxt.position.set(useBtn.x + useBtn.w / 2, useBtn.y + useBtn.h / 2);
+      this.modalTextContainer.addChild(useBtnTxt);
+    }
+
+    drawAnimatedFeatureScene(g, vKey, vx, vy, vw, vh, t) {
+      const font = 'system-ui, -apple-system, Segoe UI, Roboto, sans-serif';
+      const addSprite = (imgName, x, y, w, h) => {
+        try {
+          const sp = new PIXI.Sprite(PIXI.Texture.from(imgName));
+          sp.anchor.set(0.5);
+          sp.width = w;
+          sp.height = h;
+          sp.position.set(x, y);
+          this.modalTextContainer.addChild(sp);
+          return sp;
+        } catch (e) { return null; }
+      };
+      const addLabel = (str, x, y, col = 0xffd166, size = 12) => {
+        const tx = new PIXI.Text(str, { fontFamily: font, fontSize: size, fontWeight: 'bold', fill: col, stroke: '#0a0714', strokeThickness: 3 });
+        tx.anchor.set(0.5);
+        tx.position.set(x, y);
+        this.modalTextContainer.addChild(tx);
+      };
+
+      // Helper to draw animated cursor arrow
+      const drawCursor = (cx, cy, clicking = false) => {
+        g.lineStyle(2, 0x120d24, 1.0);
+        g.beginFill(clicking ? 0x06d6a0 : 0xffffff, 1.0);
+        g.drawCircle(cx, cy, clicking ? 8 : 6);
+        g.endFill();
+        if (clicking) {
+          g.lineStyle(2, 0xffd166, 0.9);
+          g.drawCircle(cx, cy, 14);
+        }
+      };
+
+      if (vKey === 'power' || vKey === 'water' || vKey === 'sewage') {
+        const srcImg = vKey === 'power' ? 'Power.png' : (vKey === 'water' ? 'Blue barrel.png' : 'Orange barrel.png');
+        const wireCol = vKey === 'power' ? 0xffd166 : (vKey === 'water' ? 0x00b4d8 : 0xc77dff);
+        const badgeImg = vKey === 'power' ? 'badge_power.png' : (vKey === 'water' ? 'badge_water.png' : 'badge_drain.png');
+
+        const p1 = { x: vx + 130, y: vy + 125 };
+        const p2 = { x: vx + 380, y: vy + 68 };
+
+        // Draw river strip for water/sewage
+        if (vKey !== 'power') {
+          g.lineStyle(0);
+          g.beginFill(0x0077b6, 0.45);
+          g.drawRect(vx + 70, vy + 4, 45, vh - 8);
+          g.endFill();
+        }
+
+        // Animate Manhattan drag from t = 0.1 to 0.55, connected at t >= 0.55
+        const dragProg = Math.max(0, Math.min(1, (t - 0.1) / 0.45));
+        const curEnd = {
+          x: p1.x + (p2.x - p1.x) * dragProg,
+          y: p1.y + (p2.y - p1.y) * dragProg
+        };
+
+        if (t >= 0.1) {
+          const pathData = global.POWATER.ConnectionEntity.buildManhattanPoints(p1, curEnd, 0, 22);
+          if (pathData && pathData.points) {
+            g.lineStyle(4, wireCol, 0.95);
+            g.moveTo(pathData.points[0].x, pathData.points[0].y);
+            for (let i = 1; i < pathData.points.length; i++) {
+              g.lineTo(pathData.points[i].x, pathData.points[i].y);
+            }
+            if (t >= 0.55) {
+              const pulsePos = global.POWATER.ConnectionEntity.getPointAlongPath(pathData, (t * 3) % 1.0);
+              g.beginFill(0xffffff, 1.0);
+              g.drawCircle(pulsePos.x, pulsePos.y, 4);
+              g.endFill();
+            }
+          }
+        }
+
+        addSprite(srcImg, p1.x, p1.y, 48, 48);
+        addSprite('House.png', p2.x, p2.y, 68, 46);
+
+        // House status ring
+        g.lineStyle(3, t >= 0.55 ? 0x06d6a0 : 0xffb703, 0.9);
+        g.drawCircle(p2.x, p2.y, 38);
+
+        if (t < 0.55) {
+          addSprite(badgeImg, p2.x, p2.y - 46, 22, 22);
+        } else {
+          addLabel('+$50 บ้านสมบูรณ์ (Complete)!', p2.x, p2.y - 46, 0x06d6a0, 12);
+        }
+
+        drawCursor(curEnd.x, curEnd.y, t >= 0.1 && t <= 0.58);
+      }
+      else if (vKey === 'repair') {
+        const px = vx + 260, py = vy + 105;
+        const isBroken = (t >= 0.15 && t < 0.62);
+        addSprite('Blue barrel.png', px, py, 56, 56);
+
+        g.lineStyle(3.5, isBroken ? 0xe63946 : 0x06d6a0, 1.0);
+        g.drawCircle(px, py, 38);
+
+        if (isBroken) {
+          addSprite('badge_repair.png', px, py - 48, 28, 28);
+          addLabel('⚠️ เครื่องปั๊มเสีย! (Win Timer: PAUSED)', px, vy + 24, 0xff5a5f, 12);
+          const curX = vx + 380 - Math.min(1, Math.max(0, (t - 0.3) / 0.28)) * 120;
+          const curY = vy + 150 - Math.min(1, Math.max(0, (t - 0.3) / 0.28)) * 45;
+          drawCursor(curX, curY, t >= 0.55);
+        } else if (t >= 0.62) {
+          addLabel('🔧 ซ่อมแซมสำเร็จ! น้ำไหลปกติ & Win Timer เดินต่อ!', px, vy + 26, 0x06d6a0, 12);
+        } else {
+          addLabel('ปั๊มน้ำทำงานปกติ (มีโอกาสเสีย 30% ทุก 2 นาที)', px, vy + 26, 0x90e0ef, 12);
+        }
+      }
+      else if (vKey === 'special') {
+        // Left half: Rome Blackout + Candles | Right half: Amsterdam Flood + 500 EUR Pump
+        g.lineStyle(1, 0x48cae4, 0.4);
+        g.moveTo(vx + vw / 2, vy + 8);
+        g.lineTo(vx + vw / 2, vy + vh - 8);
+
+        // Rome Blackout side
+        const rx = vx + 130, ry = vy + 105;
+        addSprite('House.png', rx, ry, 64, 44);
+        addSprite('badge_candle.png', rx, ry - 40, 24, 24);
+        addLabel('ด่าน Rome: ไฟดับใช้เทียน 1 กล่อง/บ้าน', rx, vy + 24, 0xffd166, 11);
+        addLabel('สต็อกเทียน Bulk: 20€ / 50€ / 100€ / 500€', rx, vy + 162, 0xe9ecef, 10.5);
+
+        // Amsterdam Flood side
+        const ax = vx + 390, ay = vy + 105;
+        if (t < 0.55) {
+          g.beginFill(0x0077b6, 0.45);
+          g.drawRect(vx + vw / 2 + 4, vy + 8, vw / 2 - 8, vh - 16);
+          g.endFill();
+          addLabel('🌊 น้ำท่วม Amsterdam! (< 2 นาที)', ax, vy + 24, 0xff5a5f, 11);
+        } else {
+          addLabel('🛟 สูบน้ำท่วมออกสำเร็จทันที! (-500 EUR)', ax, vy + 24, 0x06d6a0, 11);
+        }
+        addSprite('House.png', ax, ay, 64, 44);
+        drawCursor(ax, vy + 150, t >= 0.48 && t <= 0.62);
+      }
+      else if (vKey === 'solar' || vKey === 'air_filter') {
+        const isSolar = (vKey === 'solar');
+        const sprName = isSolar ? 'Solar.png' : 'AirFilter.png';
+        const bx = vx + 180, by = vy + 100;
+        const hx = vx + 360, hy = vy + 100;
+
+        if (t >= 0.25) {
+          addSprite(sprName, bx, by, 54, 54);
+          g.lineStyle(2.5, isSolar ? 0xffd166 : 0x2ec4b6, 0.9);
+          g.drawCircle(bx, by, 34 + Math.sin(t * 18) * 4);
+        }
+        addSprite('House.png', hx, hy, 68, 46);
+
+        if (isSolar && t >= 0.45) {
+          const pathData = global.POWATER.ConnectionEntity.buildManhattanPoints({ x: bx, y: by }, { x: hx, y: hy }, 0, 20);
+          g.lineStyle(3.5, 0xffd166, 0.95);
+          g.moveTo(pathData.points[0].x, pathData.points[0].y);
+          for (let i = 1; i < pathData.points.length; i++) g.lineTo(pathData.points[i].x, pathData.points[i].y);
+        }
+
+        addLabel(
+          isSolar ? '☀️ พลังงานสะอาด 0% มลภาวะ (Tokyo ลด 25% เหลือ $45)' : '🍃 ดูดซับมลพิษอัตโนมัติ -0.2 หน่วย/วินาที',
+          vx + vw / 2, vy + 24, isSolar ? 0xffd166 : 0x06d6a0, 12
+        );
+        drawCursor(bx, by, t >= 0.2 && t <= 0.35);
+      }
+      else {
+        // Upgrades, SDGs / Upsize / Day-Night, or Win Timer Demo
+        const isNightDemo = (vKey === 'sdgs' && t >= 0.5);
+        if (isNightDemo) {
+          g.beginFill(0x05081c, 0.55);
+          g.drawRect(vx + 4, vy + 4, vw - 8, vh - 8);
+          g.endFill();
+        }
+        addSprite(isNightDemo ? 'icon_night.png' : 'icon_day.png', vx + 70, vy + 40, 32, 32);
+        addSprite('House.png', vx + 180, vy + 105, 62, 42);
+        addSprite('House.png', vx + 270, vy + 105, 62, 42);
+        addSprite('House.png', vx + 360, vy + 105, 62, 42);
+        addLabel(
+          vKey === 'upgrades'
+            ? '⚡ อัปเกรดไฟ +20% | ☢️ ลดมลพิษ -5% | 💧 ปั๊มน้ำ +20%'
+            : (vKey === 'sdgs'
+              ? '🗺️ ขยายแมพทุก +10 หลัง (ตันที่ 40 หลัง) & ☀️/🌙 Day/Night 1 นาที'
+              : '🏆 ดูแลบ้าน > 15 หลังครบ 5 นาทีเพื่อชนะด่าน!'),
+          vx + vw / 2, vy + 30, 0x06d6a0, 12
+        );
+      }
+    }
+
     renderBriefingContent(mx, my, mw, mh, mouseX, mouseY) {
       const font = 'system-ui, -apple-system, Segoe UI, Roboto, sans-serif';
       const lvl = this.modalData.level || this.game.currentLevel || {};
       const curLvlIdx = this.game ? (this.game.levelIndex || 0) : 0;
 
-      const title = new PIXI.Text(`📋 POWATER CORP. v1.0.0.0 — 4 ด่านหลัก & เงื่อนไขพิเศษ`, {
-        fontFamily: font, fontSize: 16, fontWeight: 'bold', fill: 0x00b4d8
+      const title = new PIXI.Text(`📋 POWATER CORP. v1.0.2.0 — เลือกด่าน & โหมดฝึกสอนด่วน`, {
+        fontFamily: font, fontSize: 15.5, fontWeight: 'bold', fill: 0x00b4d8
       });
       title.position.set(mx + 20, my + 14);
       this.modalTextContainer.addChild(title);
 
+      // 5 Tabs across top: 0. Fast Tutorial + 4 Main Levels
       const levelTabs = [
+        { name: '🎓 0. Tutorial', idx: -1 },
         { name: '1. Bangkok', idx: 0 },
         { name: '2. Tokyo', idx: 1 },
         { name: '3. Rome', idx: 2 },
         { name: '4. Amsterdam', idx: 3 }
       ];
 
-      const tabW = (mw - 40 - (levelTabs.length - 1) * 8) / levelTabs.length;
+      const tabW = (mw - 40 - (levelTabs.length - 1) * 6) / levelTabs.length;
       const tabH = 32;
       const tabY = my + 56;
 
       for (let i = 0; i < levelTabs.length; i++) {
         const lt = levelTabs[i];
-        const tabX = mx + 20 + i * (tabW + 8);
-        const isSelected = (curLvlIdx === lt.idx);
+        const tabX = mx + 20 + i * (tabW + 6);
+        const isSelected = (lt.idx === -1) ? Boolean(this.game && this.game.isTutorialMode) : (!this.game.isTutorialMode && curLvlIdx === lt.idx);
         const isHover = (mouseX >= tabX && mouseX <= tabX + tabW && mouseY >= tabY && mouseY <= tabY + tabH);
 
-        this.modalButtons.push({ id: `select_level_${lt.idx}`, x: tabX, y: tabY, w: tabW, h: tabH });
+        this.modalButtons.push({ id: lt.idx === -1 ? 'start_fast_tutorial' : `select_level_${lt.idx}`, x: tabX, y: tabY, w: tabW, h: tabH });
 
-        this.modalGfx.lineStyle(1.5, isSelected ? 0x00b4d8 : (isHover ? 0x48cae4 : 0x3d3460), isSelected ? 1.0 : 0.6);
+        this.modalGfx.lineStyle(1.5, isSelected ? 0x06d6a0 : (isHover ? 0x48cae4 : 0x3d3460), isSelected ? 1.0 : 0.6);
         this.modalGfx.beginFill(isSelected ? 0x0077b6 : (isHover ? 0x221a44 : 0x181232), 0.95);
         this.modalGfx.drawRoundedRect(tabX, tabY, tabW, tabH, 6);
         this.modalGfx.endFill();
 
         const tabTxt = new PIXI.Text(lt.name, {
           fontFamily: font,
-          fontSize: 12,
+          fontSize: 11.5,
           fontWeight: isSelected ? 'bold' : 'normal',
           fill: isSelected ? 0xffffff : (isHover ? 0x90e0ef : 0xadb5bd)
         });
@@ -593,15 +1072,32 @@
         `• ข้อได้เปรียบ (+): ${lvl.conditionPlus || '-'}\n` +
         `• ความท้าทาย (-): ${lvl.conditionMinus || '-'}\n` +
         `• การได้เงิน: บ้าน Complete รับทันที +$50 | รายได้รายสัปดาห์: [บ้าน Complete] x $40\n` +
-        `• ระบบใหม่: ซ่อมเครื่องปั๊ม (Repair 30% ทุก 2 นาที) | Day/Night (1 นาที) | ขยายแมพ (ตันที่ 40 หลัง)\n` +
-        `• เงื่อนไขชนะ: บ้าน > 15 หลังมีน้ำและไฟต่อเนื่อง 5 นาที (Pause เมื่อต้องซ่อม/เกิดภัยพิบัติ, Reset เมื่อถูกร้องเรียน)\n\n` +
+        `• วิดีโอสาธิตฟีเจอร์ใหม่: คลิกปุ่มไอคอน [▶] สีฟ้าเหนือปุ่มเครื่องมือด้านล่างเพื่อดูวิดีโอวิธีใช้แต่ละฟีเจอร์!\n\n` +
         `🎩 Amigo TheGOATHimself: "${lvl.amigoQuote || ''}"`,
         { fontFamily: font, fontSize: 12.5, fill: 0xe9ecef, wordWrap: true, wordWrapWidth: mw - 46, lineHeight: 20 }
       );
       briefingTxt.position.set(mx + 23, my + 98);
       this.modalTextContainer.addChild(briefingTxt);
 
-      const startBtn = { id: 'btn_start', x: mx + mw / 2 - 95, y: my + mh - 54, w: 190, h: 40 };
+      // Button 1: Start Fast 30s Tutorial
+      const tutBtn = { id: 'start_fast_tutorial', x: mx + mw / 2 - 205, y: my + mh - 54, w: 195, h: 40 };
+      this.modalButtons.push(tutBtn);
+      const isTutHover = (mouseX >= tutBtn.x && mouseX <= tutBtn.x + tutBtn.w && mouseY >= tutBtn.y && mouseY <= tutBtn.y + tutBtn.h);
+
+      this.modalGfx.lineStyle(2, 0x06d6a0, 1.0);
+      this.modalGfx.beginFill(isTutHover ? 0x00b4d8 : 0x06d6a0, 1.0);
+      this.modalGfx.drawRoundedRect(tutBtn.x, tutBtn.y, tutBtn.w, tutBtn.h, 8);
+      this.modalGfx.endFill();
+
+      const tutTxt = new PIXI.Text('🎓 ฝึกสอนด่วน (TUTORIAL)', {
+        fontFamily: font, fontSize: 12.5, fontWeight: 'bold', fill: 0x120d24
+      });
+      tutTxt.anchor.set(0.5);
+      tutTxt.position.set(tutBtn.x + tutBtn.w / 2, tutBtn.y + tutBtn.h / 2);
+      this.modalTextContainer.addChild(tutTxt);
+
+      // Button 2: Start Selected Level
+      const startBtn = { id: 'btn_start', x: mx + mw / 2 + 10, y: my + mh - 54, w: 195, h: 40 };
       this.modalButtons.push(startBtn);
       const isStartHover = (mouseX >= startBtn.x && mouseX <= startBtn.x + startBtn.w && mouseY >= startBtn.y && mouseY <= startBtn.y + startBtn.h);
 
@@ -610,8 +1106,8 @@
       this.modalGfx.drawRoundedRect(startBtn.x, startBtn.y, startBtn.w, startBtn.h, 8);
       this.modalGfx.endFill();
 
-      const btnTxt = new PIXI.Text('เริ่มปฏิบัติการ! (START)', {
-        fontFamily: font, fontSize: 13, fontWeight: 'bold', fill: 0xffffff
+      const btnTxt = new PIXI.Text('🚀 เริ่มด่านนี้! (START)', {
+        fontFamily: font, fontSize: 12.5, fontWeight: 'bold', fill: 0xffffff
       });
       btnTxt.anchor.set(0.5);
       btnTxt.position.set(startBtn.x + startBtn.w / 2, startBtn.y + startBtn.h / 2);
@@ -626,7 +1122,6 @@
       title.position.set(mx + 20, my + 14);
       this.modalTextContainer.addChild(title);
 
-      // Section 1: Rome Bulk Candle Restock (20€, 50€, 100€, 500€ - 10 EUR/box)
       this.modalGfx.lineStyle(1, 0xffd166, 0.4);
       this.modalGfx.beginFill(0x1c1538, 0.92);
       this.modalGfx.drawRoundedRect(mx + 20, my + 62, mw - 40, 145, 8);
@@ -672,7 +1167,6 @@
         this.modalTextContainer.addChild(bTxt);
       }
 
-      // Section 2: Amsterdam Emergency Flood Pump (500 EUR, One-Time Use)
       const pumpY = my + 220;
       this.modalGfx.lineStyle(1, 0x00b4d8, 0.4);
       this.modalGfx.beginFill(0x1c1538, 0.92);
@@ -713,7 +1207,6 @@
       pumpBtnTxt.position.set(pumpBtn.x + pumpBtn.w / 2, pumpBtn.y + pumpBtn.h / 2);
       this.modalTextContainer.addChild(pumpBtnTxt);
 
-      // Section 3: Maintenance & Weather Simulation Controls
       const repY = my + 354;
       this.modalGfx.lineStyle(1, 0xff5a5f, 0.4);
       this.modalGfx.beginFill(0x1c1538, 0.92);
@@ -768,7 +1261,6 @@
       title.position.set(mx + 20, my + 14);
       this.modalTextContainer.addChild(title);
 
-      // Matches page 2 of POWATER IDEA PITCH.pdf (ELECTRICITY +20% FASTER Lv 1/5 10$, POLLUTION -5% Lv 1/10 100$, WATER PUMP +20% FASTER Lv 1/5 10$)
       const upgrades = [
         { key: 'elec_cap', name: '⚡ ELECTRICITY +20% FASTER', desc: 'เพิ่มประสิทธิภาพการส่งกระแสไฟฟ้า +20% (สูงสุด Lv. 5)', baseCost: 10, mult: 1.8, maxLvl: 5 },
         { key: 'poll_red', name: '☢️ POLLUTION -5%', desc: 'ลดอัตราการปล่อยมลภาวะทุกแหล่ง -5% ต่อระดับ (สูงสุด Lv. 10)', baseCost: 100, mult: 1.5, maxLvl: 10 },
@@ -855,7 +1347,6 @@
         this.modalTextContainer.addChild(descTxt);
       }
 
-      // Feature Plan Roadmap (from POWATER CORP.pdf)
       const rmY = my + 302;
       this.modalGfx.lineStyle(1.5, 0x06d6a0, 0.45);
       this.modalGfx.beginFill(0x181232, 0.95);
@@ -869,7 +1360,7 @@
       this.modalTextContainer.addChild(rmHeader);
 
       const roadmapText = new PIXI.Text(
-        '• v1.0.0.0 (Current): 4 ด่านหลัก (Bangkok, Tokyo, Rome, Amsterdam), Repair, Day/Night, Upsize 40 หลัง\n' +
+        '• v1.0.2.0 (Current): 4 ด่านหลัก, Fast Tutorial, วิดีโอสาธิตเหนือปุ่ม [▶], Repair, Day/Night, Upsize 40 หลัง\n' +
         '• v1.1 - Seasonal Update: ระบบฤดูกาล (Seasonal Weather & Energy Output)\n' +
         '• v1.2 - Save The World Update: เพิ่มเมืองใหม่ และ ระบบป่าไม้ (Forestry Carbon Sink)\n' +
         '• v1.3 - Monopoly Update: เพิ่มระบบ Gacha [ตัวละครผู้ช่วย] และ In-App Purchase เพิ่มความหมายของ In-Game Currency\n' +
@@ -931,7 +1422,7 @@
         `• เวลาสะสม Win Timer ล่าสุด: ${this.formatMMSS(this.game.winHoldTimer || 0)} / 05:00\n` +
         `• วันที่บริหารเมืองได้: ${(this.game.totalDaysPassed || 0) + 1} วัน\n` +
         `• ระดับมลภาวะสุดท้าย: ${(this.game.pollution || 0).toFixed(2)}\n\n` +
-        `เคล็ดลับ: กดปุ่ม REPAIR [R] ทันทีที่เครื่องปั๊มเสีย และเตรียมไอเทมพิเศษในปุ่ม ITEMS [I] ให้พร้อม!`,
+        `เคล็ดลับ: คลิกปุ่ม [▶] เหนือไอคอนด้านล่างเพื่อดูวิดีโอสาธิตการใช้ฟีเจอร์ได้ทุกเมื่อ!`,
         { fontFamily: font, fontSize: 13, fill: 0xe9ecef, wordWrap: true, wordWrapWidth: mw - 50, lineHeight: 22 }
       );
       msg.position.set(mx + 25, my + 90);
@@ -1027,6 +1518,28 @@
         if (mouseX >= btn.x && mouseX <= btn.x + btn.w && mouseY >= btn.y && mouseY <= btn.y + btn.h) {
           if (global.POWATER.soundManager) {
             global.POWATER.soundManager.playClick();
+          }
+
+          if (btn.id === 'vid_toggle_play') {
+            this.videoPaused = !this.videoPaused;
+            return;
+          }
+
+          if (btn.id === 'vid_use_feature') {
+            const act = btn.useAction || {};
+            this.closeModal();
+            if (act.type === 'tool') {
+              this.selectTool(act.value);
+            } else if (act.type === 'action') {
+              this.triggerAction(act.value);
+            }
+            return;
+          }
+
+          if (btn.id === 'start_fast_tutorial') {
+            this.closeModal();
+            if (this.game) this.game.startTutorial();
+            return;
           }
 
           if (btn.id === 'modal_close' || btn.id === 'btn_start' || btn.id === 'btn_ok' || btn.id === 'btn_cont') {

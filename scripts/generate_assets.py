@@ -329,6 +329,33 @@ def generate_toolbar_dock():
     print('Generated toolbar_dock.png (880x56)')
 
 
+def generate_video_help_icon():
+    """Generates icon_video_help.png (48x32) clickable video tutorial badge above feature buttons."""
+    w, h = 48, 32
+    buf = bytearray(w * h * 4)
+    radius = 8
+    for y in range(h):
+        for x in range(w):
+            dx = max(0, radius - x, x - (w - 1 - radius))
+            dy = max(0, radius - y, y - (h - 1 - radius))
+            dist = math.hypot(dx, dy)
+            if dist <= radius:
+                idx = (y * w + x) * 4
+                is_border = (dist >= radius - 2.5) or (x < 2) or (x >= w - 2) or (y < 2) or (y >= h - 2)
+                if is_border:
+                    buf[idx:idx + 4] = bytes((0, 180, 216, 255))
+                else:
+                    buf[idx:idx + 4] = bytes((20, 16, 42, 240))
+            # Play triangle in center
+            if 9 <= y <= 22:
+                half_span = (7.0 - abs(y - 15.5)) * 1.15
+                if 19 <= x <= 19 + half_span:
+                    idx = (y * w + x) * 4
+                    buf[idx:idx + 4] = bytes((255, 209, 102, 255))
+    write_png(os.path.join(ASSETS_DIR, 'icon_video_help.png'), w, h, buf)
+    print('Generated icon_video_help.png (48x32)')
+
+
 if __name__ == '__main__':
     # 1. Rome River (Tiber River)
     rome_path = [
@@ -371,4 +398,6 @@ if __name__ == '__main__':
     generate_day_night_icons()
     generate_logo_powater()
     generate_toolbar_dock()
+    generate_video_help_icon()
+
 

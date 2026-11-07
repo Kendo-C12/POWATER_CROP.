@@ -85,15 +85,19 @@
       // 4. Initialize PixiJS Graphics & Drawing UI Layers
       this.setupPixiLayers(runtimeScene);
 
-      // 5. Detect and Start Level matching Scene Name (Bangkok, Tokyo, Rome, Amsterdam)
+      // 5. Detect and Start Level matching Scene Name (Tutorial, Bangkok, Tokyo, Rome, Amsterdam)
       const sName = this.currentSceneName.toLowerCase();
-      let levelIdx = 0;
-      if (sName.includes('tokyo')) levelIdx = 1;
-      else if (sName.includes('rome') || sName.includes('venice')) levelIdx = 2;
-      else if (sName.includes('amsterdam') || sName.includes('endless') || sName.includes('metropolis')) levelIdx = 3;
+      if (sName.includes('tutorial')) {
+        this.game.startTutorial();
+      } else {
+        let levelIdx = 0;
+        if (sName.includes('tokyo')) levelIdx = 1;
+        else if (sName.includes('rome') || sName.includes('venice')) levelIdx = 2;
+        else if (sName.includes('amsterdam') || sName.includes('endless') || sName.includes('metropolis')) levelIdx = 3;
 
-      this.game.startLevel(levelIdx);
-      this.ui.showLevelBriefing(this.game.currentLevel);
+        this.game.startLevel(levelIdx);
+        this.ui.showLevelBriefing(this.game.currentLevel);
+      }
 
       this.initialized = true;
       this.lastTime = performance.now();
@@ -446,6 +450,72 @@
           const targetR = (targetNode.isHouse ? 54 : 44) + Math.sin(this.pulseTime * 6) * 4;
           gfxO.lineStyle(3, 0x06d6a0, 0.95);
           gfxO.drawCircle(tc.x, tc.y, targetR);
+        }
+      }
+
+      // 7. Interactive Fast Tutorial Visual Guide (Manhattan Guide Line & Target Highlight)
+      if (this.game.isTutorialMode && this.game.tutorialStep >= 1 && this.game.tutorialStep <= 4) {
+        const step = this.game.tutorialStep;
+        const house = this.game.houses[0];
+        let srcNode = null;
+        let dstNode = null;
+        let guideColor = 0xffd166;
+
+        if (step === 1) {
+          srcNode = this.game.buildings.find(b => b.config && b.config.type === 'generator');
+          dstNode = house;
+          guideColor = 0xffd166;
+        } else if (step === 2) {
+          srcNode = this.game.buildings.find(b => b.config && b.config.type === 'water_pump');
+          dstNode = house;
+          guideColor = 0x00b4d8;
+        } else if (step === 3) {
+          srcNode = house;
+          dstNode = this.game.buildings.find(b => b.config && b.config.type === 'waste_filter');
+          guideColor = 0xc77dff;
+        } else if (step === 4) {
+          srcNode = this.game.buildings.find(b => b.isBroken) || this.game.buildings.find(b => b.config && b.config.type === 'water_pump');
+          guideColor = 0xef476f;
+        }
+
+        if (srcNode && dstNode) {
+          const c1 = srcNode.getCenter();
+          const c2 = dstNode.getCenter();
+          const gPath = (global.POWATER.ConnectionEntity && global.POWATER.ConnectionEntity.buildManhattanPoints)
+            ? global.POWATER.ConnectionEntity.buildManhattanPoints(c1, c2, 0, 22)
+            : { points: [c1, c2] };
+          const gPts = (gPath && gPath.points) || [c1, c2];
+
+          const pulseAlpha = 0.45 + 0.35 * Math.sin(this.pulseTime * 3);
+          gfxO.lineStyle(4, guideColor, pulseAlpha);
+          if (gPts.length >= 2) {
+            gfxO.moveTo(gPts[0].x, gPts[0].y);
+            for (let i = 1; i < gPts.length; i++) {
+              gfxO.lineTo(gPts[i].x, gPts[i].y);
+            }
+          }
+
+          // Animated cursor orb sliding along the Manhattan tutorial guide path
+          const tProg = (this.pulseTime * 0.45) % 1.0;
+          const pt = (global.POWATER.ConnectionEntity && global.POWATER.ConnectionEntity.getPointAtFraction)
+            ? global.POWATER.ConnectionEntity.getPointAtFraction(gPath.segments || [], gPath.totalLength || 0, tProg, c1, c2)
+            : { x: c1.x + (c2.x - c1.x) * tProg, y: c1.y + (c2.y - c1.y) * tProg };
+          gfxO.lineStyle(2, 0xffffff, 0.95);
+          gfxO.beginFill(guideColor, 1.0);
+          gfxO.drawCircle(pt.x, pt.y, 7);
+          gfxO.endFill();
+
+          const rPulse = 46 + Math.sin(this.pulseTime * 5) * 5;
+          gfxO.lineStyle(3, guideColor, 0.9);
+          gfxO.drawCircle(c1.x, c1.y, rPulse);
+          gfxO.drawCircle(c2.x, c2.y, rPulse + 6);
+        } else if (srcNode && step === 4) {
+          const c1 = srcNode.getCenter();
+          const rPulse = 48 + Math.sin(this.pulseTime * 6) * 6;
+          gfxO.lineStyle(3.5, 0xef476f, 0.95);
+          gfxO.drawCircle(c1.x, c1.y, rPulse);
+          gfxO.lineStyle(2, 0xffd166, 0.85);
+          gfxO.drawCircle(c1.x, c1.y, rPulse + 10);
         }
       }
     }
