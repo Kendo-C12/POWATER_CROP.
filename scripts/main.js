@@ -129,6 +129,24 @@
           }
         }
 
+        // Prevent GDevelop's RuntimeScenePixiRenderer.onGameResolutionResized from multiplying
+        // _pixiContainer.scale by pixiRenderer.resolution (3x) when maximizing or full-screening!
+        if (typeof gdjs !== 'undefined' && gdjs.RuntimeScenePixiRenderer && gdjs.RuntimeScenePixiRenderer.prototype && !gdjs.RuntimeScenePixiRenderer.prototype._powaterPatchedResize) {
+          gdjs.RuntimeScenePixiRenderer.prototype._powaterPatchedResize = true;
+          gdjs.RuntimeScenePixiRenderer.prototype.onGameResolutionResized = function () {
+            const pr = this._runtimeGameRenderer ? this._runtimeGameRenderer.getPIXIRenderer() : null;
+            if (!pr) return;
+            const g = this._runtimeScene.getGame();
+            const logicalW = (pr.screen && pr.screen.width) ? pr.screen.width : (pr.width / (pr.resolution || 1));
+            const logicalH = (pr.screen && pr.screen.height) ? pr.screen.height : (pr.height / (pr.resolution || 1));
+            this._pixiContainer.scale.x = logicalW / g.getGameResolutionWidth();
+            this._pixiContainer.scale.y = logicalH / g.getGameResolutionHeight();
+            for (const layer of this._runtimeScene._orderedLayers) {
+              layer.getRenderer().onGameResolutionResized();
+            }
+          };
+        }
+
         if (pixiRenderer._powaterHiDPI !== targetRes) {
           pixiRenderer._powaterHiDPI = targetRes;
 
@@ -177,6 +195,12 @@
           };
 
           gameRenderer._resizeCanvas();
+        }
+
+        const sceneRenderer = runtimeScene.getRenderer ? runtimeScene.getRenderer() : null;
+        const rootContainer = sceneRenderer && sceneRenderer.getPIXIContainer ? sceneRenderer.getPIXIContainer() : null;
+        if (rootContainer && rootContainer.scale && (rootContainer.scale.x !== 1 || rootContainer.scale.y !== 1)) {
+          rootContainer.scale.set(1, 1);
         }
       } catch (e) {
         console.warn('High-DPI renderer setup warning:', e);
@@ -245,6 +269,15 @@
       const currentName = runtimeScene ? runtimeScene.getName() : 'Main';
       if (!this.initialized || this.currentRuntimeScene !== runtimeScene || this.currentSceneName !== currentName) {
         this.reinitScene(runtimeScene);
+      }
+
+      // Guard against GDevelop window-resize scaling the scene root container by resolution (3x)
+      if (runtimeScene && runtimeScene.getRenderer) {
+        const sr = runtimeScene.getRenderer();
+        const rc = sr && sr.getPIXIContainer ? sr.getPIXIContainer() : null;
+        if (rc && rc.scale && (rc.scale.x !== 1 || rc.scale.y !== 1)) {
+          rc.scale.set(1, 1);
+        }
       }
 
       const now = performance.now();
