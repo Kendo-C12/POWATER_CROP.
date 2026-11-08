@@ -157,6 +157,26 @@
       return Math.round(cost);
     }
 
+    reloadStageConfig() {
+      if (this.isTutorialMode && CONFIG.TUTORIAL_LEVEL) {
+        this.currentLevel = CONFIG.TUTORIAL_LEVEL;
+      } else if (CONFIG.LEVELS && CONFIG.LEVELS[this.levelIndex]) {
+        this.currentLevel = CONFIG.LEVELS[this.levelIndex];
+      }
+      const lvl = this.currentLevel || {};
+      this.maxComplaints = lvl.maxComplaints || CONFIG.MAX_COMPLAINTS || 3;
+      this.winTargetDuration = lvl.winHoldDurationSeconds || CONFIG.WIN_HOLD_DURATION_SECONDS || 300;
+      this.winRequiredHouses = lvl.winRequiredHouses || CONFIG.WIN_REQUIRED_HOUSES || 15;
+      this.maxHousesCap = lvl.maxHousesCap || CONFIG.MAX_HOUSES_CAP || 40;
+      this.dayDuration = CONFIG.DAY_DURATION_IN_GAME_SECONDS || 15.0;
+      if (CONFIG.DISASTERS && CONFIG.DISASTERS.FLOOD && typeof CONFIG.DISASTERS.FLOOD.maxDurationSecondsBeforeGameOver === 'number') {
+        this.floodMaxDuration = CONFIG.DISASTERS.FLOOD.maxDurationSecondsBeforeGameOver;
+      }
+      if (this.levelElapsedTime < 1.0 && typeof lvl.startingBudget === 'number' && !this.isTutorialMode) {
+        this.money = lvl.startingBudget;
+      }
+    }
+
     startLevel(levelIndex) {
       this.levelIndex = levelIndex;
       this.currentLevel = (CONFIG.LEVELS && CONFIG.LEVELS[levelIndex]) || CONFIG.LEVELS[0];
@@ -173,8 +193,12 @@
       this.isPaused = false;
       this.gameSpeed = 1.0;
 
-      // Win Timer reset
+      // Win Timer reset (supports per-stage overrides from stage_config.json)
       this.winHoldTimer = 0.0;
+      this.winTargetDuration = this.currentLevel.winHoldDurationSeconds || CONFIG.WIN_HOLD_DURATION_SECONDS || 300;
+      this.winRequiredHouses = this.currentLevel.winRequiredHouses || CONFIG.WIN_REQUIRED_HOUSES || 15;
+      this.maxHousesCap = this.currentLevel.maxHousesCap || CONFIG.MAX_HOUSES_CAP || 40;
+      this.dayDuration = CONFIG.DAY_DURATION_IN_GAME_SECONDS || 15.0;
       this.winTimerState = 'WAITING';
 
       // Time & Cycles reset
@@ -633,12 +657,13 @@
         if (this.totalDaysPassed % 7 === 0) {
           this.weeksPassed++;
           const completeHouses = this.houses.filter(h => h.hasPower && h.hasWater && h.hasDrainage).length;
-          const weeklyIncome = completeHouses * (CONFIG.WEEKLY_REVENUE_PER_COMPLETE_HOUSE || 40);
-          const baseGrant = 40;
+          const perHouseRev = (typeof CONFIG.WEEKLY_REVENUE_PER_COMPLETE_HOUSE === 'number') ? CONFIG.WEEKLY_REVENUE_PER_COMPLETE_HOUSE : 40;
+          const weeklyIncome = completeHouses * perHouseRev;
+          const baseGrant = (typeof CONFIG.WEEKLY_BASE_GRANT === 'number') ? CONFIG.WEEKLY_BASE_GRANT : 40;
           const totalWeekly = weeklyIncome + baseGrant;
           this.money += totalWeekly;
           this.addFloatingText(
-            `📅 สัปดาห์ที่ ${this.weeksPassed}: +$${totalWeekly} (บ้านสมบูรณ์ ${completeHouses}x$40 + งบ $40)`,
+            `📅 สัปดาห์ที่ ${this.weeksPassed}: +$${totalWeekly} (บ้านสมบูรณ์ ${completeHouses}x$${perHouseRev} + งบ $${baseGrant})`,
             CONFIG.CANVAS_WIDTH / 2,
             85,
             '#ffd166'
@@ -672,22 +697,26 @@
 
     onNewDayWeatherCheck() {
       const lvl = this.currentLevel || {};
+      const dis = CONFIG.DISASTERS || {};
+      const tideDays = (dis.HIGH_TIDE && dis.HIGH_TIDE.everyNDays) || 15;
+      const blackoutDays = (dis.BLACKOUT && dis.BLACKOUT.everyNDays) || 15;
+      const blackoutChance = (dis.BLACKOUT && typeof dis.BLACKOUT.chance === 'number') ? dis.BLACKOUT.chance : 0.125;
+      const floodDays = (dis.FLOOD && dis.FLOOD.everyNDays) || 28;
 
-      // 1. Bangkok & Amsterdam: High Tide every 15 in-game days
-      if (lvl.hasHighTide && this.totalDaysPassed > 0 && this.totalDaysPassed % 15 === 0) {
+      // 1. Bangkok & Amsterdam: High Tide every N in-game days
+      if (lvl.hasHighTide && this.totalDaysPassed > 0 && this.totalDaysPassed % tideDays === 0) {
         this.triggerHighTide();
       }
 
-      // 2. Rome: Blackout chance (12.5%) every 15 in-game days
-      if (lvl.hasBlackout && this.totalDaysPassed > 0 && this.totalDaysPassed % 15 === 0) {
-        // Roll 12.5% chance (or guarantee on Day 15 if first time so player experiences mechanic)
-        if (Math.random() < 0.125 || this.totalDaysPassed === 15) {
+      // 2. Rome: Blackout chance every N in-game days
+      if (lvl.hasBlackout && this.totalDaysPassed > 0 && this.totalDaysPassed % blackoutDays === 0) {
+        if (Math.random() < blackoutChance || this.totalDaysPassed === blackoutDays) {
           this.triggerRomeBlackout();
         }
       }
 
       // 3. Amsterdam: Main Flood every 4 weeks (28 in-game days)
-      if (lvl.hasFlood && this.totalDaysPassed > 0 && this.totalDaysPassed % 28 === 0) {
+      if (lvl.hasFlood && this.totalDaysPassed > 0 && this.totalDaysPassed % floodDays === 0) {
         this.triggerAmsterdamFlood();
       }
     }
@@ -703,7 +732,7 @@
       this.repairCheckTimer += dt * tideMultiplier;
       if (this.repairCheckTimer >= repairInterval) {
         this.repairCheckTimer = 0;
-        const chance = CONFIG.REPAIR_BREAKDOWN_CHANCE || 0.30;
+        const chance = (typeof CONFIG.REPAIR_BREAKDOWN_CHANCE === 'number') ? CONFIG.REPAIR_BREAKDOWN_CHANCE : 0.30;
         let brokeCount = 0;
         this.buildings.forEach(b => {
           if (b.config && b.config.canBreakDown && !b.isBroken) {
@@ -737,27 +766,34 @@
 
       // 3. Tokyo & Amsterdam Earthquake (every 1 minute after Protecting Time)
       if (!this.gracePeriodActive && this.currentLevel && this.currentLevel.hasEarthquake) {
+        const eqCfg = (CONFIG.DISASTERS && CONFIG.DISASTERS.EARTHQUAKE) || {};
+        const checkInterval = eqCfg.checkEverySeconds || 60.0;
+        const baseChance = (typeof eqCfg.baseChance === 'number') ? eqCfg.baseChance : 0.125;
+        const escalateAfter = eqCfg.escalateAfterMinutes || 3;
+        const escalateBonus = (typeof eqCfg.escalateBonusPerMinute === 'number') ? eqCfg.escalateBonusPerMinute : 0.05;
+        const guaranteedMin = eqCfg.guaranteedAtMinute || 5;
+
         this.earthquakeMinuteTimer += dt;
-        if (this.earthquakeMinuteTimer >= 60.0) {
-          this.earthquakeMinuteTimer -= 60.0;
+        if (this.earthquakeMinuteTimer >= checkInterval) {
+          this.earthquakeMinuteTimer -= checkInterval;
           this.minutesWithoutQuake++;
 
           // POWATER CORP.pdf Tokyo Earthquake rule:
           // Base 10-15% (12.5%). After 3 mins without quake, +5%/min. At 5 mins without quake, forced 100% quake!
           // After forced quake, condition becomes +5% every minute.
-          let quakeChance = 0.125 + this.postGuaranteedQuakeBonus;
+          let quakeChance = baseChance + this.postGuaranteedQuakeBonus;
           let forceQuake = false;
 
           if (!this.guaranteedQuakeTriggered) {
-            if (this.minutesWithoutQuake >= 5) {
+            if (this.minutesWithoutQuake >= guaranteedMin) {
               forceQuake = true;
               this.guaranteedQuakeTriggered = true;
-            } else if (this.minutesWithoutQuake > 3) {
-              quakeChance += (this.minutesWithoutQuake - 3) * 0.05;
+            } else if (this.minutesWithoutQuake > escalateAfter) {
+              quakeChance += (this.minutesWithoutQuake - escalateAfter) * escalateBonus;
             }
           } else {
-            this.postGuaranteedQuakeBonus += 0.05;
-            quakeChance = 0.125 + this.postGuaranteedQuakeBonus;
+            this.postGuaranteedQuakeBonus += escalateBonus;
+            quakeChance = baseChance + this.postGuaranteedQuakeBonus;
           }
 
           if (forceQuake || Math.random() < quakeChance) {
@@ -806,11 +842,13 @@
     }
 
     triggerHighTide() {
+      const tideCfg = (CONFIG.DISASTERS && CONFIG.DISASTERS.HIGH_TIDE) || {};
       this.isHighTide = true;
-      this.highTideTimer = 25.0;
+      this.highTideTimer = tideCfg.durationSeconds || 25.0;
+      const breakChance = (typeof tideCfg.riversideBreakChance === 'number') ? tideCfg.riversideBreakChance : 0.5;
       let broken = 0;
       this.buildings.forEach(b => {
-        if (b.config && b.config.mustBeNearWater && !b.isBroken && Math.random() < 0.5) {
+        if (b.config && b.config.mustBeNearWater && !b.isBroken && Math.random() < breakChance) {
           b.breakDown();
           broken++;
         }
@@ -844,8 +882,9 @@
     }
 
     triggerRomeBlackout() {
+      const blkCfg = (CONFIG.DISASTERS && CONFIG.DISASTERS.BLACKOUT) || {};
       this.isBlackoutActive = true;
-      this.blackoutTimer = 25.0;
+      this.blackoutTimer = blkCfg.durationSeconds || 25.0;
       let candlesUsed = 0;
       this.houses.forEach(h => {
         if (this.candleStock > 0) {
@@ -1128,12 +1167,14 @@
         if (global.POWATER.soundManager) global.POWATER.soundManager.playPollutionWarn();
       }
 
-      let delta = 0.0;
       const rates = CONFIG.POLLUTION_RATES;
-      const reductionFactor = Math.max(0.4, 1.0 - (this.upgradeLevels.poll_red * CONFIG.UPGRADES.POLLUTION_REDUCTION.bonusPerLevel));
+      const stagePollMult = (this.currentLevel && typeof this.currentLevel.pollutionMultiplier === 'number')
+        ? this.currentLevel.pollutionMultiplier
+        : 1.0;
+      const reductionFactor = Math.max(0.4, 1.0 - (this.upgradeLevels.poll_red * CONFIG.UPGRADES.POLLUTION_REDUCTION.bonusPerLevel)) * stagePollMult;
 
       const activeCoalGens = this.buildings.filter(b => b.config.type === 'generator' && !b.config.clean && b.active && !b.isBroken);
-      delta += activeCoalGens.length * rates.ELECTRIC_GENERATOR * reductionFactor * dt;
+      let delta = activeCoalGens.length * rates.ELECTRIC_GENERATOR * reductionFactor * dt;
 
       const activeOutlets = this.buildings.filter(b => b.config.type === 'waste_filter' && b.active && !b.isBroken && b.usedCapacity > 0);
       const housesDrained = this.houses.filter(h => h.hasWater && h.hasDrainage).length;

@@ -27,6 +27,15 @@ for f in os.listdir(assets_dir):
         shutil.copy2(src, os.path.join(prev_assets, f))
 print('Assets copied to preview directory.')
 
+# 1.05 Copy stage_config.json to preview root and load inline
+stage_cfg_path = os.path.join(ROOT_DIR, 'stage_config.json')
+stage_cfg_inline = '{}'
+if os.path.exists(stage_cfg_path):
+    shutil.copy2(stage_cfg_path, os.path.join(prev_dir, 'stage_config.json'))
+    with open(stage_cfg_path, 'r', encoding='utf-8') as scf:
+        stage_cfg_inline = json.dumps(json.load(scf), ensure_ascii=False, indent=2)
+    print('stage_config.json copied to preview directory.')
+
 # 1.1 Sync data.js with POWATER CROPS..json
 project_json_path = os.path.join(ROOT_DIR, 'POWATER CROPS..json')
 if os.path.exists(project_json_path):
@@ -40,7 +49,7 @@ if os.path.exists(project_json_path):
 
 # 2. Bundle all scripts in proper dependency order
 scripts_order = ['config.js', 'audio.js', 'map.js', 'entities.js', 'engine.js', 'ui.js', 'main.js']
-bundle = ''
+bundle = f'\n// === STAGE CONFIG (stage_config.json) ===\nglobalThis.POWATER_STAGE_CONFIG = {stage_cfg_inline};\n'
 for s in scripts_order:
     with open(os.path.join(scripts_dir, s), 'r', encoding='utf-8') as sf:
         bundle += f'\n// === MODULE: {s} ===\n' + sf.read()

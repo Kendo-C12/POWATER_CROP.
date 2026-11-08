@@ -1,8 +1,8 @@
-# POWATER CORP. (`v1.0.2.3`) — GDevelop 5 Project Documentation (`GEMINI.md`)
+# POWATER CORP. (`v1.0.3.0`) — GDevelop 5 Project Documentation (`GEMINI.md`)
 
 > **Team Green Gang**: Sukrit Limpakanon, Aristt Mahakitsiri, Gantinan Satjariyakul  
 > **Engine**: GDevelop 5 (`POWATER CROPS..json`) + Real PNG Sprite Assets + PixiJS Procedural River/Conduit Rendering  
-> **Version Naming**: `1.x.y.z` (`x` = Major Version, `y` = Small Addition Within Major Version, `z` = Bug Fixes) — Current: **`v1.0.2.3`**
+> **Version Naming**: `1.x.y.z` (`x` = Major Version, `y` = Small Addition Within Major Version, `z` = Bug Fixes) — Current: **`v1.0.3.0`**
 
 ---
 
@@ -78,8 +78,9 @@ All buildings, houses, rivers, HUD bars, toolbar docks, buttons, and status badg
 
 ## 5. Project Structure & Build Pipeline
 
-- `POWATER CROPS..json`: Main GDevelop 5 project file containing all 4 scene layouts (`Main`, `Tokyo`, `Rome`, `Amsterdam`), sprite objects, visual event groups, and compiled JS engine bridge.
-- `scripts/config.js`: Game constants, `v1.0.0.0` level definitions, disaster rules, special item packs, upgrades, and `v1.1–v1.4` feature roadmap.
+- `POWATER CROPS..json`: Main GDevelop 5 project file containing all 5 scene layouts (`Main`, `Tutorial`, `Tokyo`, `Rome`, `Amsterdam`), sprite objects, visual event groups, and compiled JS engine bridge.
+- `stage_config.json`: External JSON configuration file for tuning global gameplay rules (`globalRules`), pollution rates (`pollutionRates`), building costs/capacities (`buildings`), disaster frequencies/chances (`disasters`), and per-stage parameters (`stages.tutorial`, `stages.bangkok`, `stages.tokyo`, `stages.rome`, `stages.amsterdam` — including `houseSpawnIntervalSeconds`, `pollutionMultiplier`, `startingBudget`, `maxPollution`, `maxComplaints`, `winRequiredHouses`, `winHoldDurationSeconds`, `maxHousesCap`, discounts, and disaster flags). Automatically embedded at compile time and live-loaded via `fetch('stage_config.json')` at runtime.
+- `scripts/config.js`: Game constants, `POWATER.applyStageConfig()` loader, `v1.0.0.0` level definitions, disaster rules, special item packs, upgrades, and `v1.1–v1.4` feature roadmap.
 - `scripts/map.js`: River spline geometry, shoreline proximity checks, animated water current droplets, High Tide surge, and Amsterdam Flood rising water overlay.
 - `scripts/entities.js`: `HouseEntity` (needs, completion bonus tracking, Rome candle badge), `BuildingEntity` (breakdown/repair states & wrench badge), and `ConnectionEntity` (animated flow conduits).
 - `scripts/engine.js`: BFS utility propagation, economy (`+$50` completion & `+$40/week`), 5-minute Win Timer (with Pause & Reset rules), Repair timer, Day/Night cycle, Map Upsize (up to 40 houses), and Extreme Weather disasters.
@@ -101,6 +102,9 @@ All buildings, houses, rivers, HUD bars, toolbar docks, buttons, and status badg
 
 ## 7. Changelog
 
+- **`v1.0.3.0` (2026-11-08)**:
+  - Added [`stage_config.json`](file:///mnt/c/Users/user/Desktop/Folder/GDEV_POWATER/stage_config.json) for configuring global and per-stage parameters without editing source code: pollution production/reduction rates (`pollutionRates` + per-stage `pollutionMultiplier`), house spawn speed (`houseSpawnIntervalSeconds`), starting money (`startingBudget`), max pollution (`maxPollution`), max complaints (`maxComplaints`), win timer requirements (`winRequiredHouses`, `winHoldDurationSeconds`), economy rewards (`houseCompleteBonus`, `weeklyRevenuePerCompleteHouse`, `weeklyBaseGrant`), building costs/capacities (`buildings`), and disaster intervals/chances (`disasters`).
+  - Added `POWATER.applyStageConfig()` and live `fetch('stage_config.json')` hot-reloading in `scripts/config.js` and `scripts/engine.js`, plus automatic inline embedding in `scripts/sync_project.py` and `scripts/patch_preview.py`.
 - **`v1.0.2.3` (2026-11-08)**:
   - Fixed the full-screen / window-maximize unintended 3x zoom bug by patching `gdjs.RuntimeScenePixiRenderer.prototype.onGameResolutionResized` in `scripts/main.js` to use `pixiRenderer.screen.width` (`1280` logical width) instead of `pixiRenderer.width` (`3840` physical framebuffer width), and locking the scene root `_pixiContainer.scale` to `(1, 1)`.
 - **`v1.0.2.2` (2026-11-08)**:

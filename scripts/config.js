@@ -533,10 +533,172 @@
         quote: 'เสริมทักษะการสร้างบางอย่างให้ยั่งยืนโดยใช้ความสามารถในการคิดด้วยภาพจำลอง',
         desc: 'การวางผังโครงสร้างพื้นฐานและรับมือภัยพิบัติ (แผ่นดินไหว น้ำขึ้น น้ำท่วม ไฟดับ) เพื่อให้เมืองเติบโตอย่างยั่งยืน'
       }
-    ]
+    ],
+
+    DISASTERS: {
+      HIGH_TIDE: { everyNDays: 15, durationSeconds: 25.0, riversideBreakChance: 0.50 },
+      EARTHQUAKE: { checkEverySeconds: 60.0, baseChance: 0.125, escalateAfterMinutes: 3, escalateBonusPerMinute: 0.05, guaranteedAtMinute: 5 },
+      BLACKOUT: { everyNDays: 15, chance: 0.125, durationSeconds: 25.0, startingCandlesRome: 5, candleBoxUnitPrice: 10 },
+      FLOOD: { everyNDays: 28, maxDurationSecondsBeforeGameOver: 120.0, emergencyPumpCost: 500 }
+    },
+    DAY_DURATION_IN_GAME_SECONDS: 15.0,
+    WEEKLY_BASE_GRANT: 40
   };
+
+  // Apply external stage_config.json overrides into CONFIG
+  function applyStageConfig(stageCfg) {
+    if (!stageCfg || typeof stageCfg !== 'object') return;
+
+    // 1. Global Rules
+    const gr = stageCfg.globalRules;
+    if (gr && typeof gr === 'object') {
+      if (typeof gr.dayDurationSeconds === 'number') CONFIG.DAY_DURATION_IN_GAME_SECONDS = gr.dayDurationSeconds;
+      if (typeof gr.dayCycleDurationSeconds === 'number') CONFIG.DAY_DURATION_SECONDS = gr.dayCycleDurationSeconds;
+      if (typeof gr.nightCycleDurationSeconds === 'number') CONFIG.NIGHT_DURATION_SECONDS = gr.nightCycleDurationSeconds;
+      if (typeof gr.protectingTimeSeconds === 'number') CONFIG.GRACE_PERIOD_SECONDS = gr.protectingTimeSeconds;
+      if (typeof gr.pollutionStartDelaySeconds === 'number') CONFIG.POLLUTION_START_DELAY_SECONDS = gr.pollutionStartDelaySeconds;
+      if (typeof gr.complaintStrikeTimerSeconds === 'number') CONFIG.STRIKE_TIMER_SECONDS = gr.complaintStrikeTimerSeconds;
+      if (typeof gr.defaultMaxComplaints === 'number') CONFIG.MAX_COMPLAINTS = gr.defaultMaxComplaints;
+      if (typeof gr.winRequiredHouses === 'number') CONFIG.WIN_REQUIRED_HOUSES = gr.winRequiredHouses;
+      if (typeof gr.winHoldDurationSeconds === 'number') CONFIG.WIN_HOLD_DURATION_SECONDS = gr.winHoldDurationSeconds;
+      if (typeof gr.houseCompleteInstantBonus === 'number') CONFIG.HOUSE_COMPLETE_BONUS = gr.houseCompleteInstantBonus;
+      if (typeof gr.weeklyRevenuePerCompleteHouse === 'number') CONFIG.WEEKLY_REVENUE_PER_COMPLETE_HOUSE = gr.weeklyRevenuePerCompleteHouse;
+      if (typeof gr.weeklyBaseMunicipalGrant === 'number') CONFIG.WEEKLY_BASE_GRANT = gr.weeklyBaseMunicipalGrant;
+      if (typeof gr.continuousRevenuePerHousePerSec === 'number') CONFIG.REVENUE_PER_HAPPY_HOUSE_SEC = gr.continuousRevenuePerHousePerSec;
+      if (typeof gr.minHouseDistancePixels === 'number') CONFIG.MIN_HOUSE_DISTANCE = gr.minHouseDistancePixels;
+      if (typeof gr.upsizeEveryNHouses === 'number') {
+        CONFIG.UPSIZE_BASE_HOUSES = gr.upsizeEveryNHouses;
+        CONFIG.UPSIZE_STEP_HOUSES = gr.upsizeEveryNHouses;
+      }
+      if (typeof gr.maxHousesCap === 'number') CONFIG.MAX_HOUSES_CAP = gr.maxHousesCap;
+      if (typeof gr.repairCheckIntervalSeconds === 'number') CONFIG.REPAIR_CHECK_INTERVAL_SECONDS = gr.repairCheckIntervalSeconds;
+      if (typeof gr.repairBreakdownChance === 'number') CONFIG.REPAIR_BREAKDOWN_CHANCE = gr.repairBreakdownChance;
+    }
+
+    // 2. Pollution Rates
+    const pr = stageCfg.pollutionRates;
+    if (pr && typeof pr === 'object') {
+      if (typeof pr.coalGeneratorPerSec === 'number') {
+        CONFIG.POLLUTION_RATES.ELECTRIC_GENERATOR = pr.coalGeneratorPerSec;
+        if (CONFIG.BUILDINGS && CONFIG.BUILDINGS.GENERATOR_COAL) {
+          CONFIG.BUILDINGS.GENERATOR_COAL.pollutionRate = pr.coalGeneratorPerSec;
+        }
+      }
+      if (typeof pr.wastewaterOutletBasePerSec === 'number') CONFIG.POLLUTION_RATES.WASTEWATER_OUTLET_BASE = pr.wastewaterOutletBasePerSec;
+      if (typeof pr.wastewaterPerDrainedHousePerSec === 'number') CONFIG.POLLUTION_RATES.WASTEWATER_DISCHARGE_PER_HOUSE = pr.wastewaterPerDrainedHousePerSec;
+      if (typeof pr.untreatedSewagePerHousePerSec === 'number') CONFIG.POLLUTION_RATES.UNTREATED_SEWAGE_PER_HOUSE = pr.untreatedSewagePerHousePerSec;
+      if (typeof pr.airFilterReductionPerSec === 'number') {
+        CONFIG.POLLUTION_RATES.AIR_FILTER_REDUCTION = pr.airFilterReductionPerSec;
+        if (CONFIG.BUILDINGS && CONFIG.BUILDINGS.AIR_FILTER) {
+          CONFIG.BUILDINGS.AIR_FILTER.pollutionReductionRate = pr.airFilterReductionPerSec;
+        }
+      }
+      if (typeof pr.naturalDilutionPerSec === 'number') CONFIG.POLLUTION_RATES.NATURAL_DILUTION = pr.naturalDilutionPerSec;
+      if (typeof pr.warningThresholdRatio === 'number') CONFIG.POLLUTION_WARN_THRESHOLD = pr.warningThresholdRatio;
+    }
+
+    // 3. Buildings
+    const bld = stageCfg.buildings;
+    if (bld && typeof bld === 'object' && CONFIG.BUILDINGS) {
+      const mapBld = [
+        ['generatorCoal', 'GENERATOR_COAL'],
+        ['generatorSolar', 'GENERATOR_SOLAR'],
+        ['waterPump', 'WATER_PUMP'],
+        ['wasteFilter', 'WASTE_FILTER'],
+        ['airFilter', 'AIR_FILTER']
+      ];
+      for (let i = 0; i < mapBld.length; i++) {
+        const src = bld[mapBld[i][0]];
+        const dst = CONFIG.BUILDINGS[mapBld[i][1]];
+        if (src && dst) {
+          if (typeof src.cost === 'number') dst.cost = src.cost;
+          if (typeof src.capacityHouses === 'number') dst.capacity = src.capacityHouses;
+          if (typeof src.pollutionRatePerSec === 'number') dst.pollutionRate = src.pollutionRatePerSec;
+          if (typeof src.pollutionReductionPerSec === 'number') dst.pollutionReductionRate = src.pollutionReductionPerSec;
+          if (typeof src.canBreakDown === 'boolean') dst.canBreakDown = src.canBreakDown;
+        }
+      }
+    }
+
+    // 4. Disasters
+    const dis = stageCfg.disasters;
+    if (dis && typeof dis === 'object') {
+      if (dis.highTide) Object.assign(CONFIG.DISASTERS.HIGH_TIDE, dis.highTide);
+      if (dis.earthquake) Object.assign(CONFIG.DISASTERS.EARTHQUAKE, dis.earthquake);
+      if (dis.blackout) {
+        Object.assign(CONFIG.DISASTERS.BLACKOUT, dis.blackout);
+        if (typeof dis.blackout.candleBoxUnitPrice === 'number' && CONFIG.SPECIAL_ITEMS) {
+          CONFIG.SPECIAL_ITEMS.CANDLE_BOX_UNIT_PRICE = dis.blackout.candleBoxUnitPrice;
+        }
+      }
+      if (dis.flood) {
+        Object.assign(CONFIG.DISASTERS.FLOOD, dis.flood);
+        if (typeof dis.flood.emergencyPumpCost === 'number' && CONFIG.SPECIAL_ITEMS && CONFIG.SPECIAL_ITEMS.FLOOD_PUMP) {
+          CONFIG.SPECIAL_ITEMS.FLOOD_PUMP.cost = dis.flood.emergencyPumpCost;
+        }
+      }
+    }
+
+    // 5. Per-Stage Configurations
+    const stg = stageCfg.stages;
+    if (stg && typeof stg === 'object') {
+      const applyToStageObj = (targetLvl, override) => {
+        if (!targetLvl || !override) return;
+        if (typeof override.startingBudget === 'number') targetLvl.startingBudget = override.startingBudget;
+        if (typeof override.houseSpawnIntervalSeconds === 'number') targetLvl.spawnInterval = Math.round(override.houseSpawnIntervalSeconds * 1000);
+        if (typeof override.pollutionMultiplier === 'number') targetLvl.pollutionMultiplier = override.pollutionMultiplier;
+        if (typeof override.maxPollution === 'number') targetLvl.maxPollution = override.maxPollution;
+        if (typeof override.maxComplaints === 'number') targetLvl.maxComplaints = override.maxComplaints;
+        if (typeof override.winRequiredHouses === 'number') targetLvl.winRequiredHouses = override.winRequiredHouses;
+        if (typeof override.winHoldDurationSeconds === 'number') targetLvl.winHoldDurationSeconds = override.winHoldDurationSeconds;
+        if (typeof override.maxHousesCap === 'number') targetLvl.maxHousesCap = override.maxHousesCap;
+        if (typeof override.cleanEnergyDiscount === 'number') targetLvl.cleanEnergyDiscount = override.cleanEnergyDiscount;
+        if (typeof override.buildCostDiscount === 'number') targetLvl.buildCostDiscount = override.buildCostDiscount;
+        if (typeof override.unlimitedWaterChain === 'boolean') targetLvl.unlimitedWaterChain = override.unlimitedWaterChain;
+        if (typeof override.hasHighTide === 'boolean') targetLvl.hasHighTide = override.hasHighTide;
+        if (typeof override.hasEarthquake === 'boolean') targetLvl.hasEarthquake = override.hasEarthquake;
+        if (typeof override.hasBlackout === 'boolean') targetLvl.hasBlackout = override.hasBlackout;
+        if (typeof override.hasFlood === 'boolean') targetLvl.hasFlood = override.hasFlood;
+      };
+
+      if (stg.tutorial && CONFIG.TUTORIAL_LEVEL) {
+        applyToStageObj(CONFIG.TUTORIAL_LEVEL, stg.tutorial);
+      }
+      if (Array.isArray(CONFIG.LEVELS)) {
+        for (let i = 0; i < CONFIG.LEVELS.length; i++) {
+          const lvl = CONFIG.LEVELS[i];
+          if (lvl && lvl.id && stg[lvl.id]) {
+            applyToStageObj(lvl, stg[lvl.id]);
+          }
+        }
+      }
+    }
+
+    if (global.POWATER && global.POWATER.game && typeof global.POWATER.game.reloadStageConfig === 'function') {
+      global.POWATER.game.reloadStageConfig();
+    }
+  }
 
   global.POWATER = global.POWATER || {};
   global.POWATER.CONFIG = CONFIG;
+  global.POWATER.applyStageConfig = applyStageConfig;
+
+  if (global.POWATER_STAGE_CONFIG) {
+    applyStageConfig(global.POWATER_STAGE_CONFIG);
+  }
+
+  // Also attempt live fetch of stage_config.json at runtime so edits to stage_config.json apply immediately on preview reload
+  if (typeof fetch === 'function' && !global._powaterStageConfigFetched) {
+    global._powaterStageConfigFetched = true;
+    fetch('stage_config.json?t=' + Date.now())
+      .then(res => (res && res.ok) ? res.json() : null)
+      .then(data => {
+        if (data) {
+          global.POWATER_STAGE_CONFIG = data;
+          applyStageConfig(data);
+        }
+      })
+      .catch(() => {});
+  }
 
 })(typeof window !== 'undefined' ? window : globalThis);
