@@ -1,8 +1,8 @@
-# POWATER CORP. (`v1.0.2.1`) — GDevelop 5 Project Documentation (`GEMINI.md`)
+# POWATER CORP. (`v1.0.2.2`) — GDevelop 5 Project Documentation (`GEMINI.md`)
 
 > **Team Green Gang**: Sukrit Limpakanon, Aristt Mahakitsiri, Gantinan Satjariyakul  
 > **Engine**: GDevelop 5 (`POWATER CROPS..json`) + Real PNG Sprite Assets + PixiJS Procedural River/Conduit Rendering  
-> **Version Naming**: `1.x.y.z` (`x` = Major Version, `y` = Small Addition Within Major Version, `z` = Bug Fixes) — Current: **`v1.0.2.1`**
+> **Version Naming**: `1.x.y.z` (`x` = Major Version, `y` = Small Addition Within Major Version, `z` = Bug Fixes) — Current: **`v1.0.2.2`**
 
 ---
 
@@ -101,6 +101,9 @@ All buildings, houses, rivers, HUD bars, toolbar docks, buttons, and status badg
 
 ## 7. Changelog
 
+- **`v1.0.2.2` (2026-11-08)**:
+  - Fixed WebGL `<canvas>` downsampling blur by upgrading GDevelop's `RuntimeGamePixiRenderer` (`_pixiRenderer` + `_threeRenderer`) in `scripts/main.js` (`enableHighDPIRenderer`) from `1280x720` (`resolution = 1`) to **3x–4x Supersampled 4K (`3840x2160` internal framebuffer)** while preserving `1280x720` logical coordinates.
+  - Fixed double-text ghosting and Z-order bleed on bottom toolbar buttons by setting `uiContainer` to `zOrder = 50`, hiding the static bitmap `btn_*` / `btn_video_help` sprite duplicates at runtime once their coordinates are synced, and patching all 5 scene scripts (`code0.js`..`code4.js`) in `scripts/patch_preview.py`.
 - **`v1.0.2.1` (2026-11-08)**:
   - Fixed blurry text and buttons when zoomed in by upgrading all 12 toolbar button PNGs (`btn_*.png` at `256x192`), video help badges (`icon_video_help.png` at `144x96`), and status icons (`128x128`) in `scripts/generate_assets.py` to **4x High-Definition Anti-Aliased Vector (Signed Distance Field)** sprites.
   - Upgraded all runtime `PIXI.Text` instances in `scripts/ui.js` to **4x Retina supersampling (`resolution = 4`, `roundPixels = true`)** with pooled text caching and live crisp vector toolbar button faces & labels.

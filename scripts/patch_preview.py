@@ -143,4 +143,15 @@ gdjs['EndlessCode'] = gdjs.MainCode;
 with open(code0_path, 'w', encoding='utf-8') as f:
     f.write(clean_code0)
 
-print(f'SUCCESS: code0.js cleanly written with {user_func_name}! Total size: {len(clean_code0)} bytes')
+scene_code_map = [
+    ('code1.js', 'TutorialCode'),
+    ('code2.js', 'TokyoCode'),
+    ('code3.js', 'RomeCode'),
+    ('code4.js', 'AmsterdamCode'),
+]
+for fname, code_ns in scene_code_map:
+    cpath = os.path.join(prev_dir, fname)
+    with open(cpath, 'w', encoding='utf-8') as cf:
+        cf.write(f"gdjs.{code_ns} = gdjs.MainCode;\ngdjs['{code_ns}'] = gdjs.MainCode;\n")
+
+print(f'SUCCESS: code0.js..code4.js cleanly written with {user_func_name}! Total size: {len(clean_code0)} bytes')

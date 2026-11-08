@@ -103,7 +103,88 @@
       this.lastTime = performance.now();
     }
 
+    enableHighDPIRenderer(runtimeScene) {
+      try {
+        if (!runtimeScene || !runtimeScene.getGame) return;
+        const game = runtimeScene.getGame();
+        const gameRenderer = game && game.getRenderer ? game.getRenderer() : null;
+        if (!gameRenderer) return;
+        const pixiRenderer = gameRenderer.getPIXIRenderer ? gameRenderer.getPIXIRenderer() : null;
+        const canvas = gameRenderer.getCanvas ? gameRenderer.getCanvas() : null;
+        if (!pixiRenderer || !canvas) return;
+
+        // Upgrade WebGL framebuffer from 1280x720 (1x) to 3x Supersampled 4K (3840x2160)
+        // while keeping logical game coordinates strictly at 1280x720.
+        const dpr = (typeof window !== 'undefined' && window.devicePixelRatio) ? window.devicePixelRatio : 1;
+        const targetRes = Math.max(3, Math.min(4, Math.ceil(dpr * 2)));
+
+        if (typeof PIXI !== 'undefined') {
+          if (PIXI.settings) {
+            PIXI.settings.RESOLUTION = targetRes;
+            PIXI.settings.ROUND_PIXELS = true;
+          }
+          if (PIXI.Text) {
+            PIXI.Text.defaultResolution = 4;
+            PIXI.Text.defaultAutoResolution = false;
+          }
+        }
+
+        if (pixiRenderer._powaterHiDPI !== targetRes) {
+          pixiRenderer._powaterHiDPI = targetRes;
+
+          gameRenderer._resizeCanvas = function () {
+            if (!this._pixiRenderer || !this._domElementsContainer) return;
+            const w = this._game.getGameResolutionWidth();
+            const h = this._game.getGameResolutionHeight();
+
+            if (this._threeRenderer && typeof this._threeRenderer.setPixelRatio === 'function') {
+              this._threeRenderer.setPixelRatio(targetRes);
+              this._threeRenderer.setSize(w, h, false);
+            }
+            this._pixiRenderer.resolution = targetRes;
+            if (this._pixiRenderer._view) {
+              this._pixiRenderer._view.resolution = targetRes;
+            }
+            this._pixiRenderer.resize(w, h);
+
+            const isFull = this._forceFullscreen || this._isFullPage || this._isFullscreen;
+            let cw = w;
+            let ch = h;
+            let maxW = Math.max(0, window.innerWidth - this._marginLeft - this._marginRight);
+            let maxH = Math.max(0, window.innerHeight - this._marginTop - this._marginBottom);
+            if (isFull && !this._keepRatio) {
+              cw = maxW;
+              ch = maxH;
+            } else if ((isFull && this._keepRatio) || cw > maxW || ch > maxH) {
+              let factor = maxW / cw;
+              if (ch * factor > maxH) factor = maxH / ch;
+              cw *= factor;
+              ch *= factor;
+            }
+            if (this._gameCanvas) {
+              this._gameCanvas.style.top = this._marginTop + (maxH - ch) / 2 + 'px';
+              this._gameCanvas.style.left = this._marginLeft + (maxW - cw) / 2 + 'px';
+              this._gameCanvas.style.width = cw + 'px';
+              this._gameCanvas.style.height = ch + 'px';
+              this._gameCanvas.style.imageRendering = 'auto';
+            }
+            this._domElementsContainer.style.top = this._marginTop + (maxH - ch) / 2 + 'px';
+            this._domElementsContainer.style.left = this._marginLeft + (maxW - cw) / 2 + 'px';
+            this._domElementsContainer.style.width = cw + 'px';
+            this._domElementsContainer.style.height = ch + 'px';
+            this._canvasWidth = cw;
+            this._canvasHeight = ch;
+          };
+
+          gameRenderer._resizeCanvas();
+        }
+      } catch (e) {
+        console.warn('High-DPI renderer setup warning:', e);
+      }
+    }
+
     setupPixiLayers(runtimeScene) {
+      this.enableHighDPIRenderer(runtimeScene);
       try {
         const layer = runtimeScene.getLayer('');
         if (layer && layer.getRenderer) {
@@ -141,10 +222,10 @@
             this.pixiBadgeContainer = badgeContainer;
             runtimeScene._powaterPixiBadgeContainer = badgeContainer;
 
-            // Layer 3: In-Game HUD, Floating Texts & Modals (Z=10)
+            // Layer 3: In-Game HUD, Vector Buttons, Floating Texts & Modals (Z=50, strictly above all scene sprites)
             const uiContainer = new PIXI.Container();
             if (renderer.addRendererObject) {
-              renderer.addRendererObject(uiContainer, 10);
+              renderer.addRendererObject(uiContainer, 50);
             } else {
               container.addChild(uiContainer);
             }

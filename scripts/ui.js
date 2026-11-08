@@ -310,7 +310,7 @@
         this.videoTime = (this.videoTime + dt) % this.videoDuration;
       }
 
-      // Sync button positions from GDevelop scene objects
+      // Sync button positions from GDevelop scene objects & hide static bitmap duplicates so 4K vector buttons have zero ghosting
       if (this.game && this.game.runtimeScene && this.game.runtimeScene.getObjects) {
         for (let i = 0; i < this.buttons.length; i++) {
           const btn = this.buttons[i];
@@ -322,7 +322,14 @@
               btn.y = obj.getY();
               btn.w = obj.getWidth();
               btn.h = obj.getHeight();
+              if (typeof obj.hide === 'function') obj.hide(true);
             }
+          }
+        }
+        const vidObjs = this.game.runtimeScene.getObjects('btn_video_help');
+        if (vidObjs && vidObjs.length > 0) {
+          for (let j = 0; j < vidObjs.length; j++) {
+            if (vidObjs[j] && typeof vidObjs[j].hide === 'function') vidObjs[j].hide(true);
           }
         }
         // Keep video icons aligned right above their parent buttons
@@ -341,6 +348,7 @@
 
       // 1. Check Interactions with Modal if Open
       if (this.activeModal) {
+        this.renderToolbarAndHUD(mouseX, mouseY);
         clickConsumed = true;
         if (justClicked) {
           this.handleModalClick(mouseX, mouseY);
