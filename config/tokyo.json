@@ -1,0 +1,22 @@
+{
+  "_comment": "Stage 2: Tokyo, Japan Configuration (config/tokyo.json)",
+  "id": "tokyo",
+  "sceneName": "Tokyo",
+  "name": "2. Tokyo, Japan",
+  "startingBudget": 180,
+  "houseSpawnIntervalSeconds": 16.0,
+  "pollutionMultiplier": 1.0,
+  "maxPollution": 7.0,
+  "maxComplaints": 3,
+  "winRequiredHouses": 15,
+  "winHoldDurationSeconds": 300.0,
+  "maxHousesCap": 40,
+  "cleanEnergyDiscount": 0.25,
+  "buildCostDiscount": 0.0,
+  "unlimitedWaterChain": false,
+  "hasHighTide": false,
+  "hasEarthquake": true,
+  "hasBlackout": false,
+  "hasFlood": false,
+  "featureCostOverrides": {}
+}

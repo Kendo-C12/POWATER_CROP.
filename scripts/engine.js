@@ -145,7 +145,11 @@
 
     getBuildingCost(buildCfg) {
       if (!buildCfg) return 0;
-      let cost = buildCfg.cost || 30;
+      let cost = (typeof buildCfg.cost === 'number') ? buildCfg.cost : 30;
+      const fco = this.currentLevel && this.currentLevel.featureCostOverrides;
+      if (fco && fco.buildings && buildCfg.id && typeof fco.buildings[buildCfg.id] === 'number') {
+        cost = fco.buildings[buildCfg.id];
+      }
       // Tokyo condition (+): Clean Energy -25%
       if (buildCfg.clean && this.currentLevel && this.currentLevel.cleanEnergyDiscount) {
         cost = cost * (1.0 - this.currentLevel.cleanEnergyDiscount);
@@ -155,6 +159,26 @@
         cost = cost * (1.0 - this.currentLevel.buildCostDiscount);
       }
       return Math.round(cost);
+    }
+
+    getRepairCost() {
+      const fco = this.currentLevel && this.currentLevel.featureCostOverrides;
+      if (fco && typeof fco.repairCostPerBuilding === 'number') {
+        return fco.repairCostPerBuilding;
+      }
+      return (typeof CONFIG.REPAIR_COST_PER_BUILDING === 'number') ? CONFIG.REPAIR_COST_PER_BUILDING : 0;
+    }
+
+    getConnectionCost(type, crossesRiver) {
+      let cost = 0;
+      if (CONFIG.PIPES && type) {
+        const pipeCfg = CONFIG.PIPES[type.toUpperCase()];
+        if (pipeCfg && typeof pipeCfg.cost === 'number') cost += pipeCfg.cost;
+      }
+      if (crossesRiver && typeof CONFIG.RIVER_CROSSING_EXTRA_COST === 'number') {
+        cost += CONFIG.RIVER_CROSSING_EXTRA_COST;
+      }
+      return Math.max(0, Math.round(cost));
     }
 
     reloadStageConfig() {
@@ -227,7 +251,10 @@
       this.postGuaranteedQuakeBonus = 0.0;
       this.screenShakeTimer = 0.0;
 
-      this.candleStock = (this.currentLevel.id === 'rome') ? 5 : 0;
+      const startCandles = (CONFIG.DISASTERS && CONFIG.DISASTERS.BLACKOUT && typeof CONFIG.DISASTERS.BLACKOUT.startingCandlesRome === 'number')
+        ? CONFIG.DISASTERS.BLACKOUT.startingCandlesRome
+        : 5;
+      this.candleStock = (this.currentLevel.id === 'rome') ? startCandles : 0;
       this.isBlackoutActive = false;
       this.blackoutTimer = 0.0;
 
@@ -976,9 +1003,15 @@
 
     repairBuilding(building) {
       if (!building || !building.isBroken) return false;
-      building.repair();
+      const repCost = this.getRepairCost();
       const c = building.getCenter();
-      this.addFloatingText('🔧 ซ่อมแซมสำเร็จ!', c.x, c.y - 25, '#06d6a0');
+      if (repCost > 0 && this.money < repCost) {
+        this.addFloatingText(`งบไม่พอซ่อมแซม! (ต้องการ $${repCost})`, c.x, c.y - 25, '#e63946');
+        return false;
+      }
+      if (repCost > 0) this.money -= repCost;
+      building.repair();
+      this.addFloatingText(repCost > 0 ? `🔧 ซ่อมแซมสำเร็จ! (-$${repCost})` : '🔧 ซ่อมแซมสำเร็จ!', c.x, c.y - 25, '#06d6a0');
       if (global.POWATER.soundManager) global.POWATER.soundManager.playUpgrade();
       return true;
     }
@@ -989,8 +1022,22 @@
         this.addFloatingText('✅ อุปกรณ์ทุกเครื่องทำงานปกติ ไม่มีจุดที่ต้องซ่อม', CONFIG.CANVAS_WIDTH / 2, 100, '#06d6a0');
         return 0;
       }
+      const repCost = this.getRepairCost();
+      const totalRepCost = repCost * broken.length;
+      if (totalRepCost > 0 && this.money < totalRepCost) {
+        this.addFloatingText(`งบไม่พอซ่อมทั้งหมด! (ต้องการ $${totalRepCost})`, CONFIG.CANVAS_WIDTH / 2, 100, '#e63946');
+        return 0;
+      }
+      if (totalRepCost > 0) this.money -= totalRepCost;
       broken.forEach(b => b.repair());
-      this.addFloatingText(`🔧 ซ่อมแซมอุปกรณ์ทั้งหมด ${broken.length} แห่งเรียบร้อย!`, CONFIG.CANVAS_WIDTH / 2, 100, '#06d6a0');
+      this.addFloatingText(
+        totalRepCost > 0
+          ? `🔧 ซ่อมแซมอุปกรณ์ทั้งหมด ${broken.length} แห่งเรียบร้อย! (-$${totalRepCost})`
+          : `🔧 ซ่อมแซมอุปกรณ์ทั้งหมด ${broken.length} แห่งเรียบร้อย!`,
+        CONFIG.CANVAS_WIDTH / 2,
+        100,
+        '#06d6a0'
+      );
       if (global.POWATER.soundManager) global.POWATER.soundManager.playUpgrade();
       return broken.length;
     }
@@ -1363,6 +1410,12 @@
       const p1 = nodeA.getCenter();
       const p2 = nodeB.getCenter();
       const crossesRiver = this.map.checkLineIntersectsRiver(p1, p2);
+      const connCost = this.getConnectionCost(actualType, crossesRiver);
+      if (connCost > 0 && this.money < connCost) {
+        this.addFloatingText(`งบไม่พอเชื่อมต่อสาย/ท่อ! (ต้องการ $${connCost})`, (p1.x + p2.x) / 2, (p1.y + p2.y) / 2 - 20, '#e63946');
+        return false;
+      }
+      if (connCost > 0) this.money -= connCost;
 
       const conn = new global.POWATER.ConnectionEntity(`c_${this.nextEntityId++}`, actualType, nodeA, nodeB);
       conn.crossesRiver = crossesRiver;
@@ -1370,7 +1423,8 @@
 
       const typeLabels = { power: '⚡ เชื่อมสายไฟ', water: '💧 เชื่อมท่อน้ำดี', sewage: '🧪 เชื่อมท่อระบายน้ำ' };
       const typeColors = { power: '#ffd166', water: '#00b4d8', sewage: '#c77dff' };
-      this.addFloatingText(typeLabels[actualType] || 'เชื่อมต่อสำเร็จ', (p1.x + p2.x) / 2, (p1.y + p2.y) / 2 - 20, typeColors[actualType] || '#06d6a0');
+      const costSuffix = connCost > 0 ? ` (-$${connCost})` : '';
+      this.addFloatingText((typeLabels[actualType] || 'เชื่อมต่อสำเร็จ') + costSuffix, (p1.x + p2.x) / 2, (p1.y + p2.y) / 2 - 20, typeColors[actualType] || '#06d6a0');
 
       if (global.POWATER.soundManager) {
         if (actualType === 'power') global.POWATER.soundManager.playWireConnect();
@@ -1412,7 +1466,8 @@
       });
       if (bIdx !== -1) {
         const b = this.buildings[bIdx];
-        const refund = Math.round(this.getBuildingCost(b.config) * 0.5);
+        const refundRatio = (typeof CONFIG.DEMOLISH_REFUND_RATIO === 'number') ? CONFIG.DEMOLISH_REFUND_RATIO : 0.5;
+        const refund = Math.round(this.getBuildingCost(b.config) * refundRatio);
         this.money += refund;
 
         this.connections = this.connections.filter(c => c.fromNode.id !== b.id && c.toNode.id !== b.id);
@@ -1454,20 +1509,20 @@
       return null;
     }
 
-    buyUpgrade(upgradeKey) {
-      let baseCost = 10;
-      let mult = 1.8;
-      let maxLvl = 5;
+    getUpgradeConfig(upgradeKey) {
+      const u = CONFIG.UPGRADES || {};
+      if (upgradeKey === 'elec_cap' && u.ELECTRICITY_CAPACITY) return u.ELECTRICITY_CAPACITY;
+      if (upgradeKey === 'poll_red' && u.POLLUTION_REDUCTION) return u.POLLUTION_REDUCTION;
+      if (upgradeKey === 'water_cap' && u.WATER_PUMP_CAPACITY) return u.WATER_PUMP_CAPACITY;
+      if (upgradeKey === 'waste_cap' && u.WASTE_FILTER_CAPACITY) return u.WASTE_FILTER_CAPACITY;
+      return null;
+    }
 
-      if (upgradeKey === 'elec_cap') {
-        baseCost = 10; mult = 1.8; maxLvl = 5;
-      } else if (upgradeKey === 'poll_red') {
-        baseCost = 100; mult = 1.5; maxLvl = 10;
-      } else if (upgradeKey === 'water_cap') {
-        baseCost = 10; mult = 1.8; maxLvl = 5;
-      } else if (upgradeKey === 'waste_cap') {
-        baseCost = 25; mult = 1.6; maxLvl = 5;
-      }
+    buyUpgrade(upgradeKey) {
+      const upCfg = this.getUpgradeConfig(upgradeKey);
+      const baseCost = (upCfg && typeof upCfg.baseCost === 'number') ? upCfg.baseCost : 10;
+      const mult = (upCfg && typeof upCfg.costMult === 'number') ? upCfg.costMult : 1.8;
+      const maxLvl = (upCfg && typeof upCfg.maxLevel === 'number') ? upCfg.maxLevel : 5;
 
       const curLvl = this.upgradeLevels[upgradeKey] || 0;
       if (curLvl >= maxLvl) {

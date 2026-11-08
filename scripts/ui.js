@@ -669,9 +669,17 @@
           if (btn.id === 'speed') {
             btn._txtSub.text = (this.game.gameSpeed === 2.0) ? '⚡ 2X FAST' : '1X / 2X';
           } else if (btn.id === 'repair' && brokenCount > 0) {
-            btn._txtSub.text = `⚠️ FIX (${brokenCount})`;
+            const repCost = this.game.getRepairCost ? this.game.getRepairCost() * brokenCount : 0;
+            btn._txtSub.text = repCost > 0 ? `⚠️ FIX $${repCost}` : `⚠️ FIX (${brokenCount})`;
           } else if (btn.id === 'repair') {
-            btn._txtSub.text = '[R] FIX';
+            const repCost = this.game.getRepairCost ? this.game.getRepairCost() : 0;
+            btn._txtSub.text = repCost > 0 ? `[R] FIX $${repCost}` : '[R] FIX';
+          } else if (btn.id === 'power' && CONFIG.PIPES && CONFIG.PIPES.POWER) {
+            btn._txtSub.text = CONFIG.PIPES.POWER.cost > 0 ? `[1] $${CONFIG.PIPES.POWER.cost}` : '[1] WIRE';
+          } else if (btn.id === 'water' && CONFIG.PIPES && CONFIG.PIPES.WATER) {
+            btn._txtSub.text = CONFIG.PIPES.WATER.cost > 0 ? `[2] $${CONFIG.PIPES.WATER.cost}` : '[2] PIPE';
+          } else if (btn.id === 'sewage' && CONFIG.PIPES && CONFIG.PIPES.SEWAGE) {
+            btn._txtSub.text = CONFIG.PIPES.SEWAGE.cost > 0 ? `[3] $${CONFIG.PIPES.SEWAGE.cost}` : '[3] SEWAGE';
           } else if (btn.id === 'solar' && this.game.getBuildingCost && CONFIG.BUILDINGS) {
             btn._txtSub.text = `[4] $${this.game.getBuildingCost(CONFIG.BUILDINGS.GENERATOR_SOLAR)}`;
           } else if (btn.id === 'air_filter' && this.game.getBuildingCost && CONFIG.BUILDINGS) {
@@ -1362,11 +1370,16 @@
       title.position.set(mx + 20, my + 14);
       this.modalTextContainer.addChild(title);
 
+      const upgCfg = CONFIG.UPGRADES || {};
+      const uElec = upgCfg.ELECTRICITY_CAPACITY || {};
+      const uPoll = upgCfg.POLLUTION_REDUCTION || {};
+      const uWater = upgCfg.WATER_PUMP_CAPACITY || {};
+      const uWaste = upgCfg.WASTE_FILTER_CAPACITY || {};
       const upgrades = [
-        { key: 'elec_cap', name: '⚡ ELECTRICITY +20% FASTER', desc: 'เพิ่มประสิทธิภาพการส่งกระแสไฟฟ้า +20% (สูงสุด Lv. 5)', baseCost: 10, mult: 1.8, maxLvl: 5 },
-        { key: 'poll_red', name: '☢️ POLLUTION -5%', desc: 'ลดอัตราการปล่อยมลภาวะทุกแหล่ง -5% ต่อระดับ (สูงสุด Lv. 10)', baseCost: 100, mult: 1.5, maxLvl: 10 },
-        { key: 'water_cap', name: '💧 WATER PUMP +20% FASTER', desc: 'เพิ่มความจุและแรงดันเครื่องปั๊มน้ำสะอาด +20% (สูงสุด Lv. 5)', baseCost: 10, mult: 1.8, maxLvl: 5 },
-        { key: 'waste_cap', name: '🧪 WASTEWATER FILTER +25%', desc: 'เพิ่มความจุการบำบัดน้ำเสียริมแม่น้ำ +25% (สูงสุด Lv. 5)', baseCost: 25, mult: 1.6, maxLvl: 5 }
+        { key: 'elec_cap', name: '⚡ ELECTRICITY +20% FASTER', desc: 'เพิ่มประสิทธิภาพการส่งกระแสไฟฟ้า +20% (สูงสุด Lv. 5)', baseCost: uElec.baseCost ?? 10, mult: uElec.costMult ?? 1.8, maxLvl: uElec.maxLevel ?? 5 },
+        { key: 'poll_red', name: '☢️ POLLUTION -5%', desc: 'ลดอัตราการปล่อยมลภาวะทุกแหล่ง -5% ต่อระดับ (สูงสุด Lv. 10)', baseCost: uPoll.baseCost ?? 100, mult: uPoll.costMult ?? 1.5, maxLvl: uPoll.maxLevel ?? 10 },
+        { key: 'water_cap', name: '💧 WATER PUMP +20% FASTER', desc: 'เพิ่มความจุและแรงดันเครื่องปั๊มน้ำสะอาด +20% (สูงสุด Lv. 5)', baseCost: uWater.baseCost ?? 10, mult: uWater.costMult ?? 1.8, maxLvl: uWater.maxLevel ?? 5 },
+        { key: 'waste_cap', name: '🧪 WASTEWATER FILTER +25%', desc: 'เพิ่มความจุการบำบัดน้ำเสียริมแม่น้ำ +25% (สูงสุด Lv. 5)', baseCost: uWaste.baseCost ?? 25, mult: uWaste.costMult ?? 1.6, maxLvl: uWaste.maxLevel ?? 5 }
       ];
 
       for (let i = 0; i < upgrades.length; i++) {

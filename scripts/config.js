@@ -226,8 +226,22 @@
         costMult: 1.8,
         maxLevel: 5,
         bonusPerLevel: 0.20
+      },
+      WASTE_FILTER_CAPACITY: {
+        id: 'waste_cap',
+        name: 'WASTEWATER FILTER +25%',
+        thaiName: 'ถังบำบัดน้ำเสีย +25%',
+        desc: '+25% Wastewater Filter treatment capacity (Max Lv. 5)',
+        icon: '🧪',
+        baseCost: 25,
+        costMult: 1.6,
+        maxLevel: 5,
+        bonusPerLevel: 0.25
       }
     },
+    DEMOLISH_REFUND_RATIO: 0.50,
+    REPAIR_COST_PER_BUILDING: 0,
+    RIVER_CROSSING_EXTRA_COST: 0,
 
     // Fast Interactive Scene Tutorial Configuration
     TUTORIAL_LEVEL: {
@@ -545,9 +559,48 @@
     WEEKLY_BASE_GRANT: 40
   };
 
-  // Apply external stage_config.json overrides into CONFIG
+  function applyStageEntry(targetLvl, override) {
+    if (!targetLvl || !override || typeof override !== 'object') return;
+    if (typeof override.startingBudget === 'number') targetLvl.startingBudget = override.startingBudget;
+    if (typeof override.houseSpawnIntervalSeconds === 'number') targetLvl.spawnInterval = Math.round(override.houseSpawnIntervalSeconds * 1000);
+    if (typeof override.pollutionMultiplier === 'number') targetLvl.pollutionMultiplier = override.pollutionMultiplier;
+    if (typeof override.maxPollution === 'number') targetLvl.maxPollution = override.maxPollution;
+    if (typeof override.maxComplaints === 'number') targetLvl.maxComplaints = override.maxComplaints;
+    if (typeof override.winRequiredHouses === 'number') targetLvl.winRequiredHouses = override.winRequiredHouses;
+    if (typeof override.winHoldDurationSeconds === 'number') targetLvl.winHoldDurationSeconds = override.winHoldDurationSeconds;
+    if (typeof override.maxHousesCap === 'number') targetLvl.maxHousesCap = override.maxHousesCap;
+    if (typeof override.cleanEnergyDiscount === 'number') targetLvl.cleanEnergyDiscount = override.cleanEnergyDiscount;
+    if (typeof override.buildCostDiscount === 'number') targetLvl.buildCostDiscount = override.buildCostDiscount;
+    if (typeof override.unlimitedWaterChain === 'boolean') targetLvl.unlimitedWaterChain = override.unlimitedWaterChain;
+    if (typeof override.hasHighTide === 'boolean') targetLvl.hasHighTide = override.hasHighTide;
+    if (typeof override.hasEarthquake === 'boolean') targetLvl.hasEarthquake = override.hasEarthquake;
+    if (typeof override.hasBlackout === 'boolean') targetLvl.hasBlackout = override.hasBlackout;
+    if (typeof override.hasFlood === 'boolean') targetLvl.hasFlood = override.hasFlood;
+    if (override.featureCostOverrides && typeof override.featureCostOverrides === 'object') {
+      targetLvl.featureCostOverrides = Object.assign({}, targetLvl.featureCostOverrides || {}, override.featureCostOverrides);
+    }
+  }
+
+  // Apply external config/global.json and config/<stage>.json overrides into CONFIG
   function applyStageConfig(stageCfg) {
     if (!stageCfg || typeof stageCfg !== 'object') return;
+
+    // 0. If this is a single-stage JSON file (e.g., config/bangkok.json) with an "id" field
+    if (typeof stageCfg.id === 'string' && !stageCfg.globalRules && !stageCfg.featureCosts) {
+      if (stageCfg.id === 'tutorial' && CONFIG.TUTORIAL_LEVEL) {
+        applyStageEntry(CONFIG.TUTORIAL_LEVEL, stageCfg);
+      } else if (Array.isArray(CONFIG.LEVELS)) {
+        for (let i = 0; i < CONFIG.LEVELS.length; i++) {
+          if (CONFIG.LEVELS[i] && CONFIG.LEVELS[i].id === stageCfg.id) {
+            applyStageEntry(CONFIG.LEVELS[i], stageCfg);
+          }
+        }
+      }
+      if (global.POWATER && global.POWATER.game && typeof global.POWATER.game.reloadStageConfig === 'function') {
+        global.POWATER.game.reloadStageConfig();
+      }
+      return;
+    }
 
     // 1. Global Rules
     const gr = stageCfg.globalRules;
@@ -597,9 +650,13 @@
       if (typeof pr.warningThresholdRatio === 'number') CONFIG.POLLUTION_WARN_THRESHOLD = pr.warningThresholdRatio;
     }
 
-    // 3. Buildings
-    const bld = stageCfg.buildings;
+    // 3. Feature Costs (Buildings, Connections, Repair, Special Items, Upgrades)
+    const fc = stageCfg.featureCosts || {};
+    const bld = fc.buildings || stageCfg.buildings;
     if (bld && typeof bld === 'object' && CONFIG.BUILDINGS) {
+      if (typeof bld.demolishRefundRatio === 'number') {
+        CONFIG.DEMOLISH_REFUND_RATIO = bld.demolishRefundRatio;
+      }
       const mapBld = [
         ['generatorCoal', 'GENERATOR_COAL'],
         ['generatorSolar', 'GENERATOR_SOLAR'],
@@ -616,6 +673,63 @@
           if (typeof src.pollutionRatePerSec === 'number') dst.pollutionRate = src.pollutionRatePerSec;
           if (typeof src.pollutionReductionPerSec === 'number') dst.pollutionReductionRate = src.pollutionReductionPerSec;
           if (typeof src.canBreakDown === 'boolean') dst.canBreakDown = src.canBreakDown;
+        }
+      }
+    }
+
+    const connCfg = fc.connections;
+    if (connCfg && typeof connCfg === 'object' && CONFIG.PIPES) {
+      if (typeof connCfg.powerLineCost === 'number' && CONFIG.PIPES.POWER) CONFIG.PIPES.POWER.cost = connCfg.powerLineCost;
+      if (typeof connCfg.waterPipeCost === 'number' && CONFIG.PIPES.WATER) CONFIG.PIPES.WATER.cost = connCfg.waterPipeCost;
+      if (typeof connCfg.sewagePipeCost === 'number' && CONFIG.PIPES.SEWAGE) CONFIG.PIPES.SEWAGE.cost = connCfg.sewagePipeCost;
+      if (typeof connCfg.riverCrossingExtraCost === 'number') CONFIG.RIVER_CROSSING_EXTRA_COST = connCfg.riverCrossingExtraCost;
+    }
+
+    const repCfg = fc.repair;
+    if (repCfg && typeof repCfg === 'object') {
+      if (typeof repCfg.repairCostPerBuilding === 'number') {
+        CONFIG.REPAIR_COST_PER_BUILDING = repCfg.repairCostPerBuilding;
+      }
+    }
+
+    const spCfg = fc.specialItems;
+    if (spCfg && typeof spCfg === 'object' && CONFIG.SPECIAL_ITEMS) {
+      if (typeof spCfg.candleBoxUnitPrice === 'number') {
+        CONFIG.SPECIAL_ITEMS.CANDLE_BOX_UNIT_PRICE = spCfg.candleBoxUnitPrice;
+        if (CONFIG.DISASTERS && CONFIG.DISASTERS.BLACKOUT) {
+          CONFIG.DISASTERS.BLACKOUT.candleBoxUnitPrice = spCfg.candleBoxUnitPrice;
+        }
+      }
+      if (typeof spCfg.startingCandlesRome === 'number' && CONFIG.DISASTERS && CONFIG.DISASTERS.BLACKOUT) {
+        CONFIG.DISASTERS.BLACKOUT.startingCandlesRome = spCfg.startingCandlesRome;
+      }
+      if (Array.isArray(spCfg.candlePacks)) {
+        CONFIG.SPECIAL_ITEMS.CANDLE_PACKS = spCfg.candlePacks.map(p => Object.assign({}, p));
+      }
+      if (typeof spCfg.emergencyFloodPumpCost === 'number' && CONFIG.SPECIAL_ITEMS.FLOOD_PUMP) {
+        CONFIG.SPECIAL_ITEMS.FLOOD_PUMP.cost = spCfg.emergencyFloodPumpCost;
+        if (CONFIG.DISASTERS && CONFIG.DISASTERS.FLOOD) {
+          CONFIG.DISASTERS.FLOOD.emergencyPumpCost = spCfg.emergencyFloodPumpCost;
+        }
+      }
+    }
+
+    const upgCfg = fc.upgrades;
+    if (upgCfg && typeof upgCfg === 'object' && CONFIG.UPGRADES) {
+      const mapUpg = [
+        ['elec_cap', 'ELECTRICITY_CAPACITY'],
+        ['poll_red', 'POLLUTION_REDUCTION'],
+        ['water_cap', 'WATER_PUMP_CAPACITY'],
+        ['waste_cap', 'WASTE_FILTER_CAPACITY']
+      ];
+      for (let i = 0; i < mapUpg.length; i++) {
+        const src = upgCfg[mapUpg[i][0]];
+        const dst = CONFIG.UPGRADES[mapUpg[i][1]];
+        if (src && dst) {
+          if (typeof src.baseCost === 'number') dst.baseCost = src.baseCost;
+          if (typeof src.costMult === 'number') dst.costMult = src.costMult;
+          if (typeof src.maxLevel === 'number') dst.maxLevel = src.maxLevel;
+          if (typeof src.bonusPerLevel === 'number') dst.bonusPerLevel = src.bonusPerLevel;
         }
       }
     }
@@ -642,33 +756,14 @@
     // 5. Per-Stage Configurations
     const stg = stageCfg.stages;
     if (stg && typeof stg === 'object') {
-      const applyToStageObj = (targetLvl, override) => {
-        if (!targetLvl || !override) return;
-        if (typeof override.startingBudget === 'number') targetLvl.startingBudget = override.startingBudget;
-        if (typeof override.houseSpawnIntervalSeconds === 'number') targetLvl.spawnInterval = Math.round(override.houseSpawnIntervalSeconds * 1000);
-        if (typeof override.pollutionMultiplier === 'number') targetLvl.pollutionMultiplier = override.pollutionMultiplier;
-        if (typeof override.maxPollution === 'number') targetLvl.maxPollution = override.maxPollution;
-        if (typeof override.maxComplaints === 'number') targetLvl.maxComplaints = override.maxComplaints;
-        if (typeof override.winRequiredHouses === 'number') targetLvl.winRequiredHouses = override.winRequiredHouses;
-        if (typeof override.winHoldDurationSeconds === 'number') targetLvl.winHoldDurationSeconds = override.winHoldDurationSeconds;
-        if (typeof override.maxHousesCap === 'number') targetLvl.maxHousesCap = override.maxHousesCap;
-        if (typeof override.cleanEnergyDiscount === 'number') targetLvl.cleanEnergyDiscount = override.cleanEnergyDiscount;
-        if (typeof override.buildCostDiscount === 'number') targetLvl.buildCostDiscount = override.buildCostDiscount;
-        if (typeof override.unlimitedWaterChain === 'boolean') targetLvl.unlimitedWaterChain = override.unlimitedWaterChain;
-        if (typeof override.hasHighTide === 'boolean') targetLvl.hasHighTide = override.hasHighTide;
-        if (typeof override.hasEarthquake === 'boolean') targetLvl.hasEarthquake = override.hasEarthquake;
-        if (typeof override.hasBlackout === 'boolean') targetLvl.hasBlackout = override.hasBlackout;
-        if (typeof override.hasFlood === 'boolean') targetLvl.hasFlood = override.hasFlood;
-      };
-
       if (stg.tutorial && CONFIG.TUTORIAL_LEVEL) {
-        applyToStageObj(CONFIG.TUTORIAL_LEVEL, stg.tutorial);
+        applyStageEntry(CONFIG.TUTORIAL_LEVEL, stg.tutorial);
       }
       if (Array.isArray(CONFIG.LEVELS)) {
         for (let i = 0; i < CONFIG.LEVELS.length; i++) {
           const lvl = CONFIG.LEVELS[i];
           if (lvl && lvl.id && stg[lvl.id]) {
-            applyToStageObj(lvl, stg[lvl.id]);
+            applyStageEntry(lvl, stg[lvl.id]);
           }
         }
       }
@@ -687,18 +782,26 @@
     applyStageConfig(global.POWATER_STAGE_CONFIG);
   }
 
-  // Also attempt live fetch of stage_config.json at runtime so edits to stage_config.json apply immediately on preview reload
+  // Live fetch of config/global.json and per-stage config/*.json files at runtime
   if (typeof fetch === 'function' && !global._powaterStageConfigFetched) {
     global._powaterStageConfigFetched = true;
-    fetch('stage_config.json?t=' + Date.now())
-      .then(res => (res && res.ok) ? res.json() : null)
-      .then(data => {
-        if (data) {
-          global.POWATER_STAGE_CONFIG = data;
-          applyStageConfig(data);
-        }
-      })
-      .catch(() => {});
+    const ts = Date.now();
+    const configFiles = [
+      'config/global.json',
+      'config/tutorial.json',
+      'config/bangkok.json',
+      'config/tokyo.json',
+      'config/rome.json',
+      'config/amsterdam.json'
+    ];
+    for (let i = 0; i < configFiles.length; i++) {
+      fetch(configFiles[i] + '?t=' + ts)
+        .then(res => (res && res.ok) ? res.json() : null)
+        .then(data => {
+          if (data) applyStageConfig(data);
+        })
+        .catch(() => {});
+    }
   }
 
 })(typeof window !== 'undefined' ? window : globalThis);

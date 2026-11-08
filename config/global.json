@@ -1,0 +1,136 @@
+{
+  "_comment": "POWATER CORP. v1.0.3.1 — Global Configuration File (config/global.json). Configures feature costs, economy, global rules, pollution rates, and disaster parameters across all stages.",
+  "featureCosts": {
+    "buildings": {
+      "generatorCoal": {
+        "cost": 30,
+        "capacityHouses": null,
+        "pollutionRatePerSec": 0.30,
+        "canBreakDown": true
+      },
+      "generatorSolar": {
+        "cost": 60,
+        "capacityHouses": null,
+        "pollutionRatePerSec": 0.0,
+        "canBreakDown": true
+      },
+      "waterPump": {
+        "cost": 30,
+        "capacityHouses": 15,
+        "pollutionRatePerSec": 0.0,
+        "canBreakDown": true
+      },
+      "wasteFilter": {
+        "cost": 40,
+        "capacityHouses": 12,
+        "pollutionRatePerSec": 0.05,
+        "canBreakDown": true
+      },
+      "airFilter": {
+        "cost": 40,
+        "capacityHouses": 0,
+        "pollutionReductionPerSec": 0.20,
+        "canBreakDown": false
+      },
+      "demolishRefundRatio": 0.50
+    },
+    "connections": {
+      "powerLineCost": 0,
+      "waterPipeCost": 0,
+      "sewagePipeCost": 0,
+      "riverCrossingExtraCost": 0
+    },
+    "repair": {
+      "repairCostPerBuilding": 0
+    },
+    "specialItems": {
+      "candleBoxUnitPrice": 10,
+      "startingCandlesRome": 5,
+      "candlePacks": [
+        { "id": "candle_20", "cost": 20, "boxes": 2, "label": "Bulk 20€ (2 กล่อง)" },
+        { "id": "candle_50", "cost": 50, "boxes": 5, "label": "Bulk 50€ (5 กล่อง)" },
+        { "id": "candle_100", "cost": 100, "boxes": 10, "label": "Bulk 100€ (10 กล่อง)" },
+        { "id": "candle_500", "cost": 500, "boxes": 50, "label": "Bulk 500€ (50 กล่อง)" }
+      ],
+      "emergencyFloodPumpCost": 500
+    },
+    "upgrades": {
+      "elec_cap": {
+        "baseCost": 10,
+        "costMult": 1.8,
+        "maxLevel": 5,
+        "bonusPerLevel": 0.20
+      },
+      "poll_red": {
+        "baseCost": 100,
+        "costMult": 1.5,
+        "maxLevel": 10,
+        "bonusPerLevel": 0.05
+      },
+      "water_cap": {
+        "baseCost": 10,
+        "costMult": 1.8,
+        "maxLevel": 5,
+        "bonusPerLevel": 0.20
+      },
+      "waste_cap": {
+        "baseCost": 25,
+        "costMult": 1.6,
+        "maxLevel": 5,
+        "bonusPerLevel": 0.25
+      }
+    }
+  },
+  "globalRules": {
+    "dayDurationSeconds": 15.0,
+    "dayCycleDurationSeconds": 60.0,
+    "nightCycleDurationSeconds": 60.0,
+    "protectingTimeSeconds": 120.0,
+    "pollutionStartDelaySeconds": 180.0,
+    "complaintStrikeTimerSeconds": 27.0,
+    "defaultMaxComplaints": 3,
+    "winRequiredHouses": 15,
+    "winHoldDurationSeconds": 300.0,
+    "houseCompleteInstantBonus": 50,
+    "weeklyRevenuePerCompleteHouse": 40,
+    "weeklyBaseMunicipalGrant": 40,
+    "continuousRevenuePerHousePerSec": 0.8,
+    "minHouseDistancePixels": 135,
+    "upsizeEveryNHouses": 10,
+    "maxHousesCap": 40,
+    "repairCheckIntervalSeconds": 120.0,
+    "repairBreakdownChance": 0.30
+  },
+  "pollutionRates": {
+    "coalGeneratorPerSec": 0.30,
+    "wastewaterOutletBasePerSec": 0.05,
+    "wastewaterPerDrainedHousePerSec": 0.05,
+    "untreatedSewagePerHousePerSec": 0.15,
+    "airFilterReductionPerSec": 0.20,
+    "naturalDilutionPerSec": 0.01,
+    "warningThresholdRatio": 0.80
+  },
+  "disasters": {
+    "highTide": {
+      "everyNDays": 15,
+      "durationSeconds": 25.0,
+      "riversideBreakChance": 0.50
+    },
+    "earthquake": {
+      "checkEverySeconds": 60.0,
+      "baseChance": 0.125,
+      "escalateAfterMinutes": 3,
+      "escalateBonusPerMinute": 0.05,
+      "guaranteedAtMinute": 5
+    },
+    "blackout": {
+      "everyNDays": 15,
+      "chance": 0.125,
+      "durationSeconds": 25.0
+    },
+    "flood": {
+      "everyNDays": 28,
+      "maxDurationSecondsBeforeGameOver": 120.0
+    }
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "_comment": "Stage 0: Fast Interactive Tutorial Configuration (config/tutorial.json)",
+  "id": "tutorial",
+  "sceneName": "Tutorial",
+  "name": "0. Fast Scene Tutorial",
+  "startingBudget": 300,
+  "houseSpawnIntervalSeconds": 999.0,
+  "pollutionMultiplier": 0.0,
+  "maxPollution": 10.0,
+  "maxComplaints": 99,
+  "winRequiredHouses": 1,
+  "winHoldDurationSeconds": 30.0,
+  "maxHousesCap": 10,
+  "cleanEnergyDiscount": 0.0,
+  "buildCostDiscount": 0.0,
+  "unlimitedWaterChain": true,
+  "hasHighTide": false,
+  "hasEarthquake": false,
+  "hasBlackout": false,
+  "hasFlood": false,
+  "featureCostOverrides": {}
+}

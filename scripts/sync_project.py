@@ -20,7 +20,7 @@ props['adaptGameResolutionAtRuntime'] = False
 props['sizeOnStartupMode'] = ""
 props['windowWidth'] = 1280
 props['windowHeight'] = 720
-props['version'] = '1.0.3.0'
+props['version'] = '1.0.3.1'
 props['name'] = 'POWATER CORP.'
 
 # 2. Update Resources (All real PNG assets)
@@ -90,15 +90,25 @@ scripts_order = [
     'main.js'
 ]
 
-stage_config_path = os.path.join(ROOT_DIR, 'stage_config.json')
-stage_config_inline = '{}'
-if os.path.exists(stage_config_path):
-    with open(stage_config_path, 'r', encoding='utf-8') as scf:
-        stage_config_inline = json.dumps(json.load(scf), ensure_ascii=False, indent=2)
+config_dir = os.path.join(ROOT_DIR, 'config')
+merged_config = {}
+global_cfg_path = os.path.join(config_dir, 'global.json')
+if os.path.exists(global_cfg_path):
+    with open(global_cfg_path, 'r', encoding='utf-8') as gcf:
+        merged_config = json.load(gcf)
 
-combined_source = f"""// POWATER CORP. v1.0.3.0 - Singleplayer Infrastructure & Environmental Strategy Game
+merged_config['stages'] = {}
+for stg_name in ['tutorial', 'bangkok', 'tokyo', 'rome', 'amsterdam']:
+    stg_path = os.path.join(config_dir, f'{stg_name}.json')
+    if os.path.exists(stg_path):
+        with open(stg_path, 'r', encoding='utf-8') as scf:
+            merged_config['stages'][stg_name] = json.load(scf)
+
+stage_config_inline = json.dumps(merged_config, ensure_ascii=False, indent=2)
+
+combined_source = f"""// POWATER CORP. v1.0.3.1 - Singleplayer Infrastructure & Environmental Strategy Game
 // Auto-compiled bundle of modular scripts (POWATER IDEA PITCH.pdf & POWATER CORP.pdf)
-// Embedded Stage Configuration from stage_config.json:
+// Embedded Configuration from config/global.json & config/<stage>.json:
 globalThis.POWATER_STAGE_CONFIG = {stage_config_inline};
 """
 

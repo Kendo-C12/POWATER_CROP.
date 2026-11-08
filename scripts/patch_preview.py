@@ -27,14 +27,28 @@ for f in os.listdir(assets_dir):
         shutil.copy2(src, os.path.join(prev_assets, f))
 print('Assets copied to preview directory.')
 
-# 1.05 Copy stage_config.json to preview root and load inline
-stage_cfg_path = os.path.join(ROOT_DIR, 'stage_config.json')
-stage_cfg_inline = '{}'
-if os.path.exists(stage_cfg_path):
-    shutil.copy2(stage_cfg_path, os.path.join(prev_dir, 'stage_config.json'))
-    with open(stage_cfg_path, 'r', encoding='utf-8') as scf:
-        stage_cfg_inline = json.dumps(json.load(scf), ensure_ascii=False, indent=2)
-    print('stage_config.json copied to preview directory.')
+# 1.05 Copy config/*.json to preview/config/ and load inline
+config_dir = os.path.join(ROOT_DIR, 'config')
+prev_config_dir = os.path.join(prev_dir, 'config')
+os.makedirs(prev_config_dir, exist_ok=True)
+
+merged_config = {}
+global_cfg_path = os.path.join(config_dir, 'global.json')
+if os.path.exists(global_cfg_path):
+    shutil.copy2(global_cfg_path, os.path.join(prev_config_dir, 'global.json'))
+    with open(global_cfg_path, 'r', encoding='utf-8') as gcf:
+        merged_config = json.load(gcf)
+
+merged_config['stages'] = {}
+for stg_name in ['tutorial', 'bangkok', 'tokyo', 'rome', 'amsterdam']:
+    stg_path = os.path.join(config_dir, f'{stg_name}.json')
+    if os.path.exists(stg_path):
+        shutil.copy2(stg_path, os.path.join(prev_config_dir, f'{stg_name}.json'))
+        with open(stg_path, 'r', encoding='utf-8') as scf:
+            merged_config['stages'][stg_name] = json.load(scf)
+
+stage_cfg_inline = json.dumps(merged_config, ensure_ascii=False, indent=2)
+print('config/*.json copied to preview/config/ directory.')
 
 # 1.1 Sync data.js with POWATER CROPS..json
 project_json_path = os.path.join(ROOT_DIR, 'POWATER CROPS..json')

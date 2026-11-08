@@ -1,8 +1,8 @@
-# POWATER CORP. (`v1.0.3.0`) — GDevelop 5 Project Documentation (`GEMINI.md`)
+# POWATER CORP. (`v1.0.3.1`) — GDevelop 5 Project Documentation (`GEMINI.md`)
 
 > **Team Green Gang**: Sukrit Limpakanon, Aristt Mahakitsiri, Gantinan Satjariyakul  
 > **Engine**: GDevelop 5 (`POWATER CROPS..json`) + Real PNG Sprite Assets + PixiJS Procedural River/Conduit Rendering  
-> **Version Naming**: `1.x.y.z` (`x` = Major Version, `y` = Small Addition Within Major Version, `z` = Bug Fixes) — Current: **`v1.0.3.0`**
+> **Version Naming**: `1.x.y.z` (`x` = Major Version, `y` = Small Addition Within Major Version, `z` = Bug Fixes) — Current: **`v1.0.3.1`**
 
 ---
 
@@ -79,7 +79,9 @@ All buildings, houses, rivers, HUD bars, toolbar docks, buttons, and status badg
 ## 5. Project Structure & Build Pipeline
 
 - `POWATER CROPS..json`: Main GDevelop 5 project file containing all 5 scene layouts (`Main`, `Tutorial`, `Tokyo`, `Rome`, `Amsterdam`), sprite objects, visual event groups, and compiled JS engine bridge.
-- `stage_config.json`: External JSON configuration file for tuning global gameplay rules (`globalRules`), pollution rates (`pollutionRates`), building costs/capacities (`buildings`), disaster frequencies/chances (`disasters`), and per-stage parameters (`stages.tutorial`, `stages.bangkok`, `stages.tokyo`, `stages.rome`, `stages.amsterdam` — including `houseSpawnIntervalSeconds`, `pollutionMultiplier`, `startingBudget`, `maxPollution`, `maxComplaints`, `winRequiredHouses`, `winHoldDurationSeconds`, `maxHousesCap`, discounts, and disaster flags). Automatically embedded at compile time and live-loaded via `fetch('stage_config.json')` at runtime.
+- `config/`: Dedicated configuration folder in the project root:
+  - `config/global.json`: Global configuration for all stages, including `featureCosts` (building costs & capacities, wire/pipe connection costs, river crossing extra cost, demolish refund ratio, repair cost per building, Rome candle packs & Amsterdam emergency flood pump costs, and upgrade base costs/multipliers), `globalRules`, `pollutionRates`, and `disasters`.
+  - `config/tutorial.json`, `config/bangkok.json`, `config/tokyo.json`, `config/rome.json`, `config/amsterdam.json`: Individual per-stage configuration files controlling `startingBudget`, `houseSpawnIntervalSeconds`, `pollutionMultiplier`, `maxPollution`, `maxComplaints`, `winRequiredHouses`, `winHoldDurationSeconds`, `maxHousesCap`, discounts, disaster flags, and optional `featureCostOverrides`.
 - `scripts/config.js`: Game constants, `POWATER.applyStageConfig()` loader, `v1.0.0.0` level definitions, disaster rules, special item packs, upgrades, and `v1.1–v1.4` feature roadmap.
 - `scripts/map.js`: River spline geometry, shoreline proximity checks, animated water current droplets, High Tide surge, and Amsterdam Flood rising water overlay.
 - `scripts/entities.js`: `HouseEntity` (needs, completion bonus tracking, Rome candle badge), `BuildingEntity` (breakdown/repair states & wrench badge), and `ConnectionEntity` (animated flow conduits).
@@ -102,6 +104,11 @@ All buildings, houses, rivers, HUD bars, toolbar docks, buttons, and status badg
 
 ## 7. Changelog
 
+- **`v1.0.3.1` (2026-11-09)**:
+  - Reorganized stage and global configuration into a dedicated [`config/`](file:///mnt/c/Users/user/Desktop/Folder/GDEV_POWATER/config) folder at the root of the project:
+    - [`config/global.json`](file:///mnt/c/Users/user/Desktop/Folder/GDEV_POWATER/config/global.json): Configures all global feature costs (`featureCosts.buildings`, `featureCosts.connections`, `featureCosts.repair`, `featureCosts.specialItems`, `featureCosts.upgrades`), `globalRules`, `pollutionRates`, and `disasters`.
+    - [`config/tutorial.json`](file:///mnt/c/Users/user/Desktop/Folder/GDEV_POWATER/config/tutorial.json), [`config/bangkok.json`](file:///mnt/c/Users/user/Desktop/Folder/GDEV_POWATER/config/bangkok.json), [`config/tokyo.json`](file:///mnt/c/Users/user/Desktop/Folder/GDEV_POWATER/config/tokyo.json), [`config/rome.json`](file:///mnt/c/Users/user/Desktop/Folder/GDEV_POWATER/config/rome.json), [`config/amsterdam.json`](file:///mnt/c/Users/user/Desktop/Folder/GDEV_POWATER/config/amsterdam.json): Dedicated JSON configuration file for each stage.
+  - Wired all feature costs (`getBuildingCost`, `getConnectionCost`, `getRepairCost`, `buyCandlePack`, `useEmergencyFloodPump`, `buyUpgrade`, and `DEMOLISH_REFUND_RATIO`) across [`scripts/config.js`](file:///mnt/c/Users/user/Desktop/Folder/GDEV_POWATER/scripts/config.js), [`scripts/engine.js`](file:///mnt/c/Users/user/Desktop/Folder/GDEV_POWATER/scripts/engine.js), and [`scripts/ui.js`](file:///mnt/c/Users/user/Desktop/Folder/GDEV_POWATER/scripts/ui.js).
 - **`v1.0.3.0` (2026-11-08)**:
   - Added [`stage_config.json`](file:///mnt/c/Users/user/Desktop/Folder/GDEV_POWATER/stage_config.json) for configuring global and per-stage parameters without editing source code: pollution production/reduction rates (`pollutionRates` + per-stage `pollutionMultiplier`), house spawn speed (`houseSpawnIntervalSeconds`), starting money (`startingBudget`), max pollution (`maxPollution`), max complaints (`maxComplaints`), win timer requirements (`winRequiredHouses`, `winHoldDurationSeconds`), economy rewards (`houseCompleteBonus`, `weeklyRevenuePerCompleteHouse`, `weeklyBaseGrant`), building costs/capacities (`buildings`), and disaster intervals/chances (`disasters`).
   - Added `POWATER.applyStageConfig()` and live `fetch('stage_config.json')` hot-reloading in `scripts/config.js` and `scripts/engine.js`, plus automatic inline embedding in `scripts/sync_project.py` and `scripts/patch_preview.py`.
