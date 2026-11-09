@@ -129,11 +129,10 @@ async function runTest() {
       isBroken: pump.isBroken,
       winTimerState: game.winTimerState
     };
-    const fixedCount = game.repairAllBroken();
+    game.repairBuilding(pump);
     game.update(0.1);
     return {
       brokenState,
-      fixedCount,
       isBrokenAfterRepair: pump.isBroken
     };
   });
@@ -158,36 +157,28 @@ async function runTest() {
     throw new Error('Map Upsize did not trigger after exceeding 10 houses!');
   }
 
-  // 4. Test Level 2 (Tokyo Clean Energy -25% & Earthquake), Level 3 (Rome Candles & Blackout), Level 4 (Amsterdam Flood & Pump)
+  // 4. Disaster Test Lab costs money; Rome blackout cuts all power; Amsterdam 1-complaint rule
   const levelsCheck = await page.evaluate(() => {
     const game = window.POWATER.game;
     const cfg = window.POWATER.CONFIG;
 
-    // Tokyo (index 1)
+    // Tokyo (index 1): paid quake test
     game.startLevel(1);
-    const tokyoSolarCost = game.getBuildingCost(cfg.BUILDINGS.GENERATOR_SOLAR);
-    game.triggerEarthquake();
+    game.money = cfg.DISASTER_TEST_COST;
+    const quakeOk = game.testDisaster('quake');
+    const moneyAfterTest = game.money;
     const tokyoBrokenAfterQuake = game.buildings.filter(b => b.isBroken).length;
-    game.repairAllBroken();
+    const brokeTestRejected = !game.testDisaster('tide'); // $0 left -> refused
 
-    // Rome (index 2)
+    // Rome (index 2): blackout -> no house keeps power
     game.startLevel(2);
-    game.money = 200;
-    game.buyCandlePack('candle_50'); // +5 boxes
-    const stockBeforeBlackout = game.candleStock;
     game.triggerRomeBlackout();
     game.update(0.1);
-    const stockAfterBlackout = game.candleStock;
-    const housesProtectedByCandle = game.houses.filter(h => h.usingCandle && h.hasPower).length;
+    const poweredDuringBlackout = game.houses.filter(h => h.hasPower).length;
 
     // Amsterdam (index 3)
     game.startLevel(3);
     const amsMaxComplaints = game.maxComplaints;
-    game.money = 600;
-    game.triggerAmsterdamFlood();
-    const floodActiveBeforePump = game.isFloodActive;
-    game.useEmergencyFloodPump();
-    const floodActiveAfterPump = game.isFloodActive;
 
     // Return to Bangkok (index 0) for clean screenshot
     game.startLevel(0);
@@ -202,25 +193,23 @@ async function runTest() {
     game.update(0.2);
 
     return {
-      tokyoSolarCost,
+      quakeOk,
+      moneyAfterTest,
       tokyoBrokenAfterQuake,
-      stockBeforeBlackout,
-      stockAfterBlackout,
-      housesProtectedByCandle,
-      amsMaxComplaints,
-      floodActiveBeforePump,
-      floodActiveAfterPump
+      brokeTestRejected,
+      poweredDuringBlackout,
+      amsMaxComplaints
     };
   });
   console.log('4. 4-Level Special Mechanics Verification:', levelsCheck);
 
   if (
-    levelsCheck.tokyoSolarCost !== 45 ||
+    !levelsCheck.quakeOk ||
+    levelsCheck.moneyAfterTest !== 0 ||
     levelsCheck.tokyoBrokenAfterQuake < 2 ||
-    levelsCheck.housesProtectedByCandle < 3 ||
-    levelsCheck.amsMaxComplaints !== 1 ||
-    !levelsCheck.floodActiveBeforePump ||
-    levelsCheck.floodActiveAfterPump
+    !levelsCheck.brokeTestRejected ||
+    levelsCheck.poweredDuringBlackout !== 0 ||
+    levelsCheck.amsMaxComplaints !== 1
   ) {
     throw new Error('4-Level special mechanics verification failed!');
   }

@@ -86,20 +86,18 @@
       const tbH = 48;
       const tbW = 64;
 
-      // 12 Toolbar Buttons matching the 12 GDevelop PNG Sprite instances on the dock tray
+      // 10 Toolbar Buttons matching the 10 GDevelop PNG Sprite instances on the dock tray
       this.buttons = [
-        { id: 'power', objectName: 'btn_power', title: '⚡ POWER', sub: '[1] WIRE', videoKey: 'power', type: 'tool', toolId: 'power', x: 208, y: tbY, w: tbW, h: tbH, color: 0xffb703 },
-        { id: 'water', objectName: 'btn_water', title: '💧 WATER', sub: '[2] PIPE', videoKey: 'water', type: 'tool', toolId: 'water', x: 276, y: tbY, w: tbW, h: tbH, color: 0x00b4d8 },
-        { id: 'sewage', objectName: 'btn_drain', title: '🧪 DRAIN', sub: '[3] SEWAGE', videoKey: 'sewage', type: 'tool', toolId: 'sewage', x: 344, y: tbY, w: tbW, h: tbH, color: 0x9d4edd },
-        { id: 'solar', objectName: 'btn_solar', title: '☀️ SOLAR', sub: '[4] $60', videoKey: 'solar', type: 'build', buildId: 'build_solar', x: 420, y: tbY, w: tbW, h: tbH, color: 0xffd166 },
-        { id: 'air_filter', objectName: 'btn_filter', title: '🍃 FILTER', sub: '[5] $40', videoKey: 'air_filter', type: 'build', buildId: 'build_air_filter', x: 488, y: tbY, w: tbW, h: tbH, color: 0x06d6a0 },
-        { id: 'repair', objectName: 'btn_repair', title: '🔧 REPAIR', sub: '[R] FIX', videoKey: 'repair', type: 'action', action: 'repairToolOrAll', x: 556, y: tbY, w: tbW, h: tbH, color: 0xff5a5f },
-        { id: 'special', objectName: 'btn_special', title: '🎒 ITEMS', sub: '[I] SHOP', videoKey: 'special', type: 'action', action: 'openSpecialItems', x: 624, y: tbY, w: tbW, h: tbH, color: 0x06d6a0 },
-        { id: 'pause', objectName: 'btn_pause', title: '⏸️ PAUSE', sub: '[SPACE]', type: 'action', action: 'togglePause', x: 700, y: tbY, w: tbW, h: tbH, color: 0xadb5bd },
-        { id: 'speed', objectName: 'btn_speed', title: '⏩ SPEED', sub: '1X / 2X', type: 'action', action: 'toggleSpeed', x: 768, y: tbY, w: tbW, h: tbH, color: 0xadb5bd },
-        { id: 'upgrades', objectName: 'btn_upgrade', title: '⬆️ TECH', sub: '[U] UPGRD', videoKey: 'upgrades', type: 'action', action: 'openUpgrades', x: 844, y: tbY, w: tbW, h: tbH, color: 0xffd166 },
-        { id: 'sdgs', objectName: 'btn_sdgs', title: '🎯 SDGs', sub: 'ROADMAP', videoKey: 'sdgs', type: 'action', action: 'openSdgs', x: 912, y: tbY, w: tbW, h: tbH, color: 0x00b4d8 },
-        { id: 'guide', objectName: 'btn_guide', title: '📖 LEVELS', sub: 'BRIEFING', videoKey: 'guide', type: 'action', action: 'openGuide', x: 980, y: tbY, w: tbW, h: tbH, color: 0x48cae4 },
+        { id: 'power', objectName: 'btn_power', title: '⚡ POWER', sub: '[1] WIRE', videoKey: 'power', type: 'tool', toolId: 'power', x: 302, y: tbY, w: tbW, h: tbH, color: 0xffb703 },
+        { id: 'water', objectName: 'btn_water', title: '💧 WATER', sub: '[2] PIPE', videoKey: 'water', type: 'tool', toolId: 'water', x: 370, y: tbY, w: tbW, h: tbH, color: 0x00b4d8 },
+        { id: 'sewage', objectName: 'btn_drain', title: '🧪 DRAIN', sub: '[3] SEWAGE', videoKey: 'sewage', type: 'tool', toolId: 'sewage', x: 438, y: tbY, w: tbW, h: tbH, color: 0x9d4edd },
+        { id: 'air_filter', objectName: 'btn_filter', title: '🍃 FILTER', sub: '[4] $40', videoKey: 'air_filter', type: 'build', buildId: 'build_air_filter', x: 506, y: tbY, w: tbW, h: tbH, color: 0x06d6a0 },
+        { id: 'repair', objectName: 'btn_repair', title: '🔧 REPAIR', sub: '[R] FIX', videoKey: 'repair', type: 'action', action: 'repairTool', x: 574, y: tbY, w: tbW, h: tbH, color: 0xff5a5f },
+        { id: 'special', objectName: 'btn_special', title: '🧪 TEST', sub: '[I] LAB', videoKey: 'special', type: 'action', action: 'openSpecialItems', x: 642, y: tbY, w: tbW, h: tbH, color: 0x06d6a0 },
+        { id: 'pause', objectName: 'btn_pause', title: '⏸️ PAUSE', sub: '[SPACE]', type: 'action', action: 'togglePause', x: 710, y: tbY, w: tbW, h: tbH, color: 0xadb5bd },
+        { id: 'speed', objectName: 'btn_speed', title: '⏩ SPEED', sub: '1X / 2X', type: 'action', action: 'toggleSpeed', x: 778, y: tbY, w: tbW, h: tbH, color: 0xadb5bd },
+        { id: 'upgrades', objectName: 'btn_upgrade', title: '⬆️ TECH', sub: '[U] UPGRD', videoKey: 'upgrades', type: 'action', action: 'openUpgrades', x: 846, y: tbY, w: tbW, h: tbH, color: 0xffd166 },
+        { id: 'guide', objectName: 'btn_guide', title: '📖 LEVELS', sub: 'BRIEFING', videoKey: 'guide', type: 'action', action: 'openGuide', x: 914, y: tbY, w: tbW, h: tbH, color: 0x48cae4 },
         { id: 'logo', type: 'action', action: 'openGuide', x: 8, y: 6, w: 185, h: 32 }
       ];
 
@@ -528,13 +526,8 @@
 
     triggerAction(actionName) {
       switch (actionName) {
-        case 'repairToolOrAll':
-          if (this.game) {
-            const fixed = this.game.repairAllBroken();
-            if (fixed === 0) {
-              this.selectTool('repair');
-            }
-          }
+        case 'repairTool':
+          this.selectTool('repair');
           break;
         case 'openSpecialItems':
           this.showSpecialItemsModal();
@@ -670,8 +663,7 @@
           if (btn.id === 'speed') {
             btn._txtSub.text = (this.game.gameSpeed === 2.0) ? '⚡ 2X FAST' : '1X / 2X';
           } else if (btn.id === 'repair' && brokenCount > 0) {
-            const repCost = this.game.getRepairCost ? this.game.getRepairCost() * brokenCount : 0;
-            btn._txtSub.text = repCost > 0 ? `⚠️ FIX $${repCost}` : `⚠️ FIX (${brokenCount})`;
+            btn._txtSub.text = `⚠️ FIX (${brokenCount})`;
           } else if (btn.id === 'repair') {
             const repCost = this.game.getRepairCost ? this.game.getRepairCost() : 0;
             btn._txtSub.text = repCost > 0 ? `[R] FIX $${repCost}` : '[R] FIX';
@@ -681,10 +673,8 @@
             btn._txtSub.text = CONFIG.PIPES.WATER.cost > 0 ? `[2] $${CONFIG.PIPES.WATER.cost}` : '[2] PIPE';
           } else if (btn.id === 'sewage' && CONFIG.PIPES && CONFIG.PIPES.SEWAGE) {
             btn._txtSub.text = CONFIG.PIPES.SEWAGE.cost > 0 ? `[3] $${CONFIG.PIPES.SEWAGE.cost}` : '[3] SEWAGE';
-          } else if (btn.id === 'solar' && this.game.getBuildingCost && CONFIG.BUILDINGS) {
-            btn._txtSub.text = `[4] $${this.game.getBuildingCost(CONFIG.BUILDINGS.GENERATOR_SOLAR)}`;
           } else if (btn.id === 'air_filter' && this.game.getBuildingCost && CONFIG.BUILDINGS) {
-            btn._txtSub.text = `[5] $${this.game.getBuildingCost(CONFIG.BUILDINGS.AIR_FILTER)}`;
+            btn._txtSub.text = `[4] $${this.game.getBuildingCost(CONFIG.BUILDINGS.AIR_FILTER)}`;
           }
           btn._txtSub.position.set(Math.round(btn.x + btn.w * 0.5), Math.round(btn.y + 37));
         }
@@ -1054,55 +1044,30 @@
         }
       }
       else if (vKey === 'special') {
-        // Left half: Rome Blackout + Candles | Right half: Amsterdam Flood + 500 EUR Pump
-        g.lineStyle(1, 0x48cae4, 0.4);
-        g.moveTo(vx + vw / 2, vy + 8);
-        g.lineTo(vx + vw / 2, vy + vh - 8);
-
-        // Rome Blackout side
-        const rx = vx + 130, ry = vy + 105;
-        addSprite('House.png', rx, ry, 64, 44);
-        addSprite('badge_candle.png', rx, ry - 40, 24, 24);
-        addLabel('ด่าน Rome: ไฟดับใช้เทียน 1 กล่อง/บ้าน', rx, vy + 24, 0xffd166, 11);
-        addLabel('สต็อกเทียน Bulk: 20€ / 50€ / 100€ / 500€', rx, vy + 162, 0xe9ecef, 10.5);
-
-        // Amsterdam Flood side
-        const ax = vx + 390, ay = vy + 105;
-        if (t < 0.55) {
+        // Disaster Test Lab: pay $50 -> simulated flood washes over the city
+        const ax = vx + vw / 2, ay = vy + 105;
+        const cost = (typeof CONFIG.DISASTER_TEST_COST === 'number') ? CONFIG.DISASTER_TEST_COST : 50;
+        if (t >= 0.45) {
           g.beginFill(0x0077b6, 0.45);
-          g.drawRect(vx + vw / 2 + 4, vy + 8, vw / 2 - 8, vh - 16);
+          g.drawRect(vx + 8, vy + 8, vw - 16, vh - 16);
           g.endFill();
-          addLabel('🌊 น้ำท่วม Amsterdam! (< 2 นาที)', ax, vy + 24, 0xff5a5f, 11);
+          addLabel(`🧪 จำลองภัยพิบัติสำเร็จ (-$${cost}) ตรวจจุดที่ชำรุด!`, ax, vy + 24, 0xffd166, 12);
         } else {
-          addLabel('🛟 สูบน้ำท่วมออกสำเร็จทันที! (-500 EUR)', ax, vy + 24, 0x06d6a0, 11);
+          addLabel(`🧪 ศูนย์ทดสอบภัยพิบัติ: ทดสอบครั้งละ $${cost}`, ax, vy + 24, 0x06d6a0, 12);
         }
         addSprite('House.png', ax, ay, 64, 44);
-        drawCursor(ax, vy + 150, t >= 0.48 && t <= 0.62);
+        drawCursor(ax, vy + 150, t >= 0.38 && t <= 0.5);
       }
-      else if (vKey === 'solar' || vKey === 'air_filter') {
-        const isSolar = (vKey === 'solar');
-        const sprName = isSolar ? 'Solar.png' : 'AirFilter.png';
+      else if (vKey === 'air_filter') {
         const bx = vx + 180, by = vy + 100;
         const hx = vx + 360, hy = vy + 100;
-
         if (t >= 0.25) {
-          addSprite(sprName, bx, by, 54, 54);
-          g.lineStyle(2.5, isSolar ? 0xffd166 : 0x2ec4b6, 0.9);
+          addSprite('AirFilter.png', bx, by, 54, 54);
+          g.lineStyle(2.5, 0x2ec4b6, 0.9);
           g.drawCircle(bx, by, 34 + Math.sin(t * 18) * 4);
         }
         addSprite('House.png', hx, hy, 68, 46);
-
-        if (isSolar && t >= 0.45) {
-          const pathData = global.POWATER.ConnectionEntity.buildManhattanPoints({ x: bx, y: by }, { x: hx, y: hy }, 0, 20);
-          g.lineStyle(3.5, 0xffd166, 0.95);
-          g.moveTo(pathData.points[0].x, pathData.points[0].y);
-          for (let i = 1; i < pathData.points.length; i++) g.lineTo(pathData.points[i].x, pathData.points[i].y);
-        }
-
-        addLabel(
-          isSolar ? '☀️ พลังงานสะอาด 0% มลภาวะ (Tokyo ลด 25% เหลือ $45)' : '🍃 ดูดซับมลพิษอัตโนมัติ -0.2 หน่วย/วินาที',
-          vx + vw / 2, vy + 24, isSolar ? 0xffd166 : 0x06d6a0, 12
-        );
+        addLabel('🍃 ดูดซับมลพิษอัตโนมัติ -0.2 หน่วย/วินาที', vx + vw / 2, vy + 24, 0x06d6a0, 12);
         drawCursor(bx, by, t >= 0.2 && t <= 0.35);
       }
       else {
@@ -1228,136 +1193,48 @@
 
     renderSpecialItemsContent(mx, my, mw, mh, mouseX, mouseY) {
       const font = 'system-ui, -apple-system, Segoe UI, Roboto, sans-serif';
-      const title = this.makeText('🎒 ร้านค้าไอเทมพิเศษ & ศูนย์รับมือภัยพิบัติ (SPECIAL ITEMS & REPAIR)', {
+      const cost = (typeof CONFIG.DISASTER_TEST_COST === 'number') ? CONFIG.DISASTER_TEST_COST : 50;
+      const canAfford = this.game.money >= cost;
+      const title = this.makeText(`🧪 ศูนย์ทดสอบภัยพิบัติ (DISASTER TEST LAB) — ค่าทดสอบ $${cost} / ครั้ง`, {
         fontFamily: font, fontSize: 15, fontWeight: 'bold', fill: 0x06d6a0
       });
       title.position.set(mx + 20, my + 14);
       this.modalTextContainer.addChild(title);
 
-      this.modalGfx.lineStyle(1, 0xffd166, 0.4);
-      this.modalGfx.beginFill(0x1c1538, 0.92);
-      this.modalGfx.drawRoundedRect(mx + 20, my + 62, mw - 40, 145, 8);
-      this.modalGfx.endFill();
-
-      const candleTitle = this.makeText(
-        `🕯️ Item พิเศษด่าน Rome: Candle (เทียนไขสำรองยามไฟดับ) — สต็อกปัจจุบัน: ${this.game.candleStock || 0} กล่อง`,
-        { fontFamily: font, fontSize: 13, fontWeight: 'bold', fill: 0xffd166 }
+      const desc = this.makeText(
+        'ใช้งบประมาณเทศบาลจำลองภัยพิบัติเพื่อทดสอบความพร้อมของโครงข่ายน้ำและไฟ (ซ่อมอุปกรณ์ได้โดยคลิกที่อาคารที่เสียทีละจุด)',
+        { fontFamily: font, fontSize: 11.5, fill: 0xadb5bd, wordWrap: true, wordWrapWidth: mw - 64 }
       );
-      candleTitle.position.set(mx + 32, my + 72);
-      this.modalTextContainer.addChild(candleTitle);
-
-      const candleDesc = this.makeText(
-        'ต้องซื้อแบบ Bulk Restock (กล่องละ 10 EUR): หากไฟดับชาวบ้านต้องใช้เทียน บ้านละ 1 กล่อง/รอบที่ไฟดับ เพื่อไม่ให้ถูกร้องเรียน!',
-        { fontFamily: font, fontSize: 11.5, fill: 0xadb5bd }
-      );
-      candleDesc.position.set(mx + 32, my + 96);
-      this.modalTextContainer.addChild(candleDesc);
-
-      const packs = (CONFIG.SPECIAL_ITEMS && CONFIG.SPECIAL_ITEMS.CANDLE_PACKS) || [];
-      const btnW = 142;
-      for (let i = 0; i < packs.length; i++) {
-        const pk = packs[i];
-        const bx = mx + 32 + i * (btnW + 12);
-        const by = my + 132;
-        const bh = 54;
-        const canAfford = this.game.money >= pk.cost;
-        const isHover = (mouseX >= bx && mouseX <= bx + btnW && mouseY >= by && mouseY <= by + bh);
-
-        this.modalButtons.push({ id: `buy_candle_${pk.id}`, packId: pk.id, x: bx, y: by, w: btnW, h: bh });
-
-        this.modalGfx.lineStyle(1.5, canAfford ? 0xffd166 : 0x6c757d, 0.9);
-        this.modalGfx.beginFill(canAfford ? (isHover ? 0xffb703 : 0x2d2250) : 0x221a38, 0.95);
-        this.modalGfx.drawRoundedRect(bx, by, btnW, bh, 6);
-        this.modalGfx.endFill();
-
-        const bTxt = this.makeText(`${pk.label}\n(BUY $${pk.cost})`, {
-          fontFamily: font, fontSize: 11.5, fontWeight: 'bold', align: 'center',
-          fill: canAfford ? (isHover ? 0x120d24 : 0xffd166) : 0x6c757d
-        });
-        bTxt.anchor.set(0.5);
-        bTxt.position.set(bx + btnW / 2, by + bh / 2);
-        this.modalTextContainer.addChild(bTxt);
-      }
-
-      const pumpY = my + 220;
-      this.modalGfx.lineStyle(1, 0x00b4d8, 0.4);
-      this.modalGfx.beginFill(0x1c1538, 0.92);
-      this.modalGfx.drawRoundedRect(mx + 20, pumpY, mw - 40, 120, 8);
-      this.modalGfx.endFill();
-
-      const floodStatus = this.game.isFloodActive
-        ? `🌊 กำลังเกิดน้ำท่วม! (เหลือเวลา ${Math.max(0, Math.ceil(120 - this.game.floodTimer))}s ก่อน Game Over)`
-        : `สถานะน้ำท่วม: ปกติ (มีเครื่องสูบน้ำสำรอง: ${this.game.floodPumpsOwned || 0} เครื่อง)`;
-      const pumpTitle = this.makeText(`🛟 Item พิเศษด่าน Amsterdam: เครื่องสูบน้ำฉุกเฉิน (500 EUR) — ${floodStatus}`, {
-        fontFamily: font, fontSize: 13, fontWeight: 'bold', fill: 0x00b4d8
-      });
-      pumpTitle.position.set(mx + 32, pumpY + 12);
-      this.modalTextContainer.addChild(pumpTitle);
-
-      const pumpDesc = this.makeText(
-        'เครื่องละ 500 EUR (One-Time Use): ใช้สูบน้ำออกทันทีเมื่อเกิดน้ำท่วมใหญ่ทุกๆ 4 สัปดาห์ (28 วัน) ถ้าน้ำท่วมเกิน 2 นาที Game Over!',
-        { fontFamily: font, fontSize: 11.5, fill: 0xadb5bd, wordWrap: true, wordWrapWidth: mw - 230 }
-      );
-      pumpDesc.position.set(mx + 32, pumpY + 40);
-      this.modalTextContainer.addChild(pumpDesc);
-
-      const pumpBtn = { id: 'buy_flood_pump', x: mx + mw - 190, y: pumpY + 34, w: 155, h: 48 };
-      this.modalButtons.push(pumpBtn);
-      const canBuyPump = this.game.money >= 500 || (this.game.floodPumpsOwned > 0);
-      const isPumpHover = (mouseX >= pumpBtn.x && mouseX <= pumpBtn.x + pumpBtn.w && mouseY >= pumpBtn.y && mouseY <= pumpBtn.y + pumpBtn.h);
-
-      this.modalGfx.lineStyle(1.5, canBuyPump ? 0x06d6a0 : 0x6c757d, 0.95);
-      this.modalGfx.beginFill(canBuyPump ? (isPumpHover ? 0x00b4d8 : 0x06d6a0) : 0x2d2444, 0.95);
-      this.modalGfx.drawRoundedRect(pumpBtn.x, pumpBtn.y, pumpBtn.w, pumpBtn.h, 6);
-      this.modalGfx.endFill();
-
-      const pumpBtnLabel = this.game.floodPumpsOwned > 0 ? 'USE PUMP (FREE)' : 'BUY & PUMP $500';
-      const pumpBtnTxt = this.makeText(pumpBtnLabel, {
-        fontFamily: font, fontSize: 12, fontWeight: 'bold', fill: canBuyPump ? 0x120d24 : 0x6c757d
-      });
-      pumpBtnTxt.anchor.set(0.5);
-      pumpBtnTxt.position.set(pumpBtn.x + pumpBtn.w / 2, pumpBtn.y + pumpBtn.h / 2);
-      this.modalTextContainer.addChild(pumpBtnTxt);
-
-      const repY = my + 354;
-      this.modalGfx.lineStyle(1, 0xff5a5f, 0.4);
-      this.modalGfx.beginFill(0x1c1538, 0.92);
-      this.modalGfx.drawRoundedRect(mx + 20, repY, mw - 40, 125, 8);
-      this.modalGfx.endFill();
-
-      const brokenCnt = this.game.buildings.filter(b => b.isBroken).length;
-      const repTitle = this.makeText(
-        `🔧 ระบบซ่อมบำรุง (Repair System) & ทดสอบสภาพอากาศสุดขั้ว — อุปกรณ์ที่เสียตอนนี้: ${brokenCnt} แห่ง`,
-        { fontFamily: font, fontSize: 13, fontWeight: 'bold', fill: 0xff5a5f }
-      );
-      repTitle.position.set(mx + 32, repY + 12);
-      this.modalTextContainer.addChild(repTitle);
+      desc.position.set(mx + 32, my + 72);
+      this.modalTextContainer.addChild(desc);
 
       const actionButtons = [
-        { id: 'act_repair_all', label: `🔧 ซ่อมทั้งหมด (${brokenCnt})`, color: 0x06d6a0 },
         { id: 'act_test_tide', label: '🌊 ทดสอบน้ำขึ้น', color: 0x00b4d8 },
         { id: 'act_test_quake', label: '🌋 ทดสอบแผ่นดินไหว', color: 0xff5a5f },
-        { id: 'act_test_blackout', label: '🕯️ ทดสอบไฟดับ', color: 0xffd166 },
+        { id: 'act_test_blackout', label: '⚡ ทดสอบไฟดับ', color: 0xffd166 },
         { id: 'act_test_flood', label: '🛟 ทดสอบน้ำท่วม', color: 0x9d4edd }
       ];
 
-      const abW = 114;
+      const abW = 140;
       for (let i = 0; i < actionButtons.length; i++) {
         const ab = actionButtons[i];
-        const bx = mx + 30 + i * (abW + 8);
-        const by = repY + 52;
-        const bh = 48;
-        const isHover = (mouseX >= bx && mouseX <= bx + abW && mouseY >= by && mouseY <= by + bh);
+        const bx = mx + 32 + i * (abW + 12);
+        const by = my + 120;
+        const bh = 54;
+        const isHover = canAfford && (mouseX >= bx && mouseX <= bx + abW && mouseY >= by && mouseY <= by + bh);
+        const col = canAfford ? ab.color : 0x6c757d;
 
         this.modalButtons.push({ id: ab.id, x: bx, y: by, w: abW, h: bh });
 
-        this.modalGfx.lineStyle(1.5, ab.color, 0.9);
-        this.modalGfx.beginFill(isHover ? ab.color : 0x241b42, 0.95);
+        this.modalGfx.lineStyle(1.5, col, 0.9);
+        this.modalGfx.beginFill(isHover ? col : 0x241b42, 0.95);
         this.modalGfx.drawRoundedRect(bx, by, abW, bh, 6);
         this.modalGfx.endFill();
 
-        const abTxt = this.makeText(ab.label, {
-          fontFamily: font, fontSize: 11, fontWeight: 'bold', fill: isHover ? 0x120d24 : 0xffffff
+        const abTxt = this.makeText(`${ab.label}
+($${cost})`, {
+          fontFamily: font, fontSize: 11.5, fontWeight: 'bold', align: 'center',
+          fill: canAfford ? (isHover ? 0x120d24 : 0xffffff) : 0x6c757d
         });
         abTxt.anchor.set(0.5);
         abTxt.position.set(bx + abW / 2, by + bh / 2);
@@ -1449,7 +1326,7 @@
         {
           id: 'sdg7',
           title: 'SDG 7: AFFORDABLE AND CLEAN ENERGY',
-          desc: 'การส่งเสริมพลังงานสะอาดและการเข้าถึงไฟฟ้าอย่างทั่วถึง โดยเน้นการใช้พลังงานหมุนเวียน เช่น Solar Cell 0% มลภาวะ',
+          desc: 'การส่งเสริมพลังงานสะอาดและการเข้าถึงไฟฟ้าอย่างทั่วถึง และลดมลภาวะด้วยเครื่องกรองอากาศ (Eco Filter)',
           color: 0xfcc30b,
           tag: 'CORE UTILITY'
         },
@@ -1738,45 +1615,8 @@
             return;
           }
 
-          if (btn.id && btn.id.startsWith('buy_candle_')) {
-            if (this.game && this.game.buyCandlePack) {
-              this.game.buyCandlePack(btn.packId);
-            }
-            return;
-          }
-
-          if (btn.id === 'buy_flood_pump') {
-            if (this.game && this.game.useEmergencyFloodPump) {
-              this.game.useEmergencyFloodPump();
-            }
-            return;
-          }
-
-          if (btn.id === 'act_repair_all') {
-            if (this.game && this.game.repairAllBroken) {
-              this.game.repairAllBroken();
-            }
-            return;
-          }
-
-          if (btn.id === 'act_test_tide') {
-            this.closeModal();
-            if (this.game && this.game.triggerHighTide) this.game.triggerHighTide();
-            return;
-          }
-          if (btn.id === 'act_test_quake') {
-            this.closeModal();
-            if (this.game && this.game.triggerEarthquake) this.game.triggerEarthquake();
-            return;
-          }
-          if (btn.id === 'act_test_blackout') {
-            this.closeModal();
-            if (this.game && this.game.triggerRomeBlackout) this.game.triggerRomeBlackout();
-            return;
-          }
-          if (btn.id === 'act_test_flood') {
-            this.closeModal();
-            if (this.game && this.game.triggerAmsterdamFlood) this.game.triggerAmsterdamFlood();
+          if (btn.id && btn.id.startsWith('act_test_')) {
+            if (this.game && this.game.testDisaster && this.game.testDisaster(btn.id.slice(9))) this.closeModal();
             return;
           }
 

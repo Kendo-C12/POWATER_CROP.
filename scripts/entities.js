@@ -32,7 +32,6 @@
       this.hasWater = false;
       this.hasDrainage = false;
       this.producesWaste = false;
-      this.usingCandle = false; // Rome Blackout Candle protection
       this.completedBonusPaid = false; // +50 instant reward on first completion
       this.isComplete = false;
 
@@ -156,7 +155,6 @@
       if (!this.hasPower) activeBadges.push('power');
       if (!this.hasWater) activeBadges.push('water');
       if (this.hasWater && !this.hasDrainage) activeBadges.push('drain');
-      if (this.usingCandle) activeBadges.push('candle');
 
       const container = badgeContainer || pixiGfx.parent;
       if (!this.badgeSprites && container && typeof PIXI !== 'undefined') {

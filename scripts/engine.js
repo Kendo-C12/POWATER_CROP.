@@ -5,7 +5,7 @@
 // - Repair System: 30% pump breakdown chance every 2 minutes + click/hotkey repair
 // - Day/Night Cycle: 1 min Day, 1 min Night
 // - Map Upsize: expands every +10 houses up to 40 houses max
-// - 4 Levels (Bangkok, Tokyo, Rome, Amsterdam) with High Tide, Earthquake, Blackout + Candles, Flood + Emergency Pump
+// - 4 Levels (Bangkok, Tokyo, Rome, Amsterdam) with High Tide, Earthquake, Blackout, Flood + paid Disaster Test Lab
 
 (function (global) {
   'use strict';
@@ -909,18 +909,8 @@
       const blkCfg = (CONFIG.DISASTERS && CONFIG.DISASTERS.BLACKOUT) || {};
       this.isBlackoutActive = true;
       this.blackoutTimer = blkCfg.durationSeconds || 25.0;
-      let candlesUsed = 0;
-      this.houses.forEach(h => {
-        if (this.candleStock > 0) {
-          this.candleStock--;
-          h.usingCandle = true;
-          candlesUsed++;
-        } else {
-          h.usingCandle = false;
-        }
-      });
       this.addFloatingText(
-        `🕯️ ไฟดับครั้งใหญ่ในโรม! ใช้เทียนสำรองไป ${candlesUsed} กล่อง (คงเหลือ ${this.candleStock} กล่อง)`,
+        '⚡ ไฟดับครั้งใหญ่ในโรม! พลังงานไฟฟ้าขัดข้องชั่วคราว Win Timer หยุดเดิน',
         CONFIG.CANVAS_WIDTH / 2,
         100,
         '#ffd166'
@@ -932,13 +922,8 @@
       if (this.isFloodActive) return;
       this.isFloodActive = true;
       this.floodTimer = 0.0;
-      // If player already pre-purchased an emergency flood pump, auto-activate or prompt
-      if (this.floodPumpsOwned > 0) {
-        this.useEmergencyFloodPump();
-        return;
-      }
       this.addFloatingText(
-        '🌊 ภัยพิบัติหลัก: น้ำท่วมใหญ่ใน Amsterdam! ต้องใช้เครื่องสูบน้ำ (500 EUR) ภายใน 2 นาที!',
+        `🌊 ภัยพิบัติหลัก: น้ำท่วมใหญ่ใน Amsterdam! ระดับน้ำจะลดลงใน ${Math.round(this.floodMaxDuration)}s`,
         CONFIG.CANVAS_WIDTH / 2,
         100,
         '#e63946'
@@ -946,55 +931,19 @@
       if (global.POWATER.soundManager) global.POWATER.soundManager.playComplaint();
     }
 
-    buyCandlePack(packId) {
-      const packs = (CONFIG.SPECIAL_ITEMS && CONFIG.SPECIAL_ITEMS.CANDLE_PACKS) || [];
-      const pack = packs.find(p => p.id === packId);
-      if (!pack) return false;
-      if (this.money < pack.cost) {
-        this.addFloatingText('งบประมาณไม่พอซื้อเทียนสำรอง!', CONFIG.CANVAS_WIDTH / 2, 100, '#e63946');
-        return false;
-      }
-      this.money -= pack.cost;
-      this.candleStock += pack.boxes;
-      // If blackout is currently active, distribute candles immediately to dark houses
-      if (this.isBlackoutActive) {
-        this.houses.forEach(h => {
-          if (!h.usingCandle && this.candleStock > 0) {
-            this.candleStock--;
-            h.usingCandle = true;
-          }
-        });
-      }
-      this.addFloatingText(`🕯️ ซื้อเทียน +${pack.boxes} กล่องสำเร็จ! (สต็อก: ${this.candleStock} กล่อง)`, CONFIG.CANVAS_WIDTH / 2, 100, '#ffd166');
-      if (global.POWATER.soundManager) global.POWATER.soundManager.playUpgrade();
-      return true;
-    }
-
-    useEmergencyFloodPump() {
-      const cost = (CONFIG.SPECIAL_ITEMS && CONFIG.SPECIAL_ITEMS.FLOOD_PUMP && CONFIG.SPECIAL_ITEMS.FLOOD_PUMP.cost) || 500;
-      if (this.floodPumpsOwned > 0) {
-        this.floodPumpsOwned--;
-        this.isFloodActive = false;
-        this.floodTimer = 0.0;
-        this.addFloatingText('🌊 สูบน้ำท่วมออกจากเมืองสำเร็จด้วยเครื่องสูบน้ำสำรอง!', CONFIG.CANVAS_WIDTH / 2, 100, '#06d6a0');
-        if (global.POWATER.soundManager) global.POWATER.soundManager.playWin();
-        return true;
-      }
+    // testDisaster: costs $50 from the Disaster Simulation Lab (v1.0.4.0)
+    testDisaster(disasterType) {
+      const cost = (typeof CONFIG.DISASTER_TEST_COST === 'number') ? CONFIG.DISASTER_TEST_COST : 50;
       if (this.money < cost) {
-        this.addFloatingText(`งบประมาณไม่พอซื้อเครื่องสูบน้ำฉุกเฉิน ($${cost})!`, CONFIG.CANVAS_WIDTH / 2, 100, '#e63946');
+        this.addFloatingText(`งบประมาณไม่พอสำหรับการทดสอบภัยพิบัติ! (ต้องการ $${cost})`, CONFIG.CANVAS_WIDTH / 2, 100, '#e63946');
         return false;
       }
       this.money -= cost;
-      if (this.isFloodActive) {
-        this.isFloodActive = false;
-        this.floodTimer = 0.0;
-        this.addFloatingText('🌊 ใช้เครื่องสูบน้ำฉุกเฉิน (500 EUR) สูบน้ำท่วมสำเร็จทันที!', CONFIG.CANVAS_WIDTH / 2, 100, '#06d6a0');
-        if (global.POWATER.soundManager) global.POWATER.soundManager.playWin();
-      } else {
-        this.floodPumpsOwned++;
-        this.addFloatingText(`🛟 ซื้อเครื่องสูบน้ำฉุกเฉินสำรองไว้แล้ว (${this.floodPumpsOwned} เครื่อง)`, CONFIG.CANVAS_WIDTH / 2, 100, '#06d6a0');
-        if (global.POWATER.soundManager) global.POWATER.soundManager.playUpgrade();
-      }
+      this.addFloatingText(`🧪 ใช้งบทดสอบภัยพิบัติ -$${cost} (งบวิจัยและทดสอบ)`, CONFIG.CANVAS_WIDTH / 2, 65, '#ffd166');
+      if (disasterType === 'tide') this.triggerHighTide();
+      else if (disasterType === 'quake') this.triggerEarthquake();
+      else if (disasterType === 'blackout') this.triggerRomeBlackout();
+      else if (disasterType === 'flood') this.triggerAmsterdamFlood();
       return true;
     }
 
@@ -1011,32 +960,6 @@
       this.addFloatingText(repCost > 0 ? `🔧 ซ่อมแซมสำเร็จ! (-$${repCost})` : '🔧 ซ่อมแซมสำเร็จ!', c.x, c.y - 25, '#06d6a0');
       if (global.POWATER.soundManager) global.POWATER.soundManager.playUpgrade();
       return true;
-    }
-
-    repairAllBroken() {
-      const broken = this.buildings.filter(b => b.isBroken);
-      if (broken.length === 0) {
-        this.addFloatingText('✅ อุปกรณ์ทุกเครื่องทำงานปกติ ไม่มีจุดที่ต้องซ่อม', CONFIG.CANVAS_WIDTH / 2, 100, '#06d6a0');
-        return 0;
-      }
-      const repCost = this.getRepairCost();
-      const totalRepCost = repCost * broken.length;
-      if (totalRepCost > 0 && this.money < totalRepCost) {
-        this.addFloatingText(`งบไม่พอซ่อมทั้งหมด! (ต้องการ $${totalRepCost})`, CONFIG.CANVAS_WIDTH / 2, 100, '#e63946');
-        return 0;
-      }
-      if (totalRepCost > 0) this.money -= totalRepCost;
-      broken.forEach(b => b.repair());
-      this.addFloatingText(
-        totalRepCost > 0
-          ? `🔧 ซ่อมแซมอุปกรณ์ทั้งหมด ${broken.length} แห่งเรียบร้อย! (-$${totalRepCost})`
-          : `🔧 ซ่อมแซมอุปกรณ์ทั้งหมด ${broken.length} แห่งเรียบร้อย!`,
-        CONFIG.CANVAS_WIDTH / 2,
-        100,
-        '#06d6a0'
-      );
-      if (global.POWATER.soundManager) global.POWATER.soundManager.playUpgrade();
-      return broken.length;
     }
 
     simulateNetwork() {
@@ -1063,11 +986,9 @@
         this.simulateTypeNetwork(type);
       });
 
-      // Rome Blackout override: if Blackout is active, only houses with a Candle keep power!
+      // Rome Blackout override: if Blackout is active, all power is cut (Win Timer pauses)
       if (this.isBlackoutActive) {
-        this.houses.forEach(h => {
-          h.hasPower = Boolean(h.usingCandle);
-        });
+        this.houses.forEach(h => { h.hasPower = false; });
       }
 
       // 2. Houses that consume clean water produce wastewater
@@ -1362,9 +1283,9 @@
       this.createBuilding(typeKey, x, y);
 
       // Easter Egg / Mini-Achievement: SDG 15 Life on Land trigger on Eco Filter or clean plant
-      if (!this.sdg15Unlocked && (buildCfg.type === 'air_filter' || (buildCfg.clean && typeKey.toLowerCase().includes('solar')))) {
+      if (!this.sdg15Unlocked && buildCfg.type === 'air_filter') {
         this.sdg15Unlocked = true;
-        this.addFloatingText('🌱 Easter Egg: ปลดล็อก SDG 15 Life on Land ในหน้าต่าง SDGs!', CONFIG.CANVAS_WIDTH / 2, 70, '#56ab2f');
+        this.addFloatingText('🌱 Easter Egg: ปลดล็อก SDG 15 Life on Land!', CONFIG.CANVAS_WIDTH / 2, 70, '#56ab2f');
         if (global.POWATER.soundManager) global.POWATER.soundManager.playUpgrade();
       }
 

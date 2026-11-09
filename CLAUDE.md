@@ -1,8 +1,8 @@
-# POWATER CORP. (`v1.0.3.2`) — GDevelop 5 Project Documentation (`GEMINI.md`)
+# POWATER CORP. (`v1.0.4.2`) — GDevelop 5 Project Documentation (`CLAUDE.md`)
 
 > **Team Green Gang**: Sukrit Limpakanon, Aristt Mahakitsiri, Gantinan Satjariyakul  
 > **Engine**: GDevelop 5 (`POWATER CROPS..json`) + Real PNG Sprite Assets + PixiJS Procedural River/Conduit Rendering  
-> **Version Naming**: `1.x.y.z` (`x` = Major Version, `y` = Small Addition Within Major Version, `z` = Bug Fixes) — Current: **`v1.0.3.2`**
+> **Version Naming**: `1.x.y.z` (`x` = Major Version, `y` = Small Addition Within Major Version, `z` = Bug Fixes) — Current: **`v1.0.4.2`**
 
 ---
 
@@ -16,7 +16,7 @@
   - **Core Philosophy**: *"ทุกการตัดสินใจมีต้นทุน ทุกโครงการมีผลกระทบต่อสิ่งแวดล้อม และทุกความผิดพลาดส่งผลต่อคุณภาพชีวิตของประชาชน เป้าหมายสูงสุดไม่ใช่การสร้างเมืองที่ใหญ่ที่สุด แต่คือการสร้างเมืองที่สามารถเติบโตได้อย่างยั่งยืน"*
 - **Connection with UN SDGs**:
   - **SDG 6 (Clean Water and Sanitation)**: การจัดการน้ำสะอาดและระบบสุขาภิบาล เพื่อให้ประชาชนทุกครัวเรือนเข้าถึงน้ำที่มีคุณภาพ โดยสูบน้ำสะอาดริมแม่น้ำและบำบัดน้ำเสียริมตลิ่ง
-  - **SDG 7 (Affordable and Clean Energy)**: การส่งเสริมพลังงานสะอาดและการเข้าถึงไฟฟ้าอย่างทั่วถึง โดยเน้นการใช้พลังงานหมุนเวียน เช่น **Solar Cell** เพื่อลดมลพิษเป็นศูนย์
+  - **SDG 7 (Affordable and Clean Energy)**: การส่งเสริมพลังงานสะอาดและการเข้าถึงไฟฟ้าอย่างทั่วถึง และลดมลภาวะด้วย **Eco Filter (เครื่องกรองอากาศ)**
   - **SDG 15 (Life on Land) — 🌱 Easter Egg & Mini-Achievement**: การอนุรักษ์ป่าไม้และระบบนิเวศบนบก ลดผลกระทบจากการขยายตัวของเมือง และรักษาสมดุลระหว่างการพัฒนาเมืองกับธรรมชาติ ออกแบบเป็น **Easter Egg / เรื่องสั้นบันทึกผู้ว่าฯ (Mayor's Forest Chronicle)** และ Mini-Achievement เมื่อผู้ว่าฯ ควบคุมมลภาวะให้บริสุทธิ์หรือติดตั้ง Eco Filter โดยไม่ต้องเพิ่มฟีเจอร์เครื่องมือใหม่
 
 ---
@@ -31,7 +31,6 @@
 ### 💀 Lose Conditions
 1. **Citizen Complaints**: Reaching the level's maximum complaint limit (`3` strikes in Bangkok, Tokyo, and Rome; **`1` strike = Instant Game Over** in Amsterdam).
 2. **Pollution Limit**: City pollution reaches or exceeds the level's maximum threshold.
-3. **Flood Timeout (Amsterdam)**: Failing to drain a major flood within **2 minutes (`120s`)**.
 
 ### 💰 Economy System
 - **Instant House Completion Bonus**: Completing a house's utility connections awards **`+$50` immediately**.
@@ -40,26 +39,26 @@
 ### 🔧 New `v1.0.0.0` Systems
 1. **Repair System**:
    - Every **2 minutes (`120s`)**, active pumps and generators have a **30% chance** to break down (`isBroken = true`), displaying a flashing red ring and the `badge_repair.png` wrench icon.
-   - Players can repair broken equipment by clicking directly on the broken building, clicking the **`REPAIR` (`btn_repair.png`)** toolbar button, or pressing `[R]`.
+   - Players repair **one building at a time**: click the broken building directly, or select the **`REPAIR` (`btn_repair.png`)** tool / press `[R]` and click it. There is no repair-all.
 2. **Day/Night Cycle**:
    - **Day: 1 minute (`60s`)** | **Night: 1 minute (`60s`)**.
-   - Features smooth ambient night lighting (`nightAlpha`), warm glowing window halos around powered/candle-lit houses, and dynamic `icon_day.png` / `icon_night.png` HUD indicators.
+   - Features smooth ambient night lighting (`nightAlpha`), warm glowing window halos around powered houses, and dynamic `icon_day.png` / `icon_night.png` HUD indicators.
 3. **Map Upsize System**:
    - Every **`x + 10` houses** (`10`, `20`, `30`), the city triggers a **Map Upsize** (`upsizeTier` 1–3), expanding playable spawn bounds and scaling footprints until capped at **40 houses maximum (`จนตันที่ 40 หลัง`)**.
 4. **Fast Interactive Scene Tutorial (`Tutorial` Scene) & Feature Video Demos (`v1.0.2.0`)**:
    - **Fast 60-Second Scene Tutorial**: Accessible via the dedicated GDevelop `Tutorial` scene or the `🎓 Fast Tutorial (60s)` button in the Level Select modal. Guides players step-by-step through wiring Power, Water, and Sewage (awarding `+$50`) and repairing a broken pump with `[R]` or click-to-repair, complete with animated Manhattan guide paths and an `⏭️ Auto-Step` button.
-   - **Clickable `[▶]` Video Icons Above Every Feature Button**: Each feature button on the bottom toolbar (`Power`, `Water`, `Sewage`, `Solar`, `Eco Filter`, `Repair`, `Special Items`, `Upgrades`, `SDGs`, `Guide`) has a clickable `icon_video_help.png` (`[▶]`) sprite badge directly above it (`y = 626`). Clicking any `[▶]` icon opens an interactive 60 FPS looping video preview demonstrating how that feature works, with play/pause controls, scrubber bar, and a **`⚡ Use This Feature Now`** button to immediately activate it.
+   - **Clickable `[▶]` Video Icons Above Every Feature Button**: Each feature button on the bottom toolbar (`Power`, `Water`, `Sewage`, `Eco Filter`, `Repair`, `Test Lab`, `Upgrades`, `Guide`) has a clickable `icon_video_help.png` (`[▶]`) sprite badge directly above it (`y = 626`). Clicking any `[▶]` icon opens an interactive 60 FPS looping video preview demonstrating how that feature works, with play/pause controls, scrubber bar, and a **`⚡ Use This Feature Now`** button to immediately activate it.
 
 ---
 
 ## 3. The 4 Levels & City Challenges (`POWATER CORP.`)
 
-| Level | Scene Name | Positive Condition `(+)` | Negative / Extreme Weather `(-)` | City Challenge (`บริบทความท้าทาย`) | Special Item |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| **1. Bangkok** | `Main` | `(0)` None — First Level & Tutorial | **High Tide (`น้ำขึ้น`)**: Every 15 in-game days, river levels surge and riverside equipment requires frequent repair | **ปัญหาน้ำท่วมและระดับน้ำที่เปลี่ยนแปลง** | Standard Repair (`[R]`) |
-| **2. Tokyo** | `Tokyo` | **Clean Energy `-25%` Cost**: Solar Cell (`$45`) & Eco Filter (`$30`) subsidized by government | **Earthquake (`แผ่นดินไหว`)**: `10–15%` chance every 1 min after Protecting Time (`+5%/min` after 3 min without quake; guaranteed at 5 min, then `+5%/min` thereafter). Breaks all water & electric pumps! | **เตรียมรับมือแผ่นดินไหวและความเสียหายของโครงสร้างพื้นฐาน** | Mass Repair (`[R]`) |
-| **3. Rome** | `Rome` | **Unlimited Aqueducts**: Unlimited house-to-house water pipe chaining capacity | **Blackout (`ไฟดับ`)**: `12.5%` chance every 15 in-game days | **บริหารระบบสาธารณูปโภคที่มีข้อจำกัดความต่อเนื่องของพลังงาน** | **Candle (`เทียนไข`)**: Bulk Restock (`20€`, `50€`, `100€`, `500€` at `10 EUR/box`). Consumes 1 box/house per blackout |
-| **4. Amsterdam** | `Amsterdam` | **Infrastructure `-5%` Cost** & **House Spawning `20%` Slower** | **Zero Complaint Tolerance (`1 Complaint = Instant Game Over`)** + Earthquake + High Tide + **Main Flood every 4 weeks (`28 days`)** (`>2 min` = Game Over) | **รักษาสมดุลของระบบเมืองที่พัฒนาจนเกือบเต็มศักยภาพ พร้อมรับมือภัยพิบัติ** | **Emergency Flood Pump (`เครื่องสูบน้ำ`)**: `500 EUR`, One-Time Use to drain flood immediately |
+| Level | Scene Name | Positive Condition `(+)` | Negative / Extreme Weather `(-)` | City Challenge (`บริบทความท้าทาย`) |
+| :--- | :--- | :--- | :--- | :--- |
+| **1. Bangkok** | `Main` | `(0)` None — First Level & Tutorial | **High Tide (`น้ำขึ้น`)**: Every 15 in-game days, river levels surge and riverside equipment requires frequent repair | **ปัญหาน้ำท่วมและระดับน้ำที่เปลี่ยนแปลง** |
+| **2. Tokyo** | `Tokyo` | **Clean Energy `-25%` Cost**: Eco Filter (`$30`) subsidized by government | **Earthquake (`แผ่นดินไหว`)**: `10–15%` chance every 1 min after Protecting Time (`+5%/min` after 3 min without quake; guaranteed at 5 min, then `+5%/min` thereafter). Breaks all water & electric pumps! | **เตรียมรับมือแผ่นดินไหวและความเสียหายของโครงสร้างพื้นฐาน** |
+| **3. Rome** | `Rome` | **Unlimited Aqueducts**: Unlimited house-to-house water pipe chaining capacity | **Blackout (`ไฟดับ`)**: `12.5%` chance every 15 in-game days — all houses lose power (Win Timer pauses) | **บริหารระบบสาธารณูปโภคที่มีข้อจำกัดความต่อเนื่องของพลังงาน** |
+| **4. Amsterdam** | `Amsterdam` | **Infrastructure `-5%` Cost** & **House Spawning `20%` Slower** | **Zero Complaint Tolerance (`1 Complaint = Instant Game Over`)** + Earthquake + High Tide + **Main Flood every 4 weeks (`28 days`)** (recedes after `120s`, Win Timer pauses) | **รักษาสมดุลของระบบเมืองที่พัฒนาจนเกือบเต็มศักยภาพ พร้อมรับมือภัยพิบัติ** |
 
 ---
 
@@ -68,15 +67,15 @@
 All buildings, houses, rivers, HUD bars, toolbar docks, buttons, and status badges use **real PNG assets** registered as GDevelop Sprite Objects in `POWATER CROPS..json`, combined with smooth PixiJS procedural water ripples, conduit energy flow pulses, and Day/Night lighting:
 
 - **World & Entities (`assets/`)**:
-  - `House.png`, `Power.png` (Electricity Generator), `Solar.png` (Solar Cell), `Blue barrel.png` (Water Pump), `Orange barrel.png` (Wastewater Dump/Filter), `AirFilter.png` (River/Eco Filter)
+  - `House.png`, `Power.png` (Electricity Generator), `Blue barrel.png` (Water Pump), `Orange barrel.png` (Wastewater Dump/Filter), `AirFilter.png` (River/Eco Filter)
 - **Level Rivers (`assets/`)**:
   - `river.png` (Chao Phraya River — Bangkok), `river_tokyo.png` (Sumida River — Tokyo), `river_rome.png` (Tiber River — Rome), `river_amsterdam.png` (Amstel Canal — Amsterdam)
 - **Status Badges & Icons (`assets/`)**:
-  - `badge_power.png`, `badge_water.png`, `badge_drain.png`, `badge_repair.png` (Broken Equipment Wrench), `badge_candle.png` (Rome Blackout Candle), `icon_day.png`, `icon_night.png`, `logo_powater.png`
+  - `badge_power.png`, `badge_water.png`, `badge_drain.png`, `badge_repair.png` (Broken Equipment Wrench), `icon_day.png`, `icon_night.png`, `logo_powater.png`
 - **Toolbar & HUD Sprites (`assets/`)**:
-  - `grid_bg.png` (`1280x720`), `hud_bar.png` (`1280x44`), `toolbar_dock.png` (`880x56`)
-  - 12 Toolbar Buttons: `btn_power.png`, `btn_water.png`, `btn_drain.png`, `btn_solar.png`, `btn_filter.png`, `btn_repair.png`, `btn_special.png`, `btn_pause.png`, `btn_speed.png`, `btn_upgrade.png`, `btn_sdgs.png`, `btn_guide.png`
-  - 10 Feature Video Demo Icons above toolbar buttons: `icon_video_help.png` (`btn_video_help` sprite object, `48x32`)
+  - `grid_bg.png` (`1280x720`), `hud_bar.png` (`1280x44`), `toolbar_dock.png` (`692x56`, centered, no dividers)
+  - 10 Toolbar Buttons (64px wide, 4px gaps, x = `302 + 68*i`): `btn_power.png`, `btn_water.png`, `btn_drain.png`, `btn_filter.png`, `btn_repair.png`, `btn_special.png` (Disaster Test Lab), `btn_pause.png`, `btn_speed.png`, `btn_upgrade.png`, `btn_guide.png`
+  - 8 Feature Video Demo Icons above toolbar buttons: `icon_video_help.png` (`btn_video_help` sprite object, `48x32`)
 
 ---
 
@@ -84,13 +83,13 @@ All buildings, houses, rivers, HUD bars, toolbar docks, buttons, and status badg
 
 - `POWATER CROPS..json`: Main GDevelop 5 project file containing all 5 scene layouts (`Main`, `Tutorial`, `Tokyo`, `Rome`, `Amsterdam`), sprite objects, visual event groups, and compiled JS engine bridge.
 - `config/`: Dedicated configuration folder in the project root:
-  - `config/global.json`: Global configuration for all stages, including `featureCosts` (building costs & capacities, wire/pipe connection costs, river crossing extra cost, demolish refund ratio, repair cost per building, Rome candle packs & Amsterdam emergency flood pump costs, and upgrade base costs/multipliers), `globalRules`, `pollutionRates`, and `disasters`.
+  - `config/global.json`: Global configuration for all stages, including `featureCosts` (building costs & capacities, wire/pipe connection costs, river crossing extra cost, demolish refund ratio, repair cost per building, `disasterTesting.testCost` (Disaster Test Lab, `$50`/test), and upgrade base costs/multipliers), `globalRules`, `pollutionRates`, and `disasters`.
   - `config/tutorial.json`, `config/bangkok.json`, `config/tokyo.json`, `config/rome.json`, `config/amsterdam.json`: Individual per-stage configuration files controlling `startingBudget`, `houseSpawnIntervalSeconds`, `pollutionMultiplier`, `maxPollution`, `maxComplaints`, `winRequiredHouses`, `winHoldDurationSeconds`, `maxHousesCap`, discounts, disaster flags, and optional `featureCostOverrides`.
-- `scripts/config.js`: Game constants, `POWATER.applyStageConfig()` loader, `v1.0.0.0` level definitions, disaster rules, special item packs, upgrades, and `v1.1–v1.4` feature roadmap.
+- `scripts/config.js`: Game constants, `POWATER.applyStageConfig()` loader, `v1.0.0.0` level definitions, disaster rules, upgrades, and `v1.1–v1.4` feature roadmap.
 - `scripts/map.js`: River spline geometry, shoreline proximity checks, animated water current droplets, High Tide surge, and Amsterdam Flood rising water overlay.
-- `scripts/entities.js`: `HouseEntity` (needs, completion bonus tracking, Rome candle badge), `BuildingEntity` (breakdown/repair states & wrench badge), and `ConnectionEntity` (animated flow conduits).
+- `scripts/entities.js`: `HouseEntity` (needs, completion bonus tracking), `BuildingEntity` (breakdown/repair states & wrench badge), and `ConnectionEntity` (animated flow conduits).
 - `scripts/engine.js`: BFS utility propagation, economy (`+$50` completion & `+$40/week`), 5-minute Win Timer (with Pause & Reset rules), Repair timer, Day/Night cycle, Map Upsize (up to 40 houses), and Extreme Weather disasters.
-- `scripts/ui.js`: Top HUD telemetry, 12-button PNG toolbar interaction, Level Selection & Briefing modal, Special Items & Disaster Control modal (`ITEMS`), Upgrades modal, and SDGs/Roadmap modal.
+- `scripts/ui.js`: Top HUD telemetry, 12-button PNG toolbar interaction, Level Selection & Briefing modal, paid Disaster Test Lab modal (`TEST [I]`), Upgrades modal, and SDGs/Roadmap modal.
 - `scripts/main.js`: GDevelop `runtimeScene` lifecycle controller, PixiJS dual-layer renderer, click-to-repair, drag-to-wire, keyboard shortcuts, Day/Night overlay, and Earthquake camera shake.
 - `scripts/generate_assets.py`: Pure-Python RGBA PNG generator for creating and updating game sprites.
 - `scripts/sync_project.py`: Bundles all modular scripts in `scripts/` and synchronizes objects, resources, and all 4 scene layouts into `POWATER CROPS..json`.
@@ -108,6 +107,15 @@ All buildings, houses, rivers, HUD bars, toolbar docks, buttons, and status badg
 
 ## 7. Changelog
 
+- **`v1.0.4.2` (2026-11-10)**:
+  - Removed the **SDGs** toolbar button (and its `[▶]` video icon).
+  - Toolbar re-laid out as one evenly spaced, centered row (10 buttons, 4px gaps); `toolbar_dock.png` regenerated at `692x56` without the old section dividers.
+- **`v1.0.4.1` (2026-11-10)**:
+  - Renamed project docs `GEMINI.md` → `CLAUDE.md`.
+  - **Removed all items**: Rome Candles (bulk restock + candle badge) and Amsterdam Emergency Flood Pump. Rome blackout now cuts power to every house; Amsterdam flood recedes after `120s` (pauses Win Timer, no longer Game Over).
+  - **Removed Repair-All**: `REPAIR` button / `[R]` now only selects the per-building repair tool; broken buildings are fixed one click at a time.
+  - **Removed Solar Cell** (toolbar button, `[4]` hotkey, video demo, scene sprites). Eco Filter (`AirFilter`) kept and moved to hotkey `[4]`. Tokyo's starting decorative solar sprite replaced with a working generator.
+  - `ITEMS` toolbar button → **`TEST [I] LAB` (Disaster Test Lab)**: every disaster test (tide / quake / blackout / flood) costs `$50` via `game.testDisaster()` (`config/global.json` → `featureCosts.disasterTesting.testCost`); refused when the budget is short.
 - **`v1.0.3.2` (2026-11-09)**:
   - Integrated Core Concept & World Background ("The Urban Sustainability Crisis"):
     - Updated Player Role to **Mayor of the City (นายกเทศมนตรี / ผู้บริหารสูงสุดของเมือง)** with **Amigo TheGOATHimself** as Chief Environmental & Infrastructure Consultant.

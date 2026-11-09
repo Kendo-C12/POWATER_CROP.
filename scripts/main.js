@@ -46,9 +46,8 @@
         if (key === '1') this.ui.selectTool('power');
         else if (key === '2') this.ui.selectTool('water');
         else if (key === '3') this.ui.selectTool('sewage');
-        else if (key === '4') this.ui.selectTool('build_solar');
-        else if (key === '5') this.ui.selectTool('build_air_filter');
-        else if (key === 'r') this.game.repairAllBroken();
+        else if (key === '4') this.ui.selectTool('build_air_filter');
+        else if (key === 'r') this.ui.selectTool('repair');
         else if (key === 'i') this.ui.showSpecialItemsModal();
         else if (key === 'u') this.ui.showUpgradesModal();
         else if (key === ' ') this.game.togglePause();
@@ -236,7 +235,7 @@
             this.pixiGfxOverlay = gfxOverlay;
             runtimeScene._powaterPixiGfxOverlay = gfxOverlay;
 
-            // Layer 2.5: Utility, Candle & Repair PNG Badges (Z=7)
+            // Layer 2.5: Utility & Repair PNG Badges (Z=7)
             const badgeContainer = new PIXI.Container();
             if (renderer.addRendererObject) {
               renderer.addRendererObject(badgeContainer, 7);
@@ -346,8 +345,6 @@
           if (hitNode && hitNode.isBuilding) {
             if (hitNode.isBroken) this.game.repairBuilding(hitNode);
             else this.game.addFloatingText('✅ อุปกรณ์ทำงานปกติ ไม่ต้องซ่อม', hitNode.getCenter().x, hitNode.getCenter().y - 20, '#06d6a0');
-          } else {
-            this.game.repairAllBroken();
           }
           this.ui.updateHUD();
         }
@@ -394,10 +391,9 @@
           this.dragStartNode = null;
           this.isDragging = false;
 
-          if (this.game.activeTool && (this.game.activeTool.startsWith('build_') || this.game.activeTool === 'solar' || this.game.activeTool === 'air_filter')) {
+          if (this.game.activeTool && (this.game.activeTool.startsWith('build_') || this.game.activeTool === 'air_filter')) {
             let typeKey = '';
             if (this.game.activeTool === 'build_gen') typeKey = 'generator_coal';
-            else if (this.game.activeTool === 'build_solar' || this.game.activeTool === 'solar') typeKey = 'generator_solar';
             else if (this.game.activeTool === 'build_pump') typeKey = 'water_pump';
             else if (this.game.activeTool === 'build_filter') typeKey = 'waste_filter';
             else if (this.game.activeTool === 'build_air_filter' || this.game.activeTool === 'air_filter') typeKey = 'air_filter';
@@ -502,9 +498,9 @@
 
         // Warm night light halos around powered houses & candle-lit houses
         this.game.houses.forEach(h => {
-          if (h.hasPower || h.usingCandle) {
+          if (h.hasPower) {
             const hc = h.getCenter();
-            const haloCol = h.usingCandle ? 0xff9f1c : 0xffd166;
+            const haloCol = 0xffd166;
             gfxO.beginFill(haloCol, this.game.nightAlpha * 0.45);
             gfxO.drawCircle(hc.x, hc.y, 58);
             gfxO.endFill();

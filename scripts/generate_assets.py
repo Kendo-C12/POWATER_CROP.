@@ -383,8 +383,8 @@ def generate_logo_powater():
 
 
 def generate_toolbar_dock():
-    """Generates toolbar_dock.png (880x56) rounded dock tray with section dividers."""
-    w, h = 880, 56
+    """Generates toolbar_dock.png (692x56) rounded dock tray behind 10 evenly spaced buttons."""
+    w, h = 692, 56
     buf = bytearray(w * h * 4)
     radius = 12.0
     for y in range(h):
@@ -396,13 +396,12 @@ def generate_toolbar_dock():
                 cov = min(1.0, max(0.0, radius + 0.5 - dist))
                 idx = (y * w + x) * 4
                 is_border = (dist >= radius - 2.0) or (x < 2) or (x >= w - 2) or (y < 2) or (y >= h - 2)
-                is_divider = (8 <= y <= h - 9) and (x in (218, 434, 580))
-                if is_border or is_divider:
+                if is_border:
                     buf[idx:idx + 4] = bytes((72, 202, 228, int(190 * cov)))
                 else:
                     buf[idx:idx + 4] = bytes((24, 20, 44, int(238 * cov)))
     write_png(os.path.join(ASSETS_DIR, 'toolbar_dock.png'), w, h, buf)
-    print('Generated toolbar_dock.png (880x56)')
+    print('Generated toolbar_dock.png (692x56)')
 
 
 def generate_video_help_icon():

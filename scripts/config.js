@@ -1,4 +1,4 @@
-// POWATER CORP. v1.0.0.0 - Configuration, Levels, Disasters, Special Items, Upgrades & SDG Data
+// POWATER CORP. v1.0.0.0 - Configuration, Levels, Disasters, Disaster Test Lab, Upgrades & SDG Data
 // Implements full specifications from "POWATER IDEA PITCH.pdf" & "POWATER CORP.pdf" (b1.5 -> v1.0 Upgrade)
 
 (function (global) {
@@ -298,7 +298,7 @@
         title: '🎬 วิดีโอสาธิต: ศูนย์จำลองและทดสอบภัยพิบัติ (Disaster Simulation Lab)',
         subtitle: 'ใช้งบประมาณเทศบาล ($50 / ครั้ง) จำลองสภาพอากาศสุดขั้วเพื่อทดสอบระบบเมือง',
         steps: [
-          '1. คลิกปุ่ม DISASTER [I] ด้านล่างเพื่อเปิดศูนย์จำลองและทดสอบภัยพิบัติ',
+          '1. คลิกปุ่ม TEST [I] ด้านล่างเพื่อเปิดศูนย์จำลองและทดสอบภัยพิบัติ',
           '2. เลือกระบบทดสอบน้ำขึ้น แผ่นดินไหว ไฟดับ หรือน้ำท่วม โดยมีค่าทดสอบครั้งละ $50',
           '3. สังเกตจุดที่โครงข่ายน้ำและไฟอาจชำรุด เพื่อวางแผนรับมือภัยพิบัติจริงได้อย่างแม่นยำ!'
         ],
@@ -516,8 +516,8 @@
     DISASTERS: {
       HIGH_TIDE: { everyNDays: 15, durationSeconds: 25.0, riversideBreakChance: 0.50 },
       EARTHQUAKE: { checkEverySeconds: 60.0, baseChance: 0.125, escalateAfterMinutes: 3, escalateBonusPerMinute: 0.05, guaranteedAtMinute: 5 },
-      BLACKOUT: { everyNDays: 15, chance: 0.125, durationSeconds: 25.0, startingCandlesRome: 5, candleBoxUnitPrice: 10 },
-      FLOOD: { everyNDays: 28, maxDurationSecondsBeforeGameOver: 120.0, emergencyPumpCost: 500 }
+      BLACKOUT: { everyNDays: 15, chance: 0.125, durationSeconds: 25.0 },
+      FLOOD: { everyNDays: 28, maxDurationSecondsBeforeGameOver: 120.0 }
     },
     DAY_DURATION_IN_GAME_SECONDS: 15.0,
     WEEKLY_BASE_GRANT: 40,
@@ -631,7 +631,6 @@
       }
       const mapBld = [
         ['generatorCoal', 'GENERATOR_COAL'],
-        ['generatorSolar', 'GENERATOR_SOLAR'],
         ['waterPump', 'WATER_PUMP'],
         ['wasteFilter', 'WASTE_FILTER'],
         ['airFilter', 'AIR_FILTER']
@@ -694,18 +693,8 @@
     if (dis && typeof dis === 'object') {
       if (dis.highTide) Object.assign(CONFIG.DISASTERS.HIGH_TIDE, dis.highTide);
       if (dis.earthquake) Object.assign(CONFIG.DISASTERS.EARTHQUAKE, dis.earthquake);
-      if (dis.blackout) {
-        Object.assign(CONFIG.DISASTERS.BLACKOUT, dis.blackout);
-        if (typeof dis.blackout.candleBoxUnitPrice === 'number' && CONFIG.SPECIAL_ITEMS) {
-          CONFIG.SPECIAL_ITEMS.CANDLE_BOX_UNIT_PRICE = dis.blackout.candleBoxUnitPrice;
-        }
-      }
-      if (dis.flood) {
-        Object.assign(CONFIG.DISASTERS.FLOOD, dis.flood);
-        if (typeof dis.flood.emergencyPumpCost === 'number' && CONFIG.SPECIAL_ITEMS && CONFIG.SPECIAL_ITEMS.FLOOD_PUMP) {
-          CONFIG.SPECIAL_ITEMS.FLOOD_PUMP.cost = dis.flood.emergencyPumpCost;
-        }
-      }
+      if (dis.blackout) Object.assign(CONFIG.DISASTERS.BLACKOUT, dis.blackout);
+      if (dis.flood) Object.assign(CONFIG.DISASTERS.FLOOD, dis.flood);
     }
 
     // 5. Per-Stage Configurations

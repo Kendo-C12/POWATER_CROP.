@@ -256,7 +256,7 @@ def create_event_sheet(level_title):
                 {
                     'type': 'BuiltinCommonInstructions::Comment',
                     'color': {'b': 255, 'g': 215, 'r': 230, 'textB': 0, 'textG': 0, 'textR': 0},
-                    'comment': 'POWATER CORP. v1.0.0.0 Engine Bridge: Multi-utility wiring, Repair system, Day/Night cycle, Map Upsize (max 40 houses), 5-7 min Win Timer, Special Items (Candles & Flood Pump), and HUD.'
+                    'comment': 'POWATER CORP. v1.0.0.0 Engine Bridge: Multi-utility wiring, Repair system, Day/Night cycle, Map Upsize (max 40 houses), 5-7 min Win Timer, paid Disaster Test Lab, and HUD.'
                 },
                 {
                     'disabled': False,
@@ -356,7 +356,7 @@ def build_layout_objects(river_image='river.png', river_w=280, river_h=720):
         ('btn_guide', 'btn_guide.png', 256, 192),
         ('grid_bg', 'grid_bg.png', 1280, 720),
         ('hud_bar', 'hud_bar.png', 1280, 44),
-        ('toolbar_dock', 'toolbar_dock.png', 880, 56),
+        ('toolbar_dock', 'toolbar_dock.png', 692, 56),
         ('logo_powater', 'logo_powater.png', 128, 128),
         ('icon_day', 'icon_day.png', 128, 128),
         ('icon_night', 'icon_night.png', 128, 128),
@@ -387,36 +387,32 @@ def make_base_instances():
             'name': 'hud_bar', 'persistentUuid': 'inst-hud-bar', 'width': 1280, 'x': 0, 'y': 0, 'zOrder': 8,
             'numberProperties': [], 'stringProperties': [], 'initialVariables': []
         },
-        # Sleek Rounded Toolbar Dock Tray behind 12 buttons (880x56)
+        # Sleek Rounded Toolbar Dock Tray behind 10 buttons (692x56)
         {
             'angle': 0, 'customSize': True, 'height': 56, 'layer': '', 'locked': False,
-            'name': 'toolbar_dock', 'persistentUuid': 'inst-toolbar-dock', 'width': 880, 'x': 200, 'y': 654, 'zOrder': 8,
+            'name': 'toolbar_dock', 'persistentUuid': 'inst-toolbar-dock', 'width': 692, 'x': 294, 'y': 654, 'zOrder': 8,
             'numberProperties': [], 'stringProperties': [], 'initialVariables': []
         },
         # 12 Toolbar Button PNG Sprites (Aligned along bottom dock tray)
-        { 'name': 'btn_power', 'x': 208, 'y': 658, 'width': 64, 'height': 48, 'zOrder': 10, 'persistentUuid': 'inst-btn-power', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
-        { 'name': 'btn_water', 'x': 276, 'y': 658, 'width': 64, 'height': 48, 'zOrder': 10, 'persistentUuid': 'inst-btn-water', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
-        { 'name': 'btn_drain', 'x': 344, 'y': 658, 'width': 64, 'height': 48, 'zOrder': 10, 'persistentUuid': 'inst-btn-drain', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
-        { 'name': 'btn_solar', 'x': 420, 'y': 658, 'width': 64, 'height': 48, 'zOrder': 10, 'persistentUuid': 'inst-btn-solar', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
-        { 'name': 'btn_filter', 'x': 488, 'y': 658, 'width': 64, 'height': 48, 'zOrder': 10, 'persistentUuid': 'inst-btn-filter', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
-        { 'name': 'btn_repair', 'x': 556, 'y': 658, 'width': 64, 'height': 48, 'zOrder': 10, 'persistentUuid': 'inst-btn-repair', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
-        { 'name': 'btn_special', 'x': 624, 'y': 658, 'width': 64, 'height': 48, 'zOrder': 10, 'persistentUuid': 'inst-btn-special', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
-        { 'name': 'btn_pause', 'x': 700, 'y': 658, 'width': 64, 'height': 48, 'zOrder': 10, 'persistentUuid': 'inst-btn-pause', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
-        { 'name': 'btn_speed', 'x': 768, 'y': 658, 'width': 64, 'height': 48, 'zOrder': 10, 'persistentUuid': 'inst-btn-speed', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
-        { 'name': 'btn_upgrade', 'x': 844, 'y': 658, 'width': 64, 'height': 48, 'zOrder': 10, 'persistentUuid': 'inst-btn-upgrade', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
-        { 'name': 'btn_sdgs', 'x': 912, 'y': 658, 'width': 64, 'height': 48, 'zOrder': 10, 'persistentUuid': 'inst-btn-sdgs', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
-        { 'name': 'btn_guide', 'x': 980, 'y': 658, 'width': 64, 'height': 48, 'zOrder': 10, 'persistentUuid': 'inst-btn-guide', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
+        { 'name': 'btn_power', 'x': 302, 'y': 658, 'width': 64, 'height': 48, 'zOrder': 10, 'persistentUuid': 'inst-btn-power', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
+        { 'name': 'btn_water', 'x': 370, 'y': 658, 'width': 64, 'height': 48, 'zOrder': 10, 'persistentUuid': 'inst-btn-water', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
+        { 'name': 'btn_drain', 'x': 438, 'y': 658, 'width': 64, 'height': 48, 'zOrder': 10, 'persistentUuid': 'inst-btn-drain', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
+        { 'name': 'btn_filter', 'x': 506, 'y': 658, 'width': 64, 'height': 48, 'zOrder': 10, 'persistentUuid': 'inst-btn-filter', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
+        { 'name': 'btn_repair', 'x': 574, 'y': 658, 'width': 64, 'height': 48, 'zOrder': 10, 'persistentUuid': 'inst-btn-repair', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
+        { 'name': 'btn_special', 'x': 642, 'y': 658, 'width': 64, 'height': 48, 'zOrder': 10, 'persistentUuid': 'inst-btn-special', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
+        { 'name': 'btn_pause', 'x': 710, 'y': 658, 'width': 64, 'height': 48, 'zOrder': 10, 'persistentUuid': 'inst-btn-pause', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
+        { 'name': 'btn_speed', 'x': 778, 'y': 658, 'width': 64, 'height': 48, 'zOrder': 10, 'persistentUuid': 'inst-btn-speed', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
+        { 'name': 'btn_upgrade', 'x': 846, 'y': 658, 'width': 64, 'height': 48, 'zOrder': 10, 'persistentUuid': 'inst-btn-upgrade', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
+        { 'name': 'btn_guide', 'x': 914, 'y': 658, 'width': 64, 'height': 48, 'zOrder': 10, 'persistentUuid': 'inst-btn-guide', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
         # 10 Clickable Feature Video Demo Icons ([▶]) directly above each feature button
-        { 'name': 'btn_video_help', 'x': 222, 'y': 626, 'width': 36, 'height': 24, 'zOrder': 10, 'persistentUuid': 'inst-vid-power', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
-        { 'name': 'btn_video_help', 'x': 290, 'y': 626, 'width': 36, 'height': 24, 'zOrder': 10, 'persistentUuid': 'inst-vid-water', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
-        { 'name': 'btn_video_help', 'x': 358, 'y': 626, 'width': 36, 'height': 24, 'zOrder': 10, 'persistentUuid': 'inst-vid-drain', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
-        { 'name': 'btn_video_help', 'x': 434, 'y': 626, 'width': 36, 'height': 24, 'zOrder': 10, 'persistentUuid': 'inst-vid-solar', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
-        { 'name': 'btn_video_help', 'x': 502, 'y': 626, 'width': 36, 'height': 24, 'zOrder': 10, 'persistentUuid': 'inst-vid-filter', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
-        { 'name': 'btn_video_help', 'x': 570, 'y': 626, 'width': 36, 'height': 24, 'zOrder': 10, 'persistentUuid': 'inst-vid-repair', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
-        { 'name': 'btn_video_help', 'x': 638, 'y': 626, 'width': 36, 'height': 24, 'zOrder': 10, 'persistentUuid': 'inst-vid-special', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
-        { 'name': 'btn_video_help', 'x': 858, 'y': 626, 'width': 36, 'height': 24, 'zOrder': 10, 'persistentUuid': 'inst-vid-upgrade', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
-        { 'name': 'btn_video_help', 'x': 926, 'y': 626, 'width': 36, 'height': 24, 'zOrder': 10, 'persistentUuid': 'inst-vid-sdgs', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
-        { 'name': 'btn_video_help', 'x': 994, 'y': 626, 'width': 36, 'height': 24, 'zOrder': 10, 'persistentUuid': 'inst-vid-guide', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] }
+        { 'name': 'btn_video_help', 'x': 316, 'y': 626, 'width': 36, 'height': 24, 'zOrder': 10, 'persistentUuid': 'inst-vid-power', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
+        { 'name': 'btn_video_help', 'x': 384, 'y': 626, 'width': 36, 'height': 24, 'zOrder': 10, 'persistentUuid': 'inst-vid-water', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
+        { 'name': 'btn_video_help', 'x': 452, 'y': 626, 'width': 36, 'height': 24, 'zOrder': 10, 'persistentUuid': 'inst-vid-drain', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
+        { 'name': 'btn_video_help', 'x': 520, 'y': 626, 'width': 36, 'height': 24, 'zOrder': 10, 'persistentUuid': 'inst-vid-filter', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
+        { 'name': 'btn_video_help', 'x': 588, 'y': 626, 'width': 36, 'height': 24, 'zOrder': 10, 'persistentUuid': 'inst-vid-repair', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
+        { 'name': 'btn_video_help', 'x': 656, 'y': 626, 'width': 36, 'height': 24, 'zOrder': 10, 'persistentUuid': 'inst-vid-special', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
+        { 'name': 'btn_video_help', 'x': 860, 'y': 626, 'width': 36, 'height': 24, 'zOrder': 10, 'persistentUuid': 'inst-vid-upgrade', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
+        { 'name': 'btn_video_help', 'x': 928, 'y': 626, 'width': 36, 'height': 24, 'zOrder': 10, 'persistentUuid': 'inst-vid-guide', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] }
     ]
 
 
@@ -523,7 +519,7 @@ tokyo_river = {
     'numberProperties': [], 'stringProperties': [], 'initialVariables': []
 }
 tokyo_buildings = [
-    { 'name': 'solar', 'x': 780, 'y': 240, 'width': 56, 'height': 56, 'zOrder': 4, 'persistentUuid': 'inst-tokyo-gen', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
+    { 'name': 'generator', 'x': 780, 'y': 240, 'width': 56, 'height': 56, 'zOrder': 4, 'persistentUuid': 'inst-tokyo-gen', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
     { 'name': 'water_pump', 'x': 600, 'y': 240, 'width': 56, 'height': 56, 'zOrder': 4, 'persistentUuid': 'inst-tokyo-pump', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
     { 'name': 'waste_filter', 'x': 630, 'y': 480, 'width': 56, 'height': 56, 'zOrder': 4, 'persistentUuid': 'inst-tokyo-filter', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] }
 ]
@@ -560,7 +556,6 @@ amsterdam_river = {
 }
 amsterdam_buildings = [
     { 'name': 'generator', 'x': 800, 'y': 200, 'width': 56, 'height': 56, 'zOrder': 4, 'persistentUuid': 'inst-ams-gen', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
-    { 'name': 'solar', 'x': 880, 'y': 200, 'width': 56, 'height': 56, 'zOrder': 4, 'persistentUuid': 'inst-ams-solar', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
     { 'name': 'water_pump', 'x': 640, 'y': 250, 'width': 56, 'height': 56, 'zOrder': 4, 'persistentUuid': 'inst-ams-pump', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
     { 'name': 'waste_filter', 'x': 680, 'y': 450, 'width': 56, 'height': 56, 'zOrder': 4, 'persistentUuid': 'inst-ams-filter', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
     { 'name': 'air_filter', 'x': 840, 'y': 320, 'width': 56, 'height': 56, 'zOrder': 4, 'persistentUuid': 'inst-ams-air', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] }
