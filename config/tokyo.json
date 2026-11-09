@@ -3,6 +3,7 @@
   "id": "tokyo",
   "sceneName": "Tokyo",
   "name": "2. Tokyo, Japan",
+  "cityChallenge": "โตเกียวต้องเตรียมรับมือกับแผ่นดินไหวและความเสียหายของโครงสร้างพื้นฐาน",
   "startingBudget": 180,
   "houseSpawnIntervalSeconds": 16.0,
   "pollutionMultiplier": 1.0,

@@ -20,7 +20,7 @@ props['adaptGameResolutionAtRuntime'] = False
 props['sizeOnStartupMode'] = ""
 props['windowWidth'] = 1280
 props['windowHeight'] = 720
-props['version'] = '1.0.3.1'
+props['version'] = '1.0.3.2'
 props['name'] = 'POWATER CORP.'
 
 # 2. Update Resources (All real PNG assets)

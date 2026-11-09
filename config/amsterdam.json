@@ -3,6 +3,7 @@
   "id": "amsterdam",
   "sceneName": "Amsterdam",
   "name": "4. Amsterdam, Netherlands",
+  "cityChallenge": "อัมสเตอร์ดัมต้องรักษาสมดุลของระบบเมืองที่พัฒนาไปจนเกือบเต็มศักยภาพ พร้อมรับมือกับภัยพิบัติทางธรรมชาติ",
   "startingBudget": 240,
   "houseSpawnIntervalSeconds": 21.6,
   "pollutionMultiplier": 1.0,

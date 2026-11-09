@@ -1176,14 +1176,16 @@
       }
 
       const briefingTxt = this.makeText(
-        `📍 ${lvl.thaiName || 'เมืองเป้าหมาย'}\n\n` +
+        `🏛️ บทบาทผู้เล่น: นายกเทศมนตรี (Mayor of the City)\n` +
+        `📍 ${lvl.thaiName || 'เมืองเป้าหมาย'}\n` +
+        `🌍 บริบทความท้าทาย: ${lvl.cityChallenge || 'การพัฒนาเมืองอย่างยั่งยืน'}\n\n` +
         `${lvl.briefing || ''}\n\n` +
         `• ข้อได้เปรียบ (+): ${lvl.conditionPlus || '-'}\n` +
         `• ความท้าทาย (-): ${lvl.conditionMinus || '-'}\n` +
         `• การได้เงิน: บ้าน Complete รับทันที +$50 | รายได้รายสัปดาห์: [บ้าน Complete] x $40\n` +
-        `• วิดีโอสาธิตฟีเจอร์ใหม่: คลิกปุ่มไอคอน [▶] สีฟ้าเหนือปุ่มเครื่องมือด้านล่างเพื่อดูวิดีโอวิธีใช้แต่ละฟีเจอร์!\n\n` +
-        `🎩 Amigo TheGOATHimself: "${lvl.amigoQuote || ''}"`,
-        { fontFamily: font, fontSize: 12.5, fill: 0xe9ecef, wordWrap: true, wordWrapWidth: mw - 46, lineHeight: 20 }
+        `• วิดีโอสาธิต: คลิกปุ่มไอคอน [▶] สีฟ้าเหนือปุ่มเครื่องมือด้านล่างเพื่อดูวิดีโอวิธีใช้แต่ละฟีเจอร์!\n\n` +
+        `🎩 Amigo TheGOATHimself (ที่ปรึกษาด้านสิ่งแวดล้อม): "${lvl.amigoQuote || ''}"`,
+        { fontFamily: font, fontSize: 12, fill: 0xe9ecef, wordWrap: true, wordWrapWidth: mw - 46, lineHeight: 19 }
       );
       briefingTxt.position.set(mx + 23, my + 98);
       this.modalTextContainer.addChild(briefingTxt);
@@ -1427,61 +1429,81 @@
 
     renderSdgsContent(mx, my, mw) {
       const font = 'system-ui, -apple-system, Segoe UI, Roboto, sans-serif';
-      const title = this.makeText('🎯 Connection with SDGs & Future Roadmap (v1.0 - v1.4)', {
-        fontFamily: font, fontSize: 15, fontWeight: 'bold', fill: 0x00b4d8
+      const title = this.makeText('🎯 SDGs & Roadmap — Core Concept: The Urban Sustainability Crisis', {
+        fontFamily: font, fontSize: 14.5, fontWeight: 'bold', fill: 0x00b4d8
       });
       title.position.set(mx + 20, my + 14);
       this.modalTextContainer.addChild(title);
 
+      const isSdg15Unlocked = Boolean(this.game && this.game.sdg15Unlocked);
+
       const sdgs = [
-        { title: 'SDG 6: CLEAN WATER AND SANITATION', desc: 'เป็นการทำให้เล็งเห็นปัญหาการระบายน้ำที่เกิดขึ้นทุกวันให้เป็นรูปธรรมและเข้าใจง่าย', color: 0x26bde2 },
-        { title: 'SDG 7: AFFORDABLE AND CLEAN ENERGY', desc: 'สร้างความตระหนักถึงการใช้ไฟฟ้าอย่างประหยัด และมองหาช่องทางใหม่ๆ ในการสร้างพลังงานสะอาด (Solar Cell)', color: 0xfcc30b },
-        { title: 'SDG 11: SUSTAINABLE CITIES AND COMMUNITIES', desc: 'เสริมทักษะการสร้างเมืองให้ยั่งยืนโดยใช้ความสามารถในการคิดด้วยภาพจำลอง', color: 0xfd9d24 }
+        {
+          title: 'SDG 6: CLEAN WATER AND SANITATION',
+          desc: 'การจัดการน้ำสะอาดและระบบสุขาภิบาล เพื่อให้ประชาชนทุกครัวเรือนเข้าถึงน้ำที่มีคุณภาพ สูบน้ำสะอาดและบำบัดน้ำเสียริมแม่น้ำ',
+          color: 0x26bde2,
+          tag: 'CORE UTILITY'
+        },
+        {
+          title: 'SDG 7: AFFORDABLE AND CLEAN ENERGY',
+          desc: 'การส่งเสริมพลังงานสะอาดและการเข้าถึงไฟฟ้าอย่างทั่วถึง โดยเน้นการใช้พลังงานหมุนเวียน เช่น Solar Cell 0% มลภาวะ',
+          color: 0xfcc30b,
+          tag: 'CORE UTILITY'
+        },
+        {
+          title: 'SDG 15: LIFE ON LAND (🌱 EASTER EGG & MINI-ACHIEVEMENT)',
+          desc: isSdg15Unlocked
+            ? '✅ ปลดล็อกแล้ว! เรื่องสั้น: "ตึกรามสร้างใหม่ได้ แต่ผืนป่ามิอาจฟื้นคืนได้ง่ายดาย... ผู้ว่าฯ รักษาสมดุลธรรมชาติเคียงคู่มหานคร"'
+            : '🔒 ปลดล็อกโดย: ติดตั้งเครื่องกรองมลภาวะ (Eco Filter) หรือรักษาระดับมลภาวะให้บริสุทธิ์เพื่อฟังบันทึกเรื่องสั้นผู้ว่าฯ',
+          color: 0x56ab2f,
+          tag: isSdg15Unlocked ? 'ACHIEVED' : 'EASTER EGG'
+        }
       ];
 
       for (let i = 0; i < sdgs.length; i++) {
         const s = sdgs[i];
-        const cardY = my + 62 + (i * 78);
+        const cardY = my + 56 + (i * 74);
 
         this.modalGfx.lineStyle(1.5, s.color, 0.45);
         this.modalGfx.beginFill(0x1a1334, 0.9);
-        this.modalGfx.drawRoundedRect(mx + 20, cardY, mw - 40, 68, 8);
+        this.modalGfx.drawRoundedRect(mx + 20, cardY, mw - 40, 66, 8);
         this.modalGfx.endFill();
 
-        const badgeTxt = this.makeText(s.title, {
-          fontFamily: font, fontSize: 12.5, fontWeight: 'bold', fill: s.color
+        const badgeTxt = this.makeText(`${s.title} [${s.tag}]`, {
+          fontFamily: font, fontSize: 11.5, fontWeight: 'bold', fill: s.color
         });
-        badgeTxt.position.set(mx + 32, cardY + 10);
+        badgeTxt.position.set(mx + 32, cardY + 8);
         this.modalTextContainer.addChild(badgeTxt);
 
         const descTxt = this.makeText(s.desc, {
-          fontFamily: font, fontSize: 11, fill: 0xe9ecef, wordWrap: true, wordWrapWidth: mw - 65
+          fontFamily: font, fontSize: 11, fill: 0xe9ecef, wordWrap: true, wordWrapWidth: mw - 65, lineHeight: 17
         });
-        descTxt.position.set(mx + 32, cardY + 34);
+        descTxt.position.set(mx + 32, cardY + 28);
         this.modalTextContainer.addChild(descTxt);
       }
 
-      const rmY = my + 302;
+      const rmY = my + 284;
       this.modalGfx.lineStyle(1.5, 0x06d6a0, 0.45);
       this.modalGfx.beginFill(0x181232, 0.95);
-      this.modalGfx.drawRoundedRect(mx + 20, rmY, mw - 40, 215, 8);
+      this.modalGfx.drawRoundedRect(mx + 20, rmY, mw - 40, 235, 8);
       this.modalGfx.endFill();
 
-      const rmHeader = this.makeText('🚀 Technical & Future Roadmap (Feature Plan):', {
-        fontFamily: font, fontSize: 13, fontWeight: 'bold', fill: 0x06d6a0
+      const rmHeader = this.makeText('🏛️ สารจากนายกเทศมนตรี & แผนการพัฒนาเมืองยั่งยืน (Roadmap):', {
+        fontFamily: font, fontSize: 12.5, fontWeight: 'bold', fill: 0x06d6a0
       });
-      rmHeader.position.set(mx + 32, rmY + 12);
+      rmHeader.position.set(mx + 32, rmY + 10);
       this.modalTextContainer.addChild(rmHeader);
 
       const roadmapText = this.makeText(
-        '• v1.0.2.0 (Current): 4 ด่านหลัก, Fast Tutorial, วิดีโอสาธิตเหนือปุ่ม [▶], Repair, Day/Night, Upsize 40 หลัง\n' +
-        '• v1.1 - Seasonal Update: ระบบฤดูกาล (Seasonal Weather & Energy Output)\n' +
-        '• v1.2 - Save The World Update: เพิ่มเมืองใหม่ และ ระบบป่าไม้ (Forestry Carbon Sink)\n' +
-        '• v1.3 - Monopoly Update: เพิ่มระบบ Gacha [ตัวละครผู้ช่วย] และ In-App Purchase เพิ่มความหมายของ In-Game Currency\n' +
-        '• v1.4 - MMD (Man Made Disaster) Update: ภัยจากมนุษย์ เช่น ไฟไหม้ โลกร้อน ฯลฯ',
-        { fontFamily: font, fontSize: 11.5, fill: 0xe9ecef, wordWrap: true, wordWrapWidth: mw - 65, lineHeight: 22 }
+        '• ปรัชญาการบริหาร: "เป้าหมายสูงสุดไม่ใช่การสร้างเมืองที่ใหญ่ที่สุด แต่คือการสร้างเมืองที่เติบโตได้อย่างยั่งยืน"\n' +
+        '• v1.0.3.1 (Current): 4 ด่านหลัก, Fast Tutorial, วิดีโอสาธิต [▶], ระบบซ่อมบำรุง, กลางวัน/กลางคืน, Upsize 40 หลัง\n' +
+        '• v1.1 - Seasonal Update: ระบบ 4 ฤดูกาล ส่งผลต่อแสงแดด ปริมาณน้ำฝน และความต้องการสาธารณูปโภค\n' +
+        '• v1.2 - Save The World Update: เมืองใหม่ระดับโลก และระบบป่าไม้ (Forestry System) ขยายความสมบูรณ์ SDG 15\n' +
+        '• v1.3 - Monopoly Update: ตัวละครผู้ช่วยและ In-Game Currency ตอบสนองความยั่งยืนทางการเงิน\n' +
+        '• v1.4 - MMD (Man Made Disaster) Update: รับมือภัยจากมนุษย์ เช่น อัคคีภัยเมือง และภาวะโลกร้อน',
+        { fontFamily: font, fontSize: 11, fill: 0xe9ecef, wordWrap: true, wordWrapWidth: mw - 65, lineHeight: 21 }
       );
-      roadmapText.position.set(mx + 32, rmY + 40);
+      roadmapText.position.set(mx + 32, rmY + 34);
       this.modalTextContainer.addChild(roadmapText);
     }
 
@@ -1569,10 +1591,10 @@
 
       const curLvl = this.game.currentLevel ? (this.game.currentLevel.name || 'Bangkok') : 'City';
       const msg = this.makeText(
-        `ยอดเยี่ยมมาก! คุณบริหาร ${curLvl} ผ่านเงื่อนไขการชนะครบสมบูรณ์!\n\n` +
+        `ยอดเยี่ยมมากท่านนายกเทศมนตรี! คุณบริหาร ${curLvl} ผ่านเงื่อนไขการชนะครบสมบูรณ์!\n\n` +
         `• ดูแลบ้านมากกว่า 15 หลังให้มีน้ำและไฟใช้ตลอดเวลาครบ 5 นาทีเต็ม!\n` +
         `• ควบคุมมลภาวะต่ำกว่าเกณฑ์และรับมือภัยพิบัติได้อย่างยอดเยี่ยม\n` +
-        `• ตอบสนองเป้าหมาย SDGs 6, 7 และ 11 ได้อย่างสมบูรณ์แบบ!`,
+        `• ตอบสนองเป้าหมาย SDGs 6, 7 และ 15 (Life on Land) รักษาสมดุลมหานครกับธรรมชาติอย่างยั่งยืน!`,
         { fontFamily: font, fontSize: 13, fill: 0xe9ecef, wordWrap: true, wordWrapWidth: mw - 50, lineHeight: 22 }
       );
       msg.position.set(mx + 25, my + 90);

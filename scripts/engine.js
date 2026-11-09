@@ -108,6 +108,9 @@
       this.housesServedPeak = 0;
       this.completedHousesCount = 0;
 
+      // Easter Egg / Mini-Achievement: SDG 15 Life on Land
+      this.sdg15Unlocked = false;
+
       // Fast Interactive Scene Tutorial State
       this.isTutorialMode = false;
       this.tutorialStep = 0;
@@ -288,6 +291,7 @@
       this.spawnTimer = 0;
       this.housesServedPeak = 0;
       this.completedHousesCount = 0;
+      this.sdg15Unlocked = false;
 
       this.setupStartingCity();
 
@@ -1363,6 +1367,13 @@
 
       this.money -= actualCost;
       this.createBuilding(typeKey, x, y);
+
+      // Easter Egg / Mini-Achievement: SDG 15 Life on Land trigger on Eco Filter or clean plant
+      if (!this.sdg15Unlocked && (buildCfg.type === 'air_filter' || (buildCfg.clean && typeKey.toLowerCase().includes('solar')))) {
+        this.sdg15Unlocked = true;
+        this.addFloatingText('🌱 Easter Egg: ปลดล็อก SDG 15 Life on Land ในหน้าต่าง SDGs!', CONFIG.CANVAS_WIDTH / 2, 70, '#56ab2f');
+        if (global.POWATER.soundManager) global.POWATER.soundManager.playUpgrade();
+      }
 
       if (global.POWATER.soundManager) global.POWATER.soundManager.playPlace();
       this.addFloatingText(`-$${actualCost}`, x, y - 20, '#ffd166');

@@ -1,19 +1,23 @@
-# POWATER CORP. (`v1.0.3.1`) — GDevelop 5 Project Documentation (`GEMINI.md`)
+# POWATER CORP. (`v1.0.3.2`) — GDevelop 5 Project Documentation (`GEMINI.md`)
 
 > **Team Green Gang**: Sukrit Limpakanon, Aristt Mahakitsiri, Gantinan Satjariyakul  
 > **Engine**: GDevelop 5 (`POWATER CROPS..json`) + Real PNG Sprite Assets + PixiJS Procedural River/Conduit Rendering  
-> **Version Naming**: `1.x.y.z` (`x` = Major Version, `y` = Small Addition Within Major Version, `z` = Bug Fixes) — Current: **`v1.0.3.1`**
+> **Version Naming**: `1.x.y.z` (`x` = Major Version, `y` = Small Addition Within Major Version, `z` = Bug Fixes) — Current: **`v1.0.3.2`**
 
 ---
 
-## 1. Game Overview & Core Lore (`POWATER IDEA PITCH.pdf`)
+## 1. Game Overview, Core Concept & Lore
 
-- **Genre**: Singleplayer Infrastructure & Environmental Strategy Game (PC, iOS, Android)
-- **Protagonist**: **Amigo TheGOATHimself** — An Italian environmental tycoon hired by cities worldwide to manage electricity, clean water, and wastewater treatment while keeping pollution below toxic thresholds and citizen complaints at zero.
+- **Genre**: Singleplayer Urban Resource & Environmental Strategy Simulation Game (PC, iOS, Android)
+- **Core Concept & World Background (The Urban Sustainability Crisis)**:
+  - เมืองขนาดใหญ่ทั่วโลกเติบโตอย่างรวดเร็ว ประชากรเพิ่มขึ้น โครงสร้างพื้นฐานเสื่อมสภาพ สภาพภูมิอากาศเปลี่ยนแปลง และความต้องการพลังงานสูงขึ้นอย่างต่อเนื่อง
+  - ผู้เล่นได้รับบทเป็น **Mayor of the City (นายกเทศมนตรี / ผู้บริหารสูงสุดของเมือง)** มีหน้าที่บริหารจัดการระบบน้ำและพลังงานผ่านการเชื่อมต่อ Node ให้ประชาชนเข้าถึงสาธารณูปโภคขั้นพื้นฐานได้อย่างทั่วถึง
+  - **Amigo TheGOATHimself**: ทำหน้าที่เป็น *Chief Environmental Advisor & Technical Consultant* (วิศวกรที่ปรึกษาด้านสิ่งแวดล้อมคู่คิดของผู้ว่าฯ) คอยให้คำแนะนำเชิงเทคนิคและกลยุทธ์ในแต่ละเมือง
+  - **Core Philosophy**: *"ทุกการตัดสินใจมีต้นทุน ทุกโครงการมีผลกระทบต่อสิ่งแวดล้อม และทุกความผิดพลาดส่งผลต่อคุณภาพชีวิตของประชาชน เป้าหมายสูงสุดไม่ใช่การสร้างเมืองที่ใหญ่ที่สุด แต่คือการสร้างเมืองที่สามารถเติบโตได้อย่างยั่งยืน"*
 - **Connection with UN SDGs**:
-  - **SDG 6 (Clean Water and Sanitation)**: Pumping clean river water to households and treating wastewater via riverside outlets/filters.
-  - **SDG 7 (Affordable and Clean Energy)**: Transitioning from polluting coal generators to zero-emission **Solar Cell** plants.
-  - **SDG 11 (Sustainable Cities and Communities)**: Planning resilient urban utility networks across rivers and surviving extreme weather disasters.
+  - **SDG 6 (Clean Water and Sanitation)**: การจัดการน้ำสะอาดและระบบสุขาภิบาล เพื่อให้ประชาชนทุกครัวเรือนเข้าถึงน้ำที่มีคุณภาพ โดยสูบน้ำสะอาดริมแม่น้ำและบำบัดน้ำเสียริมตลิ่ง
+  - **SDG 7 (Affordable and Clean Energy)**: การส่งเสริมพลังงานสะอาดและการเข้าถึงไฟฟ้าอย่างทั่วถึง โดยเน้นการใช้พลังงานหมุนเวียน เช่น **Solar Cell** เพื่อลดมลพิษเป็นศูนย์
+  - **SDG 15 (Life on Land) — 🌱 Easter Egg & Mini-Achievement**: การอนุรักษ์ป่าไม้และระบบนิเวศบนบก ลดผลกระทบจากการขยายตัวของเมือง และรักษาสมดุลระหว่างการพัฒนาเมืองกับธรรมชาติ ออกแบบเป็น **Easter Egg / เรื่องสั้นบันทึกผู้ว่าฯ (Mayor's Forest Chronicle)** และ Mini-Achievement เมื่อผู้ว่าฯ ควบคุมมลภาวะให้บริสุทธิ์หรือติดตั้ง Eco Filter โดยไม่ต้องเพิ่มฟีเจอร์เครื่องมือใหม่
 
 ---
 
@@ -48,14 +52,14 @@
 
 ---
 
-## 3. The 4 Levels of `v1.0.0.0` (`POWATER CORP.pdf`)
+## 3. The 4 Levels & City Challenges (`POWATER CORP.`)
 
-| Level | Scene Name | Positive Condition `(+)` | Negative / Extreme Weather `(-)` | Special Item |
-| :--- | :--- | :--- | :--- | :--- |
-| **1. Bangkok** | `Main` | `(0)` None — First Level & Tutorial | **High Tide (`น้ำขึ้น`)**: Every 15 in-game days, river levels surge and riverside equipment requires frequent repair | Standard Repair (`[R]`) |
-| **2. Tokyo** | `Tokyo` | **Clean Energy `-25%` Cost**: Solar Cell (`$45`) & Eco Filter (`$30`) subsidized by government | **Earthquake (`แผ่นดินไหว`)**: `10–15%` chance every 1 min after Protecting Time (`+5%/min` after 3 min without quake; guaranteed at 5 min, then `+5%/min` thereafter). Breaks all water & electric pumps! | Mass Repair (`[R]`) |
-| **3. Rome** | `Rome` | **Unlimited Aqueducts**: Unlimited house-to-house water pipe chaining capacity | **Blackout (`ไฟดับ`)**: `12.5%` chance every 15 in-game days | **Candle (`เทียนไข`)**: Bulk Restock (`20€`, `50€`, `100€`, `500€` at `10 EUR/box`). Consumes 1 box/house per blackout |
-| **4. Amsterdam** | `Amsterdam` | **Infrastructure `-5%` Cost** & **House Spawning `20%` Slower** | **Zero Complaint Tolerance (`1 Complaint = Instant Game Over`)** + Earthquake + High Tide + **Main Flood every 4 weeks (`28 days`)** (`>2 min` = Game Over) | **Emergency Flood Pump (`เครื่องสูบน้ำ`)**: `500 EUR`, One-Time Use to drain flood immediately |
+| Level | Scene Name | Positive Condition `(+)` | Negative / Extreme Weather `(-)` | City Challenge (`บริบทความท้าทาย`) | Special Item |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **1. Bangkok** | `Main` | `(0)` None — First Level & Tutorial | **High Tide (`น้ำขึ้น`)**: Every 15 in-game days, river levels surge and riverside equipment requires frequent repair | **ปัญหาน้ำท่วมและระดับน้ำที่เปลี่ยนแปลง** | Standard Repair (`[R]`) |
+| **2. Tokyo** | `Tokyo` | **Clean Energy `-25%` Cost**: Solar Cell (`$45`) & Eco Filter (`$30`) subsidized by government | **Earthquake (`แผ่นดินไหว`)**: `10–15%` chance every 1 min after Protecting Time (`+5%/min` after 3 min without quake; guaranteed at 5 min, then `+5%/min` thereafter). Breaks all water & electric pumps! | **เตรียมรับมือแผ่นดินไหวและความเสียหายของโครงสร้างพื้นฐาน** | Mass Repair (`[R]`) |
+| **3. Rome** | `Rome` | **Unlimited Aqueducts**: Unlimited house-to-house water pipe chaining capacity | **Blackout (`ไฟดับ`)**: `12.5%` chance every 15 in-game days | **บริหารระบบสาธารณูปโภคที่มีข้อจำกัดความต่อเนื่องของพลังงาน** | **Candle (`เทียนไข`)**: Bulk Restock (`20€`, `50€`, `100€`, `500€` at `10 EUR/box`). Consumes 1 box/house per blackout |
+| **4. Amsterdam** | `Amsterdam` | **Infrastructure `-5%` Cost** & **House Spawning `20%` Slower** | **Zero Complaint Tolerance (`1 Complaint = Instant Game Over`)** + Earthquake + High Tide + **Main Flood every 4 weeks (`28 days`)** (`>2 min` = Game Over) | **รักษาสมดุลของระบบเมืองที่พัฒนาจนเกือบเต็มศักยภาพ พร้อมรับมือภัยพิบัติ** | **Emergency Flood Pump (`เครื่องสูบน้ำ`)**: `500 EUR`, One-Time Use to drain flood immediately |
 
 ---
 
@@ -104,6 +108,13 @@ All buildings, houses, rivers, HUD bars, toolbar docks, buttons, and status badg
 
 ## 7. Changelog
 
+- **`v1.0.3.2` (2026-11-09)**:
+  - Integrated Core Concept & World Background ("The Urban Sustainability Crisis"):
+    - Updated Player Role to **Mayor of the City (นายกเทศมนตรี / ผู้บริหารสูงสุดของเมือง)** with **Amigo TheGOATHimself** as Chief Environmental & Infrastructure Consultant.
+    - Updated Core Philosophy: *"เป้าหมายสูงสุดไม่ใช่การสร้างเมืองที่ใหญ่ที่สุด แต่คือการสร้างเมืองที่สามารถเติบโตได้อย่างยั่งยืน"*.
+    - Updated UN SDGs: **SDG 6** (Clean Water & Sanitation) and **SDG 7** (Affordable & Clean Energy) as core utility goals.
+    - Added **SDG 15 (Life on Land)** as an **Easter Egg / Mini-Achievement & Short Story Snippet ("Mayor's Forest Chronicle")** unlocked via keeping pollution pure or placing Eco Filter without adding redundant new tools.
+    - Updated city challenges for all 4 cities in `config/` files, Level Briefing modal, and Victory modal.
 - **`v1.0.3.1` (2026-11-09)**:
   - Reorganized stage and global configuration into a dedicated [`config/`](file:///mnt/c/Users/user/Desktop/Folder/GDEV_POWATER/config) folder at the root of the project:
     - [`config/global.json`](file:///mnt/c/Users/user/Desktop/Folder/GDEV_POWATER/config/global.json): Configures all global feature costs (`featureCosts.buildings`, `featureCosts.connections`, `featureCosts.repair`, `featureCosts.specialItems`, `featureCosts.upgrades`), `globalRules`, `pollutionRates`, and `disasters`.

@@ -3,6 +3,7 @@
   "id": "bangkok",
   "sceneName": "Main",
   "name": "1. Bangkok, Thailand",
+  "cityChallenge": "กรุงเทพมหานครเผชิญกับปัญหาน้ำท่วมและระดับน้ำที่เปลี่ยนแปลง",
   "startingBudget": 150,
   "houseSpawnIntervalSeconds": 18.0,
   "pollutionMultiplier": 1.0,

@@ -3,6 +3,7 @@
   "id": "rome",
   "sceneName": "Rome",
   "name": "3. Rome, Italy",
+  "cityChallenge": "โรมต้องบริหารระบบสาธารณูปโภคที่มีข้อจำกัดด้านความต่อเนื่องของพลังงาน",
   "startingBudget": 200,
   "houseSpawnIntervalSeconds": 17.0,
   "pollutionMultiplier": 1.0,

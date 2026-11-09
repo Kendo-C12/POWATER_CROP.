@@ -1,5 +1,16 @@
 {
   "_comment": "POWATER CORP. v1.0.3.1 — Global Configuration File (config/global.json). Configures feature costs, economy, global rules, pollution rates, and disaster parameters across all stages.",
+  "gameLore": {
+    "playerRole": "Mayor of the City (นายกเทศมนตรี / ผู้บริหารสูงสุดของเมือง)",
+    "chiefAdvisor": "Amigo TheGOATHimself (Chief Environmental & Infrastructure Consultant)",
+    "worldBackground": "The Urban Sustainability Crisis: ในช่วงหลายทศวรรษที่ผ่านมา เมืองขนาดใหญ่ทั่วโลกเติบโตอย่างรวดเร็ว การขยายตัวของประชากรทำให้ความต้องการน้ำสะอาดและพลังงานไฟฟ้าเพิ่มสูงขึ้นอย่างมหาศาล",
+    "corePhilosophy": "เป้าหมายสูงสุดไม่ใช่การสร้างเมืองที่ใหญ่ที่สุด แต่คือการสร้างเมืองที่สามารถเติบโตได้อย่างยั่งยืน",
+    "sdgs": [
+      "SDG 6: Clean Water and Sanitation",
+      "SDG 7: Affordable and Clean Energy",
+      "SDG 15: Life on Land (Easter Egg & Mini-Achievement)"
+    ]
+  },
   "featureCosts": {
     "buildings": {
       "generatorCoal": {
