@@ -77,16 +77,14 @@
       this.postGuaranteedQuakeBonus = 0.0;
       this.screenShakeTimer = 0.0;
 
-      // Rome Blackout & Candles state
-      this.candleStock = 4; // Starting sample stock in Rome
+      // Rome Blackout state
       this.isBlackoutActive = false;
       this.blackoutTimer = 0.0;
 
-      // Amsterdam Flood & Emergency Pump state
+      // Amsterdam Flood state
       this.isFloodActive = false;
       this.floodTimer = 0.0;
-      this.floodMaxDuration = 120.0; // 2 minutes max before Game Over
-      this.floodPumpsOwned = 0;
+      this.floodMaxDuration = 45.0; // Flood lasts 45s before receding
 
       // Entities
       this.houses = [];
@@ -254,16 +252,11 @@
       this.postGuaranteedQuakeBonus = 0.0;
       this.screenShakeTimer = 0.0;
 
-      const startCandles = (CONFIG.DISASTERS && CONFIG.DISASTERS.BLACKOUT && typeof CONFIG.DISASTERS.BLACKOUT.startingCandlesRome === 'number')
-        ? CONFIG.DISASTERS.BLACKOUT.startingCandlesRome
-        : 5;
-      this.candleStock = (this.currentLevel.id === 'rome') ? startCandles : 0;
       this.isBlackoutActive = false;
       this.blackoutTimer = 0.0;
 
       this.isFloodActive = false;
       this.floodTimer = 0.0;
-      this.floodPumpsOwned = 0;
       this.isTutorialMode = false;
       this.tutorialStep = 0;
       this.tutorialStepTimer = 0.0;
@@ -367,7 +360,8 @@
       } else if (this.tutorialStep === 3 && filter && h0) {
         this.connectNodes('sewage', h0, filter);
       } else if (this.tutorialStep === 4) {
-        this.repairAllBroken();
+        const broken = this.buildings.find(b => b.isBroken);
+        if (broken) broken.repair();
       }
     }
 
@@ -377,7 +371,6 @@
       if (this.runtimeScene && this.runtimeScene.getObjects) {
         const buildingMappings = [
           { name: 'generator', key: 'GENERATOR_COAL' },
-          { name: 'solar', key: 'GENERATOR_SOLAR' },
           { name: 'water_pump', key: 'WATER_PUMP' },
           { name: 'waste_filter', key: 'WASTE_FILTER' },
           { name: 'air_filter', key: 'AIR_FILTER' }
@@ -839,17 +832,17 @@
         this.blackoutTimer -= dt;
         if (this.blackoutTimer <= 0) {
           this.isBlackoutActive = false;
-          this.houses.forEach(h => { h.usingCandle = false; });
           this.addFloatingText('⚡ กระแสไฟฟ้าในกรุงโรมกลับมาใช้งานได้ตามปกติแล้ว!', CONFIG.CANVAS_WIDTH / 2, 95, '#06d6a0');
         }
       }
 
-      // 5. Amsterdam Flood countdown (Game Over if > 2 minutes / 120s)
+      // 5. Amsterdam Flood countdown
       if (this.isFloodActive) {
         this.floodTimer += dt;
         if (this.floodTimer >= this.floodMaxDuration) {
-          this.triggerGameOver('🌊 น้ำท่วมเมืองอัมสเตอร์ดัมเกิน 2 นาทีโดยไม่ได้สูบน้ำออก! (Flood Disaster)');
-          return;
+          this.isFloodActive = false;
+          this.floodTimer = 0.0;
+          this.addFloatingText('🌊 ระดับน้ำท่วมใน Amsterdam ลดลงสู่สภาวะปกติเรียบร้อยแล้ว!', CONFIG.CANVAS_WIDTH / 2, 95, '#06d6a0');
         }
       }
 
@@ -857,10 +850,10 @@
       const alerts = [];
       if (this.isFloodActive) {
         const rem = Math.max(0, Math.ceil(this.floodMaxDuration - this.floodTimer));
-        alerts.push(`🌊 FLOOD! สูบน้ำภายใน ${rem}s`);
+        alerts.push(`🌊 FLOOD! ระดับน้ำท่วม (${rem}s)`);
       }
       if (this.isBlackoutActive) {
-        alerts.push(`🕯️ BLACKOUT! (${Math.ceil(this.blackoutTimer)}s)`);
+        alerts.push(`⚡ BLACKOUT! ไฟดับชั่วคราว (${Math.ceil(this.blackoutTimer)}s)`);
       }
       if (this.isHighTide) {
         alerts.push(`🌊 น้ำขึ้นสูง (${Math.ceil(this.highTideTimer)}s)`);
@@ -1385,6 +1378,48 @@
 
       if ((nodeA.config && nodeA.config.type === 'air_filter') || (nodeB.config && nodeB.config.type === 'air_filter')) {
         this.addFloatingText('เครื่องกรองมลภาวะทำงานอัตโนมัติ ไม่ต้องต่อสาย!', (nodeA.getCenter().x + nodeB.getCenter().x) / 2, (nodeA.getCenter().y + nodeB.getCenter().y) / 2 - 20, '#2ec4b6');
+        return false;
+      }
+
+      // --- Cross-type building guard ---
+      // Map each building type to the utility it belongs to
+      const BUILDING_UTILITY = {
+        generator: 'power',
+        water_pump: 'water',
+        waste_filter: 'sewage'
+      };
+      const utilA = nodeA.config ? BUILDING_UTILITY[nodeA.config.type] : null;
+      const utilB = nodeB.config ? BUILDING_UTILITY[nodeB.config.type] : null;
+
+      // If both endpoints are buildings, they must belong to the same utility
+      if (utilA && utilB && utilA !== utilB) {
+        this.addFloatingText(
+          `❌ ไม่สามารถเชื่อม${utilA === 'power' ? 'สายไฟ' : utilA === 'water' ? 'ท่อน้ำ' : 'ท่อน้ำเสีย'}กับ${utilB === 'power' ? 'โรงปั่นไฟ' : utilB === 'water' ? 'ปั๊มน้ำ' : 'ถังบำบัด'}ได้!`,
+          (nodeA.getCenter().x + nodeB.getCenter().x) / 2,
+          (nodeA.getCenter().y + nodeB.getCenter().y) / 2 - 20,
+          '#e63946'
+        );
+        return false;
+      }
+
+      // If one endpoint is a building and the other is a house,
+      // the active tool type MUST match the building's utility — otherwise block.
+      if (utilA && nodeB.isHouse && type !== utilA) {
+        this.addFloatingText(
+          `❌ กดปุ่ม ${utilA === 'power' ? 'POWER [1]' : utilA === 'water' ? 'WATER [2]' : 'DRAIN [3]'} ก่อนลากสาย!`,
+          (nodeA.getCenter().x + nodeB.getCenter().x) / 2,
+          (nodeA.getCenter().y + nodeB.getCenter().y) / 2 - 20,
+          '#ffd166'
+        );
+        return false;
+      }
+      if (utilB && nodeA.isHouse && type !== utilB) {
+        this.addFloatingText(
+          `❌ กดปุ่ม ${utilB === 'power' ? 'POWER [1]' : utilB === 'water' ? 'WATER [2]' : 'DRAIN [3]'} ก่อนลากสาย!`,
+          (nodeA.getCenter().x + nodeB.getCenter().x) / 2,
+          (nodeA.getCenter().y + nodeB.getCenter().y) / 2 - 20,
+          '#ffd166'
+        );
         return false;
       }
 

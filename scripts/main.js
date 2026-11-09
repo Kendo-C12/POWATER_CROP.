@@ -438,6 +438,17 @@
     handleConnect(nodeA, nodeB) {
       if (!nodeA || !nodeB || nodeA.id === nodeB.id) return;
 
+      // Cross-type building guard: prevent connecting buildings of different utility types
+      const BUILDING_UTILITY = { generator: 'power', water_pump: 'water', waste_filter: 'sewage' };
+      const utilA = nodeA.config ? BUILDING_UTILITY[nodeA.config.type] : null;
+      const utilB = nodeB.config ? BUILDING_UTILITY[nodeB.config.type] : null;
+      if (utilA && utilB && utilA !== utilB) {
+        // engine.js will show the error message; just bail early
+        this.game.connectNodes(this.game.activeTool, nodeA, nodeB);
+        this.ui.updateHUD();
+        return;
+      }
+
       let connectType = this.game.activeTool;
       if ((nodeA.config && nodeA.config.type === 'generator') || (nodeB.config && nodeB.config.type === 'generator')) {
         connectType = 'power';

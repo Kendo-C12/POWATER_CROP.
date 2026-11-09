@@ -1,5 +1,5 @@
 {
-  "_comment": "POWATER CORP. v1.0.3.1 — Global Configuration File (config/global.json). Configures feature costs, economy, global rules, pollution rates, and disaster parameters across all stages.",
+  "_comment": "POWATER CORP. v1.0.4.0 — Global Configuration File (config/global.json). Configures feature costs, economy, global rules, pollution rates, and disaster parameters across all stages.",
   "gameLore": {
     "playerRole": "Mayor of the City (นายกเทศมนตรี / ผู้บริหารสูงสุดของเมือง)",
     "chiefAdvisor": "Amigo TheGOATHimself (Chief Environmental & Infrastructure Consultant)",
@@ -17,12 +17,6 @@
         "cost": 30,
         "capacityHouses": null,
         "pollutionRatePerSec": 0.30,
-        "canBreakDown": true
-      },
-      "generatorSolar": {
-        "cost": 60,
-        "capacityHouses": null,
-        "pollutionRatePerSec": 0.0,
         "canBreakDown": true
       },
       "waterPump": {
@@ -54,16 +48,8 @@
     "repair": {
       "repairCostPerBuilding": 0
     },
-    "specialItems": {
-      "candleBoxUnitPrice": 10,
-      "startingCandlesRome": 5,
-      "candlePacks": [
-        { "id": "candle_20", "cost": 20, "boxes": 2, "label": "Bulk 20€ (2 กล่อง)" },
-        { "id": "candle_50", "cost": 50, "boxes": 5, "label": "Bulk 50€ (5 กล่อง)" },
-        { "id": "candle_100", "cost": 100, "boxes": 10, "label": "Bulk 100€ (10 กล่อง)" },
-        { "id": "candle_500", "cost": 500, "boxes": 50, "label": "Bulk 500€ (50 กล่อง)" }
-      ],
-      "emergencyFloodPumpCost": 500
+    "disasterTesting": {
+      "testCost": 50
     },
     "upgrades": {
       "elec_cap": {

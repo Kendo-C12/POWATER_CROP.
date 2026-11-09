@@ -36,22 +36,8 @@
     UPSIZE_STEP_HOUSES: 10,
     MAX_HOUSES_CAP: 40, // Capped at 40 houses max
 
-    // Special Items (POWATER CORP.pdf: Rome Candles & Amsterdam Emergency Flood Pump)
-    SPECIAL_ITEMS: {
-      CANDLE_PACKS: [
-        { id: 'candle_20', cost: 20, boxes: 2, label: 'Bulk 20€ (2 กล่อง)' },
-        { id: 'candle_50', cost: 50, boxes: 5, label: 'Bulk 50€ (5 กล่อง)' },
-        { id: 'candle_100', cost: 100, boxes: 10, label: 'Bulk 100€ (10 กล่อง)' },
-        { id: 'candle_500', cost: 500, boxes: 50, label: 'Bulk 500€ (50 กล่อง)' }
-      ],
-      CANDLE_BOX_UNIT_PRICE: 10,
-      FLOOD_PUMP: {
-        id: 'flood_pump',
-        name: 'เครื่องสูบน้ำฉุกเฉิน (Emergency Flood Pump)',
-        cost: 500,
-        desc: '500 EUR | One-Time Use: สูบน้ำท่วมออกจากเมืองทันที (ด่าน Amsterdam)'
-      }
-    },
+    // Disaster Simulation Testing Cost (POWATER CORP. v1.0.4.0)
+    DISASTER_TEST_COST: 50, // Cost to simulate an extreme weather disaster
 
     // Future Feature Plan Roadmap (POWATER CORP.pdf)
     ROADMAP: [
@@ -88,23 +74,6 @@
         width: 56,
         height: 56,
         desc: 'จ่ายกระแสไฟฟ้าได้ไม่จำกัด ปล่อยมลภาวะ 0.3 หน่วย/วินาที'
-      },
-      GENERATOR_SOLAR: {
-        id: 'gen_solar',
-        objectName: 'solar',
-        name: 'Solar Cell Plant',
-        thaiName: 'โรงไฟฟ้าพลังงานแสงอาทิตย์ (Solar Cell)',
-        type: 'generator',
-        cost: 60,
-        capacity: Infinity,
-        pollutionRate: 0.0,
-        clean: true,
-        canBreakDown: true,
-        color: '#ffd166',
-        icon: '☀️',
-        width: 56,
-        height: 56,
-        desc: 'พลังงานสะอาด 0% มลภาวะ (ด่าน Tokyo ลดราคา 25% เหลือ $45)'
       },
       WATER_PUMP: {
         id: 'water_pump',
@@ -302,49 +271,38 @@
         ],
         useAction: { type: 'tool', value: 'sewage', label: '🧪 เลือกเครื่องมือท่อระบายน้ำ (USE DRAIN)' }
       },
-      solar: {
-        id: 'solar',
-        title: '🎬 วิดีโอสาธิต: โรงไฟฟ้าพลังงานแสงอาทิตย์ (Solar Cell Plant)',
-        subtitle: 'ฟีเจอร์ใหม่: พลังงานสะอาด มลภาวะ 0% (ลดราคา 25% เหลือ $45 ในด่าน Tokyo!)',
-        steps: [
-          '1. คลิกปุ่ม SOLAR [4] ด้านล่างเพื่อเลือกสร้างโรงไฟฟ้าโซลาร์เซลล์',
-          '2. คลิกวางบนพื้นที่ว่างฝั่งซ้ายหรือขวาของแม่น้ำ ($60 หรือ $45 ในด่าน Tokyo)',
-          '3. ลากสายไฟไปจ่ายให้บ้านเรือนโดยไม่ปล่อยมลภาวะแม้แต่นิดเดียว (SDG 7)!'
-        ],
-        useAction: { type: 'tool', value: 'build_solar', label: '☀️ เลือกสร้างโซลาร์เซลล์ (USE SOLAR)' }
-      },
       air_filter: {
         id: 'air_filter',
         title: '🎬 วิดีโอสาธิต: เครื่องกรองมลภาวะ (Eco & River Filter)',
-        subtitle: 'ฟีเจอร์ใหม่: ลดมลภาวะในเมืองและแม่น้ำอัตโนมัติ -0.2 หน่วย/วินาที',
+        subtitle: 'เทคโนโลยีสะอาด: ลดมลภาวะในเมืองและแม่น้ำอัตโนมัติ -0.2 หน่วย/วินาที',
         steps: [
           '1. หลังผ่านไป 3 นาที ระบบมลภาวะจะเริ่มทำงานจากโรงปั่นไฟและน้ำเสีย',
-          '2. คลิกปุ่ม FILTER [5] แล้วคลิกวางเครื่องกรองมลภาวะบนพื้นที่ว่าง ($40)',
-          '3. เครื่องกรองจะทำงานอัตโนมัติทันทีโดยไม่ต้องต่อสาย ลดมลพิษ -0.2/วินาที!'
+          '2. คลิกปุ่ม FILTER [4] แล้วคลิกวางเครื่องกรองมลภาวะบนพื้นที่ว่าง ($40)',
+          '3. เครื่องกรองจะทำงานอัตโนมัติทันทีโดยไม่ต้องต่อสาย ช่วยลดมลพิษ -0.2/วินาที!'
         ],
         useAction: { type: 'tool', value: 'build_air_filter', label: '🍃 เลือกสร้างเครื่องกรองมลภาวะ (USE FILTER)' }
       },
       repair: {
         id: 'repair',
-        title: '🎬 วิดีโอสาธิต: ระบบซ่อมบำรุง (Repair System & Disasters)',
-        subtitle: 'ฟีเจอร์ใหม่ v1.0: เครื่องปั๊มมีโอกาส 30% ที่จะเสียทุกๆ 2 นาที หรือจากแผ่นดินไหว/น้ำขึ้น',
+        title: '🎬 วิดีโอสาธิต: เครื่องมือซ่อมบำรุง (Repair Tool & Disasters)',
+        subtitle: 'ระบบซ่อมแซมรายจุด: คลิกที่อุปกรณ์ที่เสียโดยตรง หรือกดปุ่ม REPAIR [R] เพื่อใช้เครื่องมือซ่อม',
         steps: [
-          '1. เมื่อเครื่องปั๊ม/โรงปั่นไฟเสีย จะขึ้นวงแหวนสีแดงกระพริบและไอคอนประแจ (Win Timer จะหยุด Pause)',
-          '2. คลิกที่ตัวอาคารที่เสียโดยตรง หรือกดปุ่ม REPAIR [R] ด้านล่างเพื่อซ่อมทั้งหมดในคลิกเดียว!',
-          '3. ทันทีที่ซ่อมเสร็จ ระบบน้ำและไฟจะกลับมาไหลตามปกติและเวลาชนะจะเดินต่อ!'
+          '1. เมื่อเครื่องปั๊มหรือโรงปั่นไฟขัดข้อง จะขึ้นวงแหวนสีแดงและไอคอนประแจ (Win Timer จะหยุดชั่วคราว)',
+          '2. คลิกที่ตัวอาคารที่ชำรุดโดยตรง หรือกดปุ่ม REPAIR [R] เพื่อเข้าโหมดซ่อมแล้วคลิกซ่อมรายจุด',
+          '3. เมื่อซ่อมแซมเสร็จสิ้น ระบบน้ำและไฟจะกลับมาจ่ายตามปกติและเวลาชนะจะเดินต่อ!'
         ],
-        useAction: { type: 'action', value: 'repairToolOrAll', label: '🔧 ซ่อมอุปกรณ์ทันที (REPAIR NOW)' }
+        useAction: { type: 'tool', value: 'repair', label: '🔧 เลือกเครื่องมือซ่อมแซม (USE REPAIR TOOL)' }
       },
       special: {
         id: 'special',
-        title: '🎬 วิดีโอสาธิต: ไอเทมพิเศษ (Rome Candles & Amsterdam Flood Pump)',
-        subtitle: 'ฟีเจอร์ใหม่ v1.0: สต็อกเทียนไขรับมือไฟดับใน Rome & เครื่องสูบน้ำฉุกเฉิน 500 EUR ใน Amsterdam',
+        title: '🎬 วิดีโอสาธิต: ศูนย์จำลองและทดสอบภัยพิบัติ (Disaster Simulation Lab)',
+        subtitle: 'ใช้งบประมาณเทศบาล ($50 / ครั้ง) จำลองสภาพอากาศสุดขั้วเพื่อทดสอบระบบเมือง',
         steps: [
-          '1. ด่าน Rome มีโอกาสไฟดับ 12.5% ทุก 15 วัน: ต้องซื้อเทียนแบบ Bulk (20€-500€, กล่องละ 10€) ใช้ 1 กล่อง/บ้าน',
-          '2. ด่าน Amsterdam มีน้ำท่วมทุก 28 วัน (เกิน 2 นาที = Game Over): ต้องกดซื้อเครื่องสูบน้ำ (500 EUR) สูบออกทันที!',
-          '3. คลิกปุ่ม ITEMS [I] เพื่อเปิดร้านค้าไอเทมพิเศษและทดสอบภัยพิบัติได้ทุกเวลา!'
+          '1. คลิกปุ่ม DISASTER [I] ด้านล่างเพื่อเปิดศูนย์จำลองและทดสอบภัยพิบัติ',
+          '2. เลือกระบบทดสอบน้ำขึ้น แผ่นดินไหว ไฟดับ หรือน้ำท่วม โดยมีค่าทดสอบครั้งละ $50',
+          '3. สังเกตจุดที่โครงข่ายน้ำและไฟอาจชำรุด เพื่อวางแผนรับมือภัยพิบัติจริงได้อย่างแม่นยำ!'
         ],
-        useAction: { type: 'action', value: 'openSpecialItems', label: '🎒 เปิดร้านค้าไอเทมพิเศษ (OPEN ITEMS SHOP)' }
+        useAction: { type: 'action', value: 'openSpecialItems', label: '⚠️ เปิดศูนย์ทดสอบภัยพิบัติ (OPEN DISASTER LAB)' }
       },
       upgrades: {
         id: 'upgrades',
@@ -424,10 +382,10 @@
         name: '2. Tokyo, Japan',
         thaiName: 'ด่าน 2: โตเกียว (Clean Energy & Earthquake)',
         cityChallenge: 'โตเกียวต้องเตรียมรับมือกับแผ่นดินไหวและความเสียหายของโครงสร้างพื้นฐาน',
-        briefing: 'ภารกิจท่านนายกเทศมนตรี: รัฐบาลสนับสนุนงบประมาณพัฒนาเมืองยั่งยืน ลดราคาพลังงานสะอาด Clean Energy (Solar & Filter) ลง 25%!\nความท้าทายธรรมชาติ: แผ่นดินไหว (Earthquake) โอกาส 10-15% ทุกๆ 1 นาทีหลังหมดเวลาเตรียมพร้อม (และบังคับเกิดที่นาทีที่ 5) ส่งผลให้อุปกรณ์ปั๊มน้ำและเครื่องปั่นไฟทุกเครื่องเสียหายพร้อมกัน!',
-        conditionPlus: '(+) รัฐบาลสนับสนุน Clean Energy ราคาถูกลง 25% (Solar เหลือ $45)',
-        conditionMinus: '(-) แผ่นดินไหว (Earthquake): อุปกรณ์น้ำและไฟทุกเครื่องพังพร้อมกัน ต้องรีบซ่อมแซม!',
-        amigoQuote: 'ท่านนายกเทศมนตรีครับ รัฐบาลโตเกียวอุดหนุนพลังงานสะอาด 25% รีบวาง Solar Cell และหากเกิดแผ่นดินไหว กดปุ่ม REPAIR [R] หรือคลิกอาคารเพื่อซ่อมแซมโครงสร้างพื้นฐานทันที!',
+        briefing: 'ภารกิจท่านนายกเทศมนตรี: รัฐบาลสนับสนุนงบประมาณพัฒนาเมืองยั่งยืน ลดราคาฟิลเตอร์บำบัดมลภาวะ Clean Energy (Eco Filter) ลง 25% (เหลือ $30)!\nความท้าทายธรรมชาติ: แผ่นดินไหว (Earthquake) โอกาส 10-15% ทุกๆ 1 นาทีหลังหมดเวลาเตรียมพร้อม (และบังคับเกิดที่นาทีที่ 5) ส่งผลให้อุปกรณ์ปั๊มน้ำและเครื่องปั่นไฟทุกเครื่องเสียหายพร้อมกัน!',
+        conditionPlus: '(+) รัฐบาลสนับสนุน Clean Energy: Eco Filter ลดราคา 25% (เหลือ $30)',
+        conditionMinus: '(-) แผ่นดินไหว (Earthquake): อุปกรณ์น้ำและไฟทุกเครื่องพังพร้อมกัน ต้องส่งทีมซ่อมรายจุดทันที!',
+        amigoQuote: 'ท่านนายกเทศมนตรีครับ รัฐบาลโตเกียวอุดหนุน Eco Filter 25% และหากเกิดแผ่นดินไหว ให้กดปุ่ม REPAIR [R] หรือคลิกอาคารเพื่อซ่อมแซมโครงสร้างพื้นฐานทีละจุดทันทีครับ!',
         riverName: 'Sumida River (แม่น้ำสุมิดะ)',
         leftSideLabel: 'Chuo / Taito',
         rightSideLabel: 'Sumida / Koto',
@@ -456,12 +414,12 @@
         id: 'rome',
         sceneName: 'Rome',
         name: '3. Rome, Italy',
-        thaiName: 'ด่าน 3: โรม อิตาลี (Unlimited Aqueducts & Blackout Candles)',
+        thaiName: 'ด่าน 3: โรม อิตาลี (Unlimited Aqueducts & Blackout)',
         cityChallenge: 'โรมต้องบริหารระบบสาธารณูปโภคที่มีข้อจำกัดด้านความต่อเนื่องของพลังงาน',
-        briefing: 'ภารกิจท่านนายกเทศมนตรี: บริหารเมืองประวัติศาสตร์ที่มีระบบท่อส่งน้ำโรมันอันยอดเยี่ยม (ต่อท่อน้ำจากบ้านสู่บ้านได้ไม่จำกัด!)\nความท้าทายพลังงาน: โรมเผชิญกับข้อจำกัดความต่อเนื่องของพลังงาน มีโอกาสเกิดไฟดับครั้งใหญ่ (Blackout 12.5% ทุก 15 วัน) ผู้ว่าฯ ต้องสั่งสต็อกเทียนไขสำรอง (Candle) ไว้ในร้าน ITEMS เพื่อแจกจ่ายบ้านเรือน!',
+        briefing: 'ภารกิจท่านนายกเทศมนตรี: บริหารเมืองประวัติศาสตร์ที่มีระบบท่อส่งน้ำโรมันอันยอดเยี่ยม (ต่อท่อน้ำจากบ้านสู่บ้านได้ไม่จำกัด!)\nความท้าทายพลังงาน: โรมเผชิญกับข้อจำกัดความต่อเนื่องของพลังงาน มีโอกาสเกิดไฟดับครั้งใหญ่ (Blackout 12.5% ทุก 15 วัน) ส่งผลให้ไฟฟ้าขัดข้องชั่วคราวและ Win Timer หยุดเดิน!',
         conditionPlus: '(+) ระบบท่อส่งน้ำโรมันชั้นเยี่ยม ต่อท่อน้ำจากบ้านต่อบ้านได้ไม่จำกัดความจุ',
-        conditionMinus: '(-) โอกาสไฟดับทุก 15 วัน (12.5%) ต้องสต็อกเทียน (Candle) บ้านละ 1 กล่อง',
-        amigoQuote: 'Benvenuti a Roma, ท่านนายกเทศมนตรี! โรมมีท่อส่งน้ำโรมันโบราณอันทรงพลัง แต่พลังงานไฟฟ้ามักขัดข้อง โปรดสต็อกเทียนไขสำรองไว้ในร้านค้า ITEMS เสมอครับ!',
+        conditionMinus: '(-) โอกาสไฟดับชั่วคราวทุก 15 วัน (12.5%) ส่งผลให้ไฟฟ้าดับและ Win Timer หยุดเดินชั่วคราว',
+        amigoQuote: 'Benvenuti a Roma, ท่านนายกเทศมนตรี! โรมมีท่อส่งน้ำโรมันโบราณอันทรงพลัง แต่พลังงานไฟฟ้ามักขัดข้อง โปรดวางแผนโครงข่ายและเตรียมพร้อมเมื่อระบบไฟฟ้าดับชั่วคราวครับ!',
         riverName: 'Tiber River (แม่น้ำไทเบอร์)',
         leftSideLabel: 'Trastevere & Vatican',
         rightSideLabel: 'Centro Storico & Colosseo',
@@ -493,10 +451,10 @@
         name: '4. Amsterdam, Netherlands',
         thaiName: 'ด่าน 4: อัมสเตอร์ดัม (ด่านยากที่สุดของเกม - Extreme Flood)',
         cityChallenge: 'อัมสเตอร์ดัมต้องรักษาสมดุลของระบบเมืองที่พัฒนาไปจนเกือบเต็มศักยภาพ พร้อมรับมือกับภัยพิบัติทางธรรมชาติ',
-        briefing: 'ภารกิจท่านนายกเทศมนตรี: บททดสอบสูงสุดของการบริหารเมืองยั่งยืน! เมืองอิ่มตัวและพัฒนาจนเกือบเต็มศักยภาพ (บ้านเกิดช้าลง 20%, ลดค่าก่อสร้าง 5%)\nความท้าทายเข้มงวด: ประชาชนรับไม่ได้กับความผิดพลาด (ถูกร้องเรียนแม้แต่ครั้งเดียว = Game Over ทันที!) แถมต้องเผชิญทั้งแผ่นดินไหว น้ำขึ้น และน้ำท่วมใหญ่ Amstel Canal ทุก 28 วัน (เกิน 2 นาที = Game Over)!',
+        briefing: 'ภารกิจท่านนายกเทศมนตรี: บททดสอบสูงสุดของการบริหารเมืองยั่งยืน! เมืองอิ่มตัวและพัฒนาจนเกือบเต็มศักยภาพ (บ้านเกิดช้าลง 20%, ลดค่าก่อสร้าง 5%)\nความท้าทายเข้มงวด: ประชาชนรับไม่ได้กับความผิดพลาด (ถูกร้องเรียนแม้แต่ครั้งเดียว = Game Over ทันที!) แถมต้องเผชิญทั้งแผ่นดินไหว น้ำขึ้น และน้ำท่วมใหญ่ Amstel Canal ทุก 28 วัน!',
         conditionPlus: '(+) ลดค่าก่อสร้าง 5% และบ้านเกิดช้าลง 20%',
         conditionMinus: '(-) ห้ามถูกร้องเรียนเด็ดขาด (1 ร้องเรียน = Game Over) + น้ำท่วมใหญ่ทุก 28 วัน!',
-        amigoQuote: 'บททดสอบสูงสุดของท่านผู้ว่าฯ! Zero Complaint Tolerance ห้ามประชาชนร้องเรียนแม้แต่ครั้งเดียว และเตรียมงบ 500 EUR ซื้อเครื่องสูบน้ำฉุกเฉินรับมือน้ำท่วมใหญ่ Amstel Canal ครับ!',
+        amigoQuote: 'บททดสอบสูงสุดของท่านผู้ว่าฯ! Zero Complaint Tolerance ห้ามประชาชนร้องเรียนแม้แต่ครั้งเดียว และบริหารจัดการเมืองให้ยืดหยุ่นต่อภัยพิบัติทางธรรมชาติครับ!',
         riverName: 'Amstel Canal (คลองอัมสเทล)',
         leftSideLabel: 'Jordaan & West Canal',
         rightSideLabel: 'Centrum & Oosterdok',
@@ -539,8 +497,8 @@
         thaiTitle: 'พลังงานสะอาดที่เข้าถึงได้',
         color: '#fcc30b',
         icon: '⚡',
-        quote: 'การส่งเสริมพลังงานสะอาดและการเข้าถึงไฟฟ้าอย่างทั่วถึง โดยเน้นการใช้พลังงานหมุนเวียน เช่น Solar Cell',
-        desc: 'ส่งเสริมการใช้พลังงานหมุนเวียน เช่น โซลาร์เซลล์ (Solar Cell) ที่ผลิตไฟฟ้าได้โดยไม่ปล่อยมลภาวะสู่บรรยากาศ'
+        quote: 'การส่งเสริมพลังงานสะอาดและการเข้าถึงไฟฟ้าอย่างทั่วถึง เพื่อให้ประชาชนทุกคนมีพลังงานไฟฟ้าใช้อย่างยั่งยืน',
+        desc: 'ส่งเสริมการจัดการระบบโครงข่ายไฟฟ้าที่มีเสถียรภาพ เพื่อให้ประชาชนทุกครัวเรือนเข้าถึงพลังงานได้อย่างทั่วถึง'
       },
       {
         number: 15,
@@ -706,26 +664,9 @@
       }
     }
 
-    const spCfg = fc.specialItems;
-    if (spCfg && typeof spCfg === 'object' && CONFIG.SPECIAL_ITEMS) {
-      if (typeof spCfg.candleBoxUnitPrice === 'number') {
-        CONFIG.SPECIAL_ITEMS.CANDLE_BOX_UNIT_PRICE = spCfg.candleBoxUnitPrice;
-        if (CONFIG.DISASTERS && CONFIG.DISASTERS.BLACKOUT) {
-          CONFIG.DISASTERS.BLACKOUT.candleBoxUnitPrice = spCfg.candleBoxUnitPrice;
-        }
-      }
-      if (typeof spCfg.startingCandlesRome === 'number' && CONFIG.DISASTERS && CONFIG.DISASTERS.BLACKOUT) {
-        CONFIG.DISASTERS.BLACKOUT.startingCandlesRome = spCfg.startingCandlesRome;
-      }
-      if (Array.isArray(spCfg.candlePacks)) {
-        CONFIG.SPECIAL_ITEMS.CANDLE_PACKS = spCfg.candlePacks.map(p => Object.assign({}, p));
-      }
-      if (typeof spCfg.emergencyFloodPumpCost === 'number' && CONFIG.SPECIAL_ITEMS.FLOOD_PUMP) {
-        CONFIG.SPECIAL_ITEMS.FLOOD_PUMP.cost = spCfg.emergencyFloodPumpCost;
-        if (CONFIG.DISASTERS && CONFIG.DISASTERS.FLOOD) {
-          CONFIG.DISASTERS.FLOOD.emergencyPumpCost = spCfg.emergencyFloodPumpCost;
-        }
-      }
+    const dtCfg = fc.disasterTesting;
+    if (dtCfg && typeof dtCfg.testCost === 'number') {
+      CONFIG.DISASTER_TEST_COST = dtCfg.testCost;
     }
 
     const upgCfg = fc.upgrades;
