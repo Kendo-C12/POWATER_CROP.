@@ -18,6 +18,7 @@
       this.modalGfx = null;
       this.activeModal = null; // null | 'briefing' | 'upgrades' | 'special_items' | 'sdgs' | 'feature_video' | 'gameover' | 'victory' | 'grace_ended'
       this.modalData = {};
+      this.showSdg15Story = false;
       this.hoveredButtonId = null;
       this.hoveredVideoBtnId = null;
 
@@ -1427,7 +1428,7 @@
       }
     }
 
-    renderSdgsContent(mx, my, mw) {
+    renderSdgsContent(mx, my, mw, mh, mouseX, mouseY) {
       const font = 'system-ui, -apple-system, Segoe UI, Roboto, sans-serif';
       const title = this.makeText('🎯 SDGs & Roadmap — Core Concept: The Urban Sustainability Crisis', {
         fontFamily: font, fontSize: 14.5, fontWeight: 'bold', fill: 0x00b4d8
@@ -1439,22 +1440,25 @@
 
       const sdgs = [
         {
+          id: 'sdg6',
           title: 'SDG 6: CLEAN WATER AND SANITATION',
           desc: 'การจัดการน้ำสะอาดและระบบสุขาภิบาล เพื่อให้ประชาชนทุกครัวเรือนเข้าถึงน้ำที่มีคุณภาพ สูบน้ำสะอาดและบำบัดน้ำเสียริมแม่น้ำ',
           color: 0x26bde2,
           tag: 'CORE UTILITY'
         },
         {
+          id: 'sdg7',
           title: 'SDG 7: AFFORDABLE AND CLEAN ENERGY',
           desc: 'การส่งเสริมพลังงานสะอาดและการเข้าถึงไฟฟ้าอย่างทั่วถึง โดยเน้นการใช้พลังงานหมุนเวียน เช่น Solar Cell 0% มลภาวะ',
           color: 0xfcc30b,
           tag: 'CORE UTILITY'
         },
         {
+          id: 'sdg15',
           title: 'SDG 15: LIFE ON LAND (🌱 EASTER EGG & MINI-ACHIEVEMENT)',
-          desc: isSdg15Unlocked
-            ? '✅ ปลดล็อกแล้ว! เรื่องสั้น: "ตึกรามสร้างใหม่ได้ แต่ผืนป่ามิอาจฟื้นคืนได้ง่ายดาย... ผู้ว่าฯ รักษาสมดุลธรรมชาติเคียงคู่มหานคร"'
-            : '🔒 ปลดล็อกโดย: ติดตั้งเครื่องกรองมลภาวะ (Eco Filter) หรือรักษาระดับมลภาวะให้บริสุทธิ์เพื่อฟังบันทึกเรื่องสั้นผู้ว่าฯ',
+          desc: (this.showSdg15Story || isSdg15Unlocked)
+            ? '✅ บันทึกผู้ว่าฯ: "ตึกรามสร้างใหม่ได้ แต่ผืนป่ามิอาจฟื้นคืนได้ง่ายดาย... ผู้ว่าฯ ดูแลธรรมชาติไม่ปล่อยมลพิษทำลายสิ่งแวดล้อม นกและต้นไม้ยังคงเบ่งบานเคียงคู่มหานคร"'
+            : '🔒 Easter Egg: ติดตั้งเครื่องกรอง Eco Filter หรือรักษาระดับมลภาวะให้บริสุทธิ์เพื่อฟังเรื่องสั้นบันทึกผู้ว่าฯ (หรือคลิกปุ่มเพื่อเปิดอ่าน)',
           color: 0x56ab2f,
           tag: isSdg15Unlocked ? 'ACHIEVED' : 'EASTER EGG'
         }
@@ -1476,10 +1480,29 @@
         this.modalTextContainer.addChild(badgeTxt);
 
         const descTxt = this.makeText(s.desc, {
-          fontFamily: font, fontSize: 11, fill: 0xe9ecef, wordWrap: true, wordWrapWidth: mw - 65, lineHeight: 17
+          fontFamily: font, fontSize: 10.5, fill: 0xe9ecef, wordWrap: true, wordWrapWidth: mw - 160, lineHeight: 16
         });
         descTxt.position.set(mx + 32, cardY + 28);
         this.modalTextContainer.addChild(descTxt);
+
+        // Interactive Button for SDG 15 Easter Egg Story
+        if (s.id === 'sdg15') {
+          const storyBtn = { id: 'toggle_sdg15_story', x: mx + mw - 145, y: cardY + 18, w: 110, h: 30 };
+          this.modalButtons.push(storyBtn);
+          const isHov = mouseX >= storyBtn.x && mouseX <= storyBtn.x + storyBtn.w && mouseY >= storyBtn.y && mouseY <= storyBtn.y + storyBtn.h;
+
+          this.modalGfx.lineStyle(1.5, 0x56ab2f, 0.9);
+          this.modalGfx.beginFill(isHov ? 0x2d6a4f : 0x1b4332, 0.95);
+          this.modalGfx.drawRoundedRect(storyBtn.x, storyBtn.y, storyBtn.w, storyBtn.h, 6);
+          this.modalGfx.endFill();
+
+          const sBtnTxt = this.makeText(this.showSdg15Story ? '📖 ซ่อนเรื่องสั้น' : '🌱 อ่านเรื่องสั้น', {
+            fontFamily: font, fontSize: 10.5, fontWeight: 'bold', fill: 0x95d5b2
+          });
+          sBtnTxt.anchor.set(0.5);
+          sBtnTxt.position.set(storyBtn.x + storyBtn.w / 2, storyBtn.y + storyBtn.h / 2);
+          this.modalTextContainer.addChild(sBtnTxt);
+        }
       }
 
       const rmY = my + 284;
@@ -1496,7 +1519,7 @@
 
       const roadmapText = this.makeText(
         '• ปรัชญาการบริหาร: "เป้าหมายสูงสุดไม่ใช่การสร้างเมืองที่ใหญ่ที่สุด แต่คือการสร้างเมืองที่เติบโตได้อย่างยั่งยืน"\n' +
-        '• v1.0.3.1 (Current): 4 ด่านหลัก, Fast Tutorial, วิดีโอสาธิต [▶], ระบบซ่อมบำรุง, กลางวัน/กลางคืน, Upsize 40 หลัง\n' +
+        '• v1.0.3.2 (Current): 4 ด่านหลัก, Fast Tutorial, วิดีโอสาธิต [▶], ระบบซ่อมบำรุง, กลางวัน/กลางคืน, Upsize 40 หลัง, SDG 15 Easter Egg\n' +
         '• v1.1 - Seasonal Update: ระบบ 4 ฤดูกาล ส่งผลต่อแสงแดด ปริมาณน้ำฝน และความต้องการสาธารณูปโภค\n' +
         '• v1.2 - Save The World Update: เมืองใหม่ระดับโลก และระบบป่าไม้ (Forestry System) ขยายความสมบูรณ์ SDG 15\n' +
         '• v1.3 - Monopoly Update: ตัวละครผู้ช่วยและ In-Game Currency ตอบสนองความยั่งยืนทางการเงิน\n' +
@@ -1675,6 +1698,18 @@
           if (btn.id === 'start_fast_tutorial') {
             this.closeModal();
             if (this.game) this.game.startTutorial();
+            return;
+          }
+
+          if (btn.id === 'toggle_sdg15_story') {
+            this.showSdg15Story = !this.showSdg15Story;
+            if (this.game) {
+              this.game.sdg15Unlocked = true;
+              if (this.showSdg15Story) {
+                this.game.addFloatingText('🌱 ปลดล็อก Easter Egg บันทึกเรื่องสั้น SDG 15 (Life on Land)!', CONFIG.CANVAS_WIDTH / 2, 70, '#56ab2f');
+                if (global.POWATER.soundManager) global.POWATER.soundManager.playUpgrade();
+              }
+            }
             return;
           }
 
