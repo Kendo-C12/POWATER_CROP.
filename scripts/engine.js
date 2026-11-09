@@ -299,6 +299,7 @@
       this.isTutorialMode = true;
       this.tutorialStep = 1;
       this.tutorialStepTimer = 0.0;
+      this.tutorialHouse2 = null;
       this.money = 300;
       this.activeTool = 'power';
 
@@ -313,43 +314,79 @@
       this.addFloatingText('🎓 เริ่มโหมดฝึกสอนด่วน (Fast Scene Tutorial)! ทำตามลูกศรแนะนำได้เลย', CONFIG.CANVAS_WIDTH / 2, 115, '#06d6a0');
     }
 
+    // Free spot near a node for tutorial spawns (same river side, not in river, not on top of anything)
+    findTutorialSpot(near) {
+      const c = near.getCenter ? near.getCenter() : { x: near.centerX, y: near.centerY };
+      const offs = [[0, 150], [0, -150], [160, 0], [-160, 0], [140, 140], [-140, 140], [140, -140], [-140, -140]];
+      for (let i = 0; i < offs.length; i++) {
+        const x = c.x + offs[i][0], y = c.y + offs[i][1];
+        if (x < 60 || x > CONFIG.CANVAS_WIDTH - 60 || y < 100 || y > CONFIG.CANVAS_HEIGHT - 120) continue;
+        if (this.map.isPointInRiver(x, y) || this.map.isNearRiver(x, y, 40)) continue;
+        const busy = [...this.houses, ...this.buildings].some(e => {
+          const ec = e.getCenter ? e.getCenter() : { x: e.centerX, y: e.centerY };
+          return Math.hypot(ec.x - x, ec.y - y) < 95;
+        });
+        if (!busy) return { x, y };
+      }
+      return null;
+    }
+
+    // Tutorial steps: 1 power, 2 water, 3 sewage, 4 chain a new house, 5 repair,
+    // 6 lose-by-pollution (place Eco Filter), 7 lose-by-strikes (read & confirm), 8 done
     updateTutorial(dt) {
       if (!this.isTutorialMode || this.tutorialStep <= 0) return;
       this.tutorialStepTimer += dt;
       const h0 = this.houses[0];
+      const h1 = this.tutorialHouse2;
       const pump = this.buildings.find(b => b.config && b.config.type === 'water_pump');
       if (!h0) return;
+      const say = (msg, col) => this.addFloatingText(msg, CONFIG.CANVAS_WIDTH / 2, 150, col);
+      const sfx = (name) => { if (global.POWATER.soundManager) global.POWATER.soundManager[name](); };
+      const next = () => { this.tutorialStep++; this.tutorialStepTimer = 0; };
 
       if (this.tutorialStep === 1 && h0.hasPower) {
-        this.tutorialStep = 2;
-        this.tutorialStepTimer = 0;
+        next();
         this.activeTool = 'water';
-        this.addFloatingText('✅ ขั้นที่ 1 สำเร็จ! ตอนนี้ลากท่อน้ำดีสีฟ้าจากปั๊มน้ำไปที่บ้าน', CONFIG.CANVAS_WIDTH / 2, 115, '#00b4d8');
-        if (global.POWATER.soundManager) global.POWATER.soundManager.playUpgrade();
+        say('✅ ขั้นที่ 1 สำเร็จ! ลากท่อน้ำดีสีฟ้าจากปั๊มน้ำไปที่บ้าน (กด Tab เพื่อสลับชนิดสาย)', '#00b4d8');
+        sfx('playUpgrade');
       } else if (this.tutorialStep === 2 && h0.hasWater) {
-        this.tutorialStep = 3;
-        this.tutorialStepTimer = 0;
+        next();
         this.activeTool = 'sewage';
-        this.addFloatingText('✅ ขั้นที่ 2 สำเร็จ! ตอนนี้ลากท่อน้ำเสียสีม่วงจากบ้านไปที่ถังบำบัดริมน้ำ', CONFIG.CANVAS_WIDTH / 2, 115, '#c77dff');
-        if (global.POWATER.soundManager) global.POWATER.soundManager.playUpgrade();
+        say('✅ ขั้นที่ 2 สำเร็จ! ลากท่อน้ำเสียสีม่วงจากบ้านไปที่ถังบำบัดริมน้ำ', '#c77dff');
+        sfx('playUpgrade');
       } else if (this.tutorialStep === 3 && h0.hasDrainage) {
-        this.tutorialStep = 4;
-        this.tutorialStepTimer = 0;
+        next();
+        this.activeTool = 'power';
+        const spot = this.findTutorialSpot(h0);
+        this.tutorialHouse2 = spot ? this.spawnHouse(h0.side || null, spot.x, spot.y) : null;
+        say('✅ บ้านสมบูรณ์ +$50! มีบ้านหลังใหม่: ลากสายจากบ้านเดิมไปบ้านใหม่ได้เลย (Tab สลับ ไฟ/น้ำ/น้ำเสีย)', '#ffd166');
+        sfx('playUpgrade');
+      } else if (this.tutorialStep === 4 && (!h1 || (h1.hasPower && h1.hasWater && h1.hasDrainage))) {
+        next();
         this.activeTool = 'repair';
         if (pump) pump.breakDown();
-        this.addFloatingText('✅ บ้านสมบูรณ์ รับ +$50! ตอนนี้ลองซ่อมเครื่องปั๊มน้ำที่เสีย (คลิกที่ปั๊มหรือกดปุ่ม REPAIR)', CONFIG.CANVAS_WIDTH / 2, 115, '#ff5a5f');
-        if (global.POWATER.soundManager) global.POWATER.soundManager.playPollutionWarn();
-      } else if (this.tutorialStep === 4 && pump && !pump.isBroken) {
-        this.tutorialStep = 5;
-        this.tutorialStepTimer = 0;
-        this.addFloatingText('🎉 ฝึกสอนสำเร็จครบทุกขั้นตอน! คลิกปุ่ม [▶] เหนือไอคอนเพื่อดูวิดีโอฟีเจอร์ หรือเริ่มด่านจริงได้เลย!', CONFIG.CANVAS_WIDTH / 2, 115, '#06d6a0');
-        if (global.POWATER.soundManager) global.POWATER.soundManager.playWin();
+        say('✅ ต่อพ่วงบ้านสำเร็จ! ปั๊มน้ำเสียแล้ว: คลิกที่ปั๊ม หรือกด REPAIR [R] แล้วคลิกปั๊มเพื่อซ่อม', '#ff5a5f');
+        sfx('playPollutionWarn');
+      } else if (this.tutorialStep === 5 && pump && !pump.isBroken) {
+        next();
+        this.activeTool = 'build_air_filter';
+        this.tutorialFilterCount = this.buildings.filter(b => b.config.type === 'air_filter').length;
+        this.pollution = this.currentLevel.maxPollution * 0.8;
+        say('☢️ วิธีแพ้ที่ 1: มลภาวะเต็มหลอด = Game Over! วางเครื่องกรองอากาศ [4] เพื่อลดมลภาวะ', '#ff5a5f');
+        sfx('playPollutionWarn');
+      } else if (this.tutorialStep === 6 && this.buildings.filter(b => b.config.type === 'air_filter').length > (this.tutorialFilterCount || 0)) {
+        next();
+        this.activeTool = null;
+        say('✅ เครื่องกรองกำลังลดมลภาวะ! ต่อไป วิธีแพ้ที่ 2: การร้องเรียน (Strike)', '#06d6a0');
+        sfx('playUpgrade');
       }
+      // Step 7 is read-only: the player confirms with the coach-bar button (skipTutorialStep)
     }
 
     skipTutorialStep() {
       if (!this.isTutorialMode) return;
       const h0 = this.houses[0];
+      const h1 = this.tutorialHouse2;
       const gen = this.buildings.find(b => b.config && b.config.type === 'generator');
       const pump = this.buildings.find(b => b.config && b.config.type === 'water_pump');
       const filter = this.buildings.find(b => b.config && b.config.type === 'waste_filter');
@@ -359,9 +396,20 @@
         this.connectNodes('water', pump, h0);
       } else if (this.tutorialStep === 3 && filter && h0) {
         this.connectNodes('sewage', h0, filter);
-      } else if (this.tutorialStep === 4) {
+      } else if (this.tutorialStep === 4 && h0 && h1) {
+        ['power', 'water', 'sewage'].forEach(t => this.connectNodes(t, h0, h1));
+      } else if (this.tutorialStep === 5) {
         const broken = this.buildings.find(b => b.isBroken);
         if (broken) broken.repair();
+      } else if (this.tutorialStep === 6) {
+        const spot = h0 && this.findTutorialSpot(h0);
+        if (spot) this.createBuilding('air_filter', spot.x, spot.y);
+        else this.tutorialFilterCount = -1;
+      } else if (this.tutorialStep === 7) {
+        this.tutorialStep = 8;
+        this.pollution = 0;
+        this.addFloatingText('🎉 ฝึกสอนครบทุกขั้นตอน! เริ่มด่าน Bangkok ได้เลย', CONFIG.CANVAS_WIDTH / 2, 115, '#06d6a0');
+        if (global.POWATER.soundManager) global.POWATER.soundManager.playWin();
       }
     }
 
@@ -1120,7 +1168,7 @@
 
     updatePollution(dt) {
       const delay = CONFIG.POLLUTION_START_DELAY_SECONDS || 180;
-      if (this.levelElapsedTime < delay) {
+      if (this.levelElapsedTime < delay && !this.isTutorialMode) {
         this.currentPollutionRate = 0.0;
         this.pollution = 0.0;
         return;

@@ -214,6 +214,30 @@ async function runTest() {
     throw new Error('4-Level special mechanics verification failed!');
   }
 
+  // 5. Simulation keeps running while the cursor rests on the HUD (used to freeze time & pollution)
+  await page.evaluate(() => { window.POWATER.uiManager.closeModal(); window.POWATER.game.startLevel(0); });
+  await page.mouse.move(740, 20);
+  await new Promise(r => setTimeout(r, 1500));
+  const hoverElapsed = await page.evaluate(() => window.POWATER.game.levelElapsedTime);
+  // 6. Tab cycles wire type
+  await page.evaluate(() => { window.POWATER.game.activeTool = 'power'; });
+  await page.keyboard.press('Tab');
+  const afterTab = await page.evaluate(() => window.POWATER.game.activeTool);
+  // 7. Tutorial runs all 7 steps (house chaining, repair, pollution, strikes)
+  const tutSteps = await page.evaluate(() => {
+    const g = window.POWATER.game;
+    g.startTutorial();
+    const seen = [];
+    for (let i = 0; i < 7; i++) { seen.push(g.tutorialStep); g.skipTutorialStep(); g.update(0.05); }
+    return { seen, final: g.tutorialStep, chained: !!(g.tutorialHouse2 && g.tutorialHouse2.hasPower && g.tutorialHouse2.hasDrainage) };
+  });
+  console.log('5-7. HUD hover / Tab / Tutorial:', { hoverElapsed, afterTab, tutSteps });
+  if (hoverElapsed < 1.0 || afterTab !== 'water' || tutSteps.final !== 8 || tutSteps.seen.join() !== '1,2,3,4,5,6,7' || !tutSteps.chained) {
+    throw new Error('HUD-hover simulation, Tab wire switch, or tutorial check failed!');
+  }
+  await page.evaluate(() => window.POWATER.game.startLevel(0));
+  await page.mouse.move(640, 400);
+
   const screenshotPath = path.join(__dirname, '..', 'test_screenshot.png');
   await page.screenshot({ path: screenshotPath });
   console.log('Saved gameplay screenshot to:', screenshotPath);

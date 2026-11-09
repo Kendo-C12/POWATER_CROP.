@@ -48,6 +48,12 @@
         else if (key === '3') this.ui.selectTool('sewage');
         else if (key === '4') this.ui.selectTool('build_air_filter');
         else if (key === 'r') this.ui.selectTool('repair');
+        else if (key === 'tab') {
+          // Cycle wire type power -> water -> sewage (works mid-drag: the wire type is read on release)
+          e.preventDefault();
+          const wires = ['power', 'water', 'sewage'];
+          this.ui.selectTool(wires[(wires.indexOf(this.game.activeTool) + 1) % wires.length]);
+        }
         else if (key === 'i') this.ui.showSpecialItemsModal();
         else if (key === 'u') this.ui.showUpgradesModal();
         else if (key === ' ') this.game.togglePause();
@@ -310,15 +316,26 @@
         uiHandled = this.ui.update(dt, mouseX, mouseY, isMouseDown, this.wasMouseDown);
       }
 
+      // UI hover/click only blocks world input; the simulation keeps running unless a modal is open
       if (uiHandled) {
         this.selectedNode = null;
         this.dragStartNode = null;
         this.isDragging = false;
-        this.wasMouseDown = isMouseDown;
         this.wasRightDown = isRightDown;
-        return;
+      } else {
+        this.handleWorldInput(mouseX, mouseY, isMouseDown, isRightDown);
       }
+      this.wasMouseDown = isMouseDown;
 
+      // 3. Simulation Step (modals pause the game)
+      if (!this.ui || !this.ui.activeModal) this.game.update(dt);
+      this.ui.updateHUD();
+
+      // 4. Render Graphics
+      this.render();
+    }
+
+    handleWorldInput(mouseX, mouseY, isMouseDown, isRightDown) {
       const hitNode = this.game.getNodeAt(mouseX, mouseY);
       this.game.hoveredNode = hitNode;
 
@@ -421,14 +438,6 @@
         this.isDragging = false;
         this.dragStartNode = null;
       }
-      this.wasMouseDown = isMouseDown;
-
-      // 3. Simulation Step
-      this.game.update(dt);
-      this.ui.updateHUD();
-
-      // 4. Render Graphics
-      this.render();
     }
 
     handleConnect(nodeA, nodeB) {
@@ -575,7 +584,7 @@
       }
 
       // 7. Interactive Fast Tutorial Visual Guide (Manhattan Guide Line & Target Highlight)
-      if (this.game.isTutorialMode && this.game.tutorialStep >= 1 && this.game.tutorialStep <= 4) {
+      if (this.game.isTutorialMode && this.game.tutorialStep >= 1 && this.game.tutorialStep <= 5) {
         const step = this.game.tutorialStep;
         const house = this.game.houses[0];
         let srcNode = null;
@@ -595,6 +604,10 @@
           dstNode = this.game.buildings.find(b => b.config && b.config.type === 'waste_filter');
           guideColor = 0xc77dff;
         } else if (step === 4) {
+          srcNode = house;
+          dstNode = this.game.tutorialHouse2;
+          guideColor = { power: 0xffd166, water: 0x00b4d8, sewage: 0xc77dff }[this.game.activeTool] || 0xffd166;
+        } else if (step === 5) {
           srcNode = this.game.buildings.find(b => b.isBroken) || this.game.buildings.find(b => b.config && b.config.type === 'water_pump');
           guideColor = 0xef476f;
         }
@@ -630,7 +643,7 @@
           gfxO.lineStyle(3, guideColor, 0.9);
           gfxO.drawCircle(c1.x, c1.y, rPulse);
           gfxO.drawCircle(c2.x, c2.y, rPulse + 6);
-        } else if (srcNode && step === 4) {
+        } else if (srcNode && step === 5) {
           const c1 = srcNode.getCenter();
           const rPulse = 48 + Math.sin(this.pulseTime * 6) * 6;
           gfxO.lineStyle(3.5, 0xef476f, 0.95);

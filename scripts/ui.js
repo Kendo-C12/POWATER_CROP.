@@ -88,16 +88,16 @@
 
       // 10 Toolbar Buttons matching the 10 GDevelop PNG Sprite instances on the dock tray
       this.buttons = [
-        { id: 'power', objectName: 'btn_power', title: '⚡ POWER', sub: '[1] WIRE', videoKey: 'power', type: 'tool', toolId: 'power', x: 302, y: tbY, w: tbW, h: tbH, color: 0xffb703 },
-        { id: 'water', objectName: 'btn_water', title: '💧 WATER', sub: '[2] PIPE', videoKey: 'water', type: 'tool', toolId: 'water', x: 370, y: tbY, w: tbW, h: tbH, color: 0x00b4d8 },
-        { id: 'sewage', objectName: 'btn_drain', title: '🧪 DRAIN', sub: '[3] SEWAGE', videoKey: 'sewage', type: 'tool', toolId: 'sewage', x: 438, y: tbY, w: tbW, h: tbH, color: 0x9d4edd },
-        { id: 'air_filter', objectName: 'btn_filter', title: '🍃 FILTER', sub: '[4] $40', videoKey: 'air_filter', type: 'build', buildId: 'build_air_filter', x: 506, y: tbY, w: tbW, h: tbH, color: 0x06d6a0 },
-        { id: 'repair', objectName: 'btn_repair', title: '🔧 REPAIR', sub: '[R] FIX', videoKey: 'repair', type: 'action', action: 'repairTool', x: 574, y: tbY, w: tbW, h: tbH, color: 0xff5a5f },
-        { id: 'special', objectName: 'btn_special', title: '🧪 TEST', sub: '[I] LAB', videoKey: 'special', type: 'action', action: 'openSpecialItems', x: 642, y: tbY, w: tbW, h: tbH, color: 0x06d6a0 },
-        { id: 'pause', objectName: 'btn_pause', title: '⏸️ PAUSE', sub: '[SPACE]', type: 'action', action: 'togglePause', x: 710, y: tbY, w: tbW, h: tbH, color: 0xadb5bd },
-        { id: 'speed', objectName: 'btn_speed', title: '⏩ SPEED', sub: '1X / 2X', type: 'action', action: 'toggleSpeed', x: 778, y: tbY, w: tbW, h: tbH, color: 0xadb5bd },
-        { id: 'upgrades', objectName: 'btn_upgrade', title: '⬆️ TECH', sub: '[U] UPGRD', videoKey: 'upgrades', type: 'action', action: 'openUpgrades', x: 846, y: tbY, w: tbW, h: tbH, color: 0xffd166 },
-        { id: 'guide', objectName: 'btn_guide', title: '📖 LEVELS', sub: 'BRIEFING', videoKey: 'guide', type: 'action', action: 'openGuide', x: 914, y: tbY, w: tbW, h: tbH, color: 0x48cae4 },
+        { id: 'power', objectName: 'btn_power', title: '⚡ POWER', sub: '[1] WIRE', videoKey: 'power', type: 'tool', toolId: 'power', x: 275, y: tbY, w: tbW, h: tbH, color: 0xffb703 },
+        { id: 'water', objectName: 'btn_water', title: '💧 WATER', sub: '[2] PIPE', videoKey: 'water', type: 'tool', toolId: 'water', x: 349, y: tbY, w: tbW, h: tbH, color: 0x00b4d8 },
+        { id: 'sewage', objectName: 'btn_drain', title: '🧪 DRAIN', sub: '[3] SEWAGE', videoKey: 'sewage', type: 'tool', toolId: 'sewage', x: 423, y: tbY, w: tbW, h: tbH, color: 0x9d4edd },
+        { id: 'air_filter', objectName: 'btn_filter', title: '🍃 FILTER', sub: '[4] $40', videoKey: 'air_filter', type: 'build', buildId: 'build_air_filter', x: 497, y: tbY, w: tbW, h: tbH, color: 0x06d6a0 },
+        { id: 'repair', objectName: 'btn_repair', title: '🔧 REPAIR', sub: '[R] FIX', videoKey: 'repair', type: 'action', action: 'repairTool', x: 571, y: tbY, w: tbW, h: tbH, color: 0xff5a5f },
+        { id: 'special', objectName: 'btn_special', title: '🧪 TEST', sub: '[I] LAB', videoKey: 'special', type: 'action', action: 'openSpecialItems', x: 645, y: tbY, w: tbW, h: tbH, color: 0x06d6a0 },
+        { id: 'pause', objectName: 'btn_pause', title: '⏸️ PAUSE', sub: '[SPACE]', type: 'action', action: 'togglePause', x: 719, y: tbY, w: tbW, h: tbH, color: 0xadb5bd },
+        { id: 'speed', objectName: 'btn_speed', title: '⏩ SPEED', sub: '1X / 2X', type: 'action', action: 'toggleSpeed', x: 793, y: tbY, w: tbW, h: tbH, color: 0xadb5bd },
+        { id: 'upgrades', objectName: 'btn_upgrade', title: '⬆️ TECH', sub: '[U] UPGRD', videoKey: 'upgrades', type: 'action', action: 'openUpgrades', x: 867, y: tbY, w: tbW, h: tbH, color: 0xffd166 },
+        { id: 'guide', objectName: 'btn_guide', title: '📖 LEVELS', sub: 'BRIEFING', videoKey: 'guide', type: 'action', action: 'openGuide', x: 941, y: tbY, w: tbW, h: tbH, color: 0x48cae4 },
         { id: 'logo', type: 'action', action: 'openGuide', x: 8, y: 6, w: 185, h: 32 }
       ];
 
@@ -281,7 +281,13 @@
       if (this.txtPollution) {
         const p = this.game.pollution.toFixed(1);
         const maxP = this.game.currentLevel ? this.game.currentLevel.maxPollution.toFixed(1) : '6.0';
-        this.txtPollution.text = `☢️ ${p}/${maxP}`;
+        const startIn = (CONFIG.POLLUTION_START_DELAY_SECONDS || 180) - (this.game.levelElapsedTime || 0);
+        if (startIn > 0 && !this.game.isTutorialMode) {
+          const m = Math.floor(startIn / 60), sec = String(Math.floor(startIn % 60)).padStart(2, '0');
+          this.txtPollution.text = `☢️ เริ่มใน ${m}:${sec}`;
+        } else {
+          this.txtPollution.text = `☢️ ${p}/${maxP}`;
+        }
       }
       if (this.txtTime) {
         const dName = this.game.dayNames ? this.game.dayNames[this.game.dayIndex] : 'MON';
@@ -433,27 +439,33 @@
       g.drawRoundedRect(barX, barY, barW, barH, 8);
       g.endFill();
 
-      let stepMsg = '';
-      if (step === 1) {
-        stepMsg = '🎓 ขั้นที่ 1/4: ลากสายไฟ (สีเหลือง) จาก โรงปั่นไฟ ไปยัง บ้านตัวอย่าง (หรือคลิก [▶] เหนือปุ่ม POWER เพื่อดูวิดีโอ)';
-      } else if (step === 2) {
-        stepMsg = '🎓 ขั้นที่ 2/4: ลากท่อน้ำดี (สีฟ้า) จาก เครื่องปั๊มน้ำริมแม่น้ำ ไปยัง บ้านตัวอย่าง';
-      } else if (step === 3) {
-        stepMsg = '🎓 ขั้นที่ 3/4: ลากท่อระบายน้ำ (สีม่วง) จาก บ้าน ไปยัง ถังบำบัดริมแม่น้ำ เพื่อรับโบนัส +$50 ทันที!';
-      } else if (step === 4) {
-        stepMsg = '🎓 ขั้นที่ 4/4: เครื่องปั๊มน้ำเสียแล้ว (ขึ้นประแจแดง)! คลิกที่เครื่องปั๊มน้ำ หรือกดปุ่ม REPAIR [R] เพื่อซ่อมทันที!';
-      } else {
-        stepMsg = '🎉 ฝึกสอนสำเร็จครบ 100%! ลองคลิกไอคอน [▶] เหนือปุ่มด้านล่างเพื่อดูวิดีโอสาธิตทุกฟีเจอร์ หรือเริ่มด่าน Bangkok ได้เลย!';
+      const msgs = {
+        1: '🎓 1/7: ลากสายไฟ (สีเหลือง) จาก โรงปั่นไฟ ไปยัง บ้าน',
+        2: '🎓 2/7: ลากท่อน้ำดี (สีฟ้า) จาก ปั๊มน้ำริมแม่น้ำ ไปยัง บ้าน — กด Tab เพื่อสลับชนิดสาย',
+        3: '🎓 3/7: ลากท่อน้ำเสีย (สีม่วง) จาก บ้าน ไปยัง ถังบำบัดริมแม่น้ำ รับโบนัส +$50',
+        4: '🎓 4/7: ต่อพ่วงบ้าน! ลากจาก บ้านเดิม ไป บ้านใหม่ ให้ครบ ไฟ/น้ำ/น้ำเสีย (กด Tab สลับสาย)',
+        5: '🎓 5/7: ปั๊มน้ำเสีย (ประแจแดง)! คลิกที่ปั๊ม หรือกด REPAIR [R] แล้วคลิกปั๊มเพื่อซ่อม',
+        6: '☢️ 6/7 วิธีแพ้ที่ 1 — มลภาวะ: ค่า ☢️ ด้านบนเต็มขีดจำกัด = Game Over! (โรงไฟฟ้าและน้ำเสียเพิ่มมลภาวะ) วางเครื่องกรองอากาศ [4] เพื่อลด',
+        7: '⚠️ 7/7 วิธีแพ้ที่ 2 — ร้องเรียน: บ้านขาดไฟ/น้ำ/ท่อน้ำเสียนานเกินไปจะร้องเรียน 1 Strike และรีเซ็ต Win Timer — ครบ 3 Strike = Game Over (Amsterdam 1 ครั้ง!)'
+      };
+      const stepMsg = msgs[step] || '🎉 ฝึกสอนสำเร็จครบ 100%! คลิก [▶] เหนือปุ่มเพื่อดูวิดีโอฟีเจอร์ หรือเริ่มด่าน Bangkok ได้เลย!';
+
+      // Point at the HUD pill the lose-condition steps talk about
+      const hl = step === 6 ? [660, 6, 172, 32] : (step === 7 ? [1056, 6, 214, 32] : null);
+      if (hl) {
+        g.lineStyle(3, 0xff5a5f, 0.6 + 0.4 * Math.sin(Date.now() / 150));
+        g.drawRoundedRect(hl[0] - 3, hl[1] - 2, hl[2] + 6, hl[3] + 4, 9);
       }
 
       const txt = this.makeText(stepMsg, {
-        fontFamily: font, fontSize: 12.5, fontWeight: 'bold', fill: 0xffffff
+        fontFamily: font, fontSize: 12, fontWeight: 'bold', fill: 0xffffff, wordWrap: true, wordWrapWidth: barW - 300
       }, 'tutorial');
-      txt.position.set(barX + 16, barY + 13);
+      txt.anchor.set(0, 0.5);
+      txt.position.set(barX + 16, barY + barH / 2);
       this.tutorialUIContainer.addChild(txt);
 
-      // Auto-complete current step button (if steps 1..4)
-      if (step >= 1 && step <= 4) {
+      // Auto-complete current step button (steps 1..7; step 7 is the "got it" confirm)
+      if (step >= 1 && step <= 7) {
         const autoBtn = { id: 'tut_auto_step', x: barX + barW - 275, y: barY + 6, w: 125, h: 32 };
         this.tutorialButtons.push(autoBtn);
         const isHov = (mouseX >= autoBtn.x && mouseX <= autoBtn.x + autoBtn.w && mouseY >= autoBtn.y && mouseY <= autoBtn.y + autoBtn.h);
@@ -462,7 +474,7 @@
         g.drawRoundedRect(autoBtn.x, autoBtn.y, autoBtn.w, autoBtn.h, 6);
         g.endFill();
 
-        const autoTxt = this.makeText('⏭️ ทำขั้นตอนนี้ให้', {
+        const autoTxt = this.makeText(step === 7 ? '✅ เข้าใจแล้ว' : '⏭️ ทำขั้นตอนนี้ให้', {
           fontFamily: font, fontSize: 11, fontWeight: 'bold', fill: isHov ? 0x120d24 : 0xffd166
         }, 'tutorial');
         autoTxt.anchor.set(0.5);
