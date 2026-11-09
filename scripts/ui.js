@@ -86,18 +86,19 @@
       const tbH = 48;
       const tbW = 64;
 
-      // 10 Toolbar Buttons matching the 10 GDevelop PNG Sprite instances on the dock tray
+      // 11 Toolbar Buttons (DELETE is vector-only) matching the GDevelop PNG Sprite instances on the dock tray
       this.buttons = [
-        { id: 'power', objectName: 'btn_power', title: '⚡ POWER', sub: '[1] WIRE', videoKey: 'power', type: 'tool', toolId: 'power', x: 275, y: tbY, w: tbW, h: tbH, color: 0xffb703 },
-        { id: 'water', objectName: 'btn_water', title: '💧 WATER', sub: '[2] PIPE', videoKey: 'water', type: 'tool', toolId: 'water', x: 349, y: tbY, w: tbW, h: tbH, color: 0x00b4d8 },
-        { id: 'sewage', objectName: 'btn_drain', title: '🧪 DRAIN', sub: '[3] SEWAGE', videoKey: 'sewage', type: 'tool', toolId: 'sewage', x: 423, y: tbY, w: tbW, h: tbH, color: 0x9d4edd },
-        { id: 'air_filter', objectName: 'btn_filter', title: '🍃 FILTER', sub: '[4] $40', videoKey: 'air_filter', type: 'build', buildId: 'build_air_filter', x: 497, y: tbY, w: tbW, h: tbH, color: 0x06d6a0 },
-        { id: 'repair', objectName: 'btn_repair', title: '🔧 REPAIR', sub: '[R] FIX', videoKey: 'repair', type: 'action', action: 'repairTool', x: 571, y: tbY, w: tbW, h: tbH, color: 0xff5a5f },
-        { id: 'special', objectName: 'btn_special', title: '🧪 TEST', sub: '[I] LAB', videoKey: 'special', type: 'action', action: 'openSpecialItems', x: 645, y: tbY, w: tbW, h: tbH, color: 0x06d6a0 },
-        { id: 'pause', objectName: 'btn_pause', title: '⏸️ PAUSE', sub: '[SPACE]', type: 'action', action: 'togglePause', x: 719, y: tbY, w: tbW, h: tbH, color: 0xadb5bd },
-        { id: 'speed', objectName: 'btn_speed', title: '⏩ SPEED', sub: '1X / 2X', type: 'action', action: 'toggleSpeed', x: 793, y: tbY, w: tbW, h: tbH, color: 0xadb5bd },
-        { id: 'upgrades', objectName: 'btn_upgrade', title: '⬆️ TECH', sub: '[U] UPGRD', videoKey: 'upgrades', type: 'action', action: 'openUpgrades', x: 867, y: tbY, w: tbW, h: tbH, color: 0xffd166 },
-        { id: 'guide', objectName: 'btn_guide', title: '📖 LEVELS', sub: 'BRIEFING', videoKey: 'guide', type: 'action', action: 'openGuide', x: 941, y: tbY, w: tbW, h: tbH, color: 0x48cae4 },
+        { id: 'power', objectName: 'btn_power', title: '⚡ POWER', sub: '[1] WIRE', videoKey: 'power', type: 'tool', toolId: 'power', x: 238, y: tbY, w: tbW, h: tbH, color: 0xffb703 },
+        { id: 'water', objectName: 'btn_water', title: '💧 WATER', sub: '[2] PIPE', videoKey: 'water', type: 'tool', toolId: 'water', x: 312, y: tbY, w: tbW, h: tbH, color: 0x00b4d8 },
+        { id: 'sewage', objectName: 'btn_drain', title: '🧪 DRAIN', sub: '[3] SEWAGE', videoKey: 'sewage', type: 'tool', toolId: 'sewage', x: 386, y: tbY, w: tbW, h: tbH, color: 0x9d4edd },
+        { id: 'delete', title: '🗑️ DELETE', sub: '[X] WIRE', type: 'tool', toolId: 'delete', x: 460, y: tbY, w: tbW, h: tbH, color: 0xadb5bd },
+        { id: 'air_filter', objectName: 'btn_filter', title: '🍃 FILTER', sub: '[4] $40', videoKey: 'air_filter', type: 'build', buildId: 'build_air_filter', x: 534, y: tbY, w: tbW, h: tbH, color: 0x06d6a0 },
+        { id: 'repair', objectName: 'btn_repair', title: '🔧 REPAIR', sub: '[R] FIX', videoKey: 'repair', type: 'action', action: 'repairTool', x: 608, y: tbY, w: tbW, h: tbH, color: 0xff5a5f },
+        { id: 'special', objectName: 'btn_special', title: '🧪 TEST', sub: '[I] LAB', videoKey: 'special', type: 'action', action: 'openSpecialItems', x: 682, y: tbY, w: tbW, h: tbH, color: 0x06d6a0 },
+        { id: 'pause', objectName: 'btn_pause', title: '⏸️ PAUSE', sub: '[SPACE]', type: 'action', action: 'togglePause', x: 756, y: tbY, w: tbW, h: tbH, color: 0xadb5bd },
+        { id: 'speed', objectName: 'btn_speed', title: '⏩ SPEED', sub: '1X / 2X', type: 'action', action: 'toggleSpeed', x: 830, y: tbY, w: tbW, h: tbH, color: 0xadb5bd },
+        { id: 'upgrades', objectName: 'btn_upgrade', title: '⬆️ TECH', sub: '[U] UPGRD', videoKey: 'upgrades', type: 'action', action: 'openUpgrades', x: 904, y: tbY, w: tbW, h: tbH, color: 0xffd166 },
+        { id: 'guide', objectName: 'btn_guide', title: '📖 LEVELS', sub: 'BRIEFING', videoKey: 'guide', type: 'action', action: 'openGuide', x: 978, y: tbY, w: tbW, h: tbH, color: 0x48cae4 },
         { id: 'logo', type: 'action', action: 'openGuide', x: 8, y: 6, w: 185, h: 32 }
       ];
 
@@ -440,18 +441,20 @@
       g.endFill();
 
       const msgs = {
-        1: '🎓 1/7: ลากสายไฟ (สีเหลือง) จาก โรงปั่นไฟ ไปยัง บ้าน',
-        2: '🎓 2/7: ลากท่อน้ำดี (สีฟ้า) จาก ปั๊มน้ำริมแม่น้ำ ไปยัง บ้าน — กด Tab เพื่อสลับชนิดสาย',
-        3: '🎓 3/7: ลากท่อน้ำเสีย (สีม่วง) จาก บ้าน ไปยัง ถังบำบัดริมแม่น้ำ รับโบนัส +$50',
-        4: '🎓 4/7: ต่อพ่วงบ้าน! ลากจาก บ้านเดิม ไป บ้านใหม่ ให้ครบ ไฟ/น้ำ/น้ำเสีย (กด Tab สลับสาย)',
-        5: '🎓 5/7: ปั๊มน้ำเสีย (ประแจแดง)! คลิกที่ปั๊ม หรือกด REPAIR [R] แล้วคลิกปั๊มเพื่อซ่อม',
-        6: '☢️ 6/7 วิธีแพ้ที่ 1 — มลภาวะ: ค่า ☢️ ด้านบนเต็มขีดจำกัด = Game Over! (โรงไฟฟ้าและน้ำเสียเพิ่มมลภาวะ) วางเครื่องกรองอากาศ [4] เพื่อลด',
-        7: '⚠️ 7/7 วิธีแพ้ที่ 2 — ร้องเรียน: บ้านขาดไฟ/น้ำ/ท่อน้ำเสียนานเกินไปจะร้องเรียน 1 Strike และรีเซ็ต Win Timer — ครบ 3 Strike = Game Over (Amsterdam 1 ครั้ง!)'
+        1: '🎓 1/9: ลากสายไฟ (สีเหลือง) จาก โรงปั่นไฟ ไปยัง บ้าน — สายยาวได้ไม่เกินวงกลมรอบจุดเริ่ม',
+        2: '🎓 2/9: ลากท่อน้ำดี (สีฟ้า) จาก ปั๊มน้ำริมแม่น้ำ ไปยัง บ้าน — กด Tab เพื่อสลับชนิดสาย',
+        3: '🎓 3/9: ลากท่อน้ำเสีย (สีม่วง) จาก บ้าน ไปยัง ถังบำบัดริมแม่น้ำ รับโบนัส +$50',
+        4: '🎓 4/9: บ้านใหม่อยู่ไกลเกินระยะสายจากโรงงาน: พ่วงจาก บ้านเดิม ไป บ้านใหม่ ให้ครบ ไฟ/น้ำ/น้ำเสีย',
+        5: '🎓 5/9: ลบสาย: คลิกขวาที่สาย หรือกด 🗑️ DELETE [X] แล้วคลิกสาย — จากนั้นลากต่อใหม่ให้บ้านครบทุกหลัง',
+        6: '🐢 6/9: พ่วงบ้านหลังที่ 3 ต่อจากหลังที่ 2 — ยิ่งพ่วงยาว ไฟ/น้ำยิ่งไหลช้า (ไอคอนกะพริบ) บ้านจะเติมไม่ทันและร้องเรียน',
+        7: '🎓 7/9: ปั๊มน้ำเสีย (ประแจแดง)! คลิกที่ปั๊ม หรือกด REPAIR [R] แล้วคลิกปั๊มเพื่อซ่อม',
+        8: '☢️ 8/9 วิธีแพ้ที่ 1 — มลภาวะ: ค่า ☢️ ด้านบนเต็มขีดจำกัด = Game Over! (โรงไฟฟ้าและน้ำเสียเพิ่มมลภาวะ) วางเครื่องกรองอากาศ [4] เพื่อลด',
+        9: '⚠️ 9/9 วิธีแพ้ที่ 2 — ร้องเรียน: บ้านขาดไฟ/น้ำ/ท่อน้ำเสีย หรือพ่วงยาวจนเติมไม่ทัน จะร้องเรียน 1 Strike และรีเซ็ต Win Timer — ครบ 3 Strike = Game Over'
       };
       const stepMsg = msgs[step] || '🎉 ฝึกสอนสำเร็จครบ 100%! คลิก [▶] เหนือปุ่มเพื่อดูวิดีโอฟีเจอร์ หรือเริ่มด่าน Bangkok ได้เลย!';
 
       // Point at the HUD pill the lose-condition steps talk about
-      const hl = step === 6 ? [660, 6, 172, 32] : (step === 7 ? [1056, 6, 214, 32] : null);
+      const hl = step === 8 ? [660, 6, 172, 32] : (step === 9 ? [1056, 6, 214, 32] : null);
       if (hl) {
         g.lineStyle(3, 0xff5a5f, 0.6 + 0.4 * Math.sin(Date.now() / 150));
         g.drawRoundedRect(hl[0] - 3, hl[1] - 2, hl[2] + 6, hl[3] + 4, 9);
@@ -464,8 +467,8 @@
       txt.position.set(barX + 16, barY + barH / 2);
       this.tutorialUIContainer.addChild(txt);
 
-      // Auto-complete current step button (steps 1..7; step 7 is the "got it" confirm)
-      if (step >= 1 && step <= 7) {
+      // Auto-complete current step button (steps 1..9; step 9 is the "got it" confirm)
+      if (step >= 1 && step <= 9) {
         const autoBtn = { id: 'tut_auto_step', x: barX + barW - 275, y: barY + 6, w: 125, h: 32 };
         this.tutorialButtons.push(autoBtn);
         const isHov = (mouseX >= autoBtn.x && mouseX <= autoBtn.x + autoBtn.w && mouseY >= autoBtn.y && mouseY <= autoBtn.y + autoBtn.h);
@@ -474,7 +477,7 @@
         g.drawRoundedRect(autoBtn.x, autoBtn.y, autoBtn.w, autoBtn.h, 6);
         g.endFill();
 
-        const autoTxt = this.makeText(step === 7 ? '✅ เข้าใจแล้ว' : '⏭️ ทำขั้นตอนนี้ให้', {
+        const autoTxt = this.makeText(step === 9 ? '✅ เข้าใจแล้ว' : '⏭️ ทำขั้นตอนนี้ให้', {
           fontFamily: font, fontSize: 11, fontWeight: 'bold', fill: isHov ? 0x120d24 : 0xffd166
         }, 'tutorial');
         autoTxt.anchor.set(0.5);
@@ -558,6 +561,9 @@
           break;
         case 'openGuide':
           this.showLevelBriefing(this.game.currentLevel);
+          break;
+        case 'startBangkok':
+          this.switchToLevelIndex(0);
           break;
         case 'startFastTutorial':
           this.closeModal();
@@ -1082,6 +1088,74 @@
         addLabel('🍃 ดูดซับมลพิษอัตโนมัติ -0.2 หน่วย/วินาที', vx + vw / 2, vy + 24, 0x06d6a0, 12);
         drawCursor(bx, by, t >= 0.2 && t <= 0.35);
       }
+      else if (vKey === 'lose_pollution') {
+        // Two coal plants puff smoke while the pollution bar fills to the limit -> GAME OVER
+        const p = Math.min(1, t / 0.8);
+        addSprite('Power.png', vx + 150, vy + 120, 56, 56);
+        addSprite('Power.png', vx + 260, vy + 135, 56, 56);
+        for (let i = 0; i < 6; i++) {
+          const k = (t * 2 + i / 6) % 1;
+          g.lineStyle(0);
+          g.beginFill(0x6c757d, 0.55 * (1 - k));
+          g.drawCircle(vx + (i % 2 ? 260 : 150) + Math.sin(k * 6 + i) * 8, vy + 95 - k * 70, 8 + k * 14);
+          g.endFill();
+        }
+        const bx = vx + 340, by = vy + 60, bw = 150, bh = 16;
+        g.lineStyle(1.5, 0xffffff, 0.5);
+        g.beginFill(0x000000, 0.5);
+        g.drawRoundedRect(bx, by, bw, bh, 6);
+        g.endFill();
+        g.lineStyle(0);
+        g.beginFill(p > 0.75 ? 0xe63946 : (p > 0.45 ? 0xffb703 : 0x06d6a0), 1);
+        g.drawRoundedRect(bx, by, Math.max(6, bw * p), bh, 6);
+        g.endFill();
+        addLabel(`☢️ ${(p * 6).toFixed(1)} / 6.0`, bx + bw / 2, by + 34, 0xffd166, 12);
+        addLabel('โรงปั่นไฟ +0.3/วิ ต่อเครื่อง', vx + 205, vy + 180, 0xadb5bd, 11);
+        if (t >= 0.8) {
+          g.beginFill(0xe63946, 0.35);
+          g.drawRect(vx + 4, vy + 4, vw - 8, vh - 8);
+          g.endFill();
+          addLabel('💀 GAME OVER: มลภาวะเกินขีดจำกัด!', vx + vw / 2, vy + 140, 0xffffff, 16);
+        }
+      }
+      else if (vKey === 'lose_complaint') {
+        // Pump -> 5 houses in series; flow slows down the chain, end houses complain -> 3 strikes -> GAME OVER
+        const py = vy + 110;
+        addSprite('Blue barrel.png', vx + 45, py, 40, 40);
+        const hx = (i) => vx + 120 + i * 85;
+        g.lineStyle(4, 0x00b4d8, 0.9);
+        g.moveTo(vx + 65, py);
+        g.lineTo(hx(4), py);
+        for (let i = 0; i < 5; i++) {
+          // flow pulses get slower and fainter down the chain
+          const flow = Math.max(0, 1 - 0.25 * Math.max(0, i + 1 - 2));
+          const k = (t * 3 * (0.3 + flow)) % 1;
+          g.lineStyle(0);
+          g.beginFill(0xffffff, 0.3 + 0.6 * flow);
+          g.drawCircle((i === 0 ? vx + 65 : hx(i - 1)) + k * 85, py, 4);
+          g.endFill();
+          addSprite('House.png', hx(i), py - 30, 56, 38);
+          addLabel(`${Math.round(flow * 100)}%`, hx(i), py + 22, flow >= 1 ? 0x06d6a0 : (flow > 0.4 ? 0xffd166 : 0xe63946), 11);
+          const unhappy = Math.min(1, t * (1 - flow) * 2.2);
+          if (unhappy > 0) {
+            g.beginFill(0x1a1334, 0.9);
+            g.drawRect(hx(i) - 20, py + 36, 40, 5);
+            g.endFill();
+            g.beginFill(unhappy > 0.6 ? 0xe63946 : 0xffd166, 1);
+            g.drawRect(hx(i) - 20, py + 36, 40 * unhappy, 5);
+            g.endFill();
+          }
+        }
+        const strikes = t >= 0.85 ? 3 : (t >= 0.6 ? 2 : (t >= 0.35 ? 1 : 0));
+        addLabel(`⚠️ STRIKES: ${'■'.repeat(strikes)}${'□'.repeat(3 - strikes)}`, vx + vw - 90, vy + 24, 0xff5a5f, 12);
+        addLabel('พ่วงยิ่งยาว ยิ่งไหลช้า → บ้านปลายสายเติมไม่ทัน → ร้องเรียน', vx + vw / 2 - 40, vy + 24, 0xffd166, 11);
+        if (t >= 0.88) {
+          g.beginFill(0xe63946, 0.35);
+          g.drawRect(vx + 4, vy + 4, vw - 8, vh - 8);
+          g.endFill();
+          addLabel('💀 GAME OVER: ถูกร้องเรียนครบ 3 ครั้ง!', vx + vw / 2, vy + 172, 0xffffff, 16);
+        }
+      }
       else {
         // Upgrades, SDGs / Upsize / Day-Night, or Win Timer Demo
         const isNightDemo = (vKey === 'sdgs' && t >= 0.5);
@@ -1578,6 +1652,8 @@
             this.closeModal();
             if (act.type === 'tool') {
               this.selectTool(act.value);
+            } else if (act.type === 'video') {
+              this.showFeatureVideoModal(act.value);
             } else if (act.type === 'action') {
               this.triggerAction(act.value);
             }

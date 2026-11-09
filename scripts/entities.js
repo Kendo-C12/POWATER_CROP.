@@ -100,6 +100,14 @@
 
           if (onComplaint) onComplaint(this, reason);
         }
+      } else if (this.flowDeficit > 0) {
+        // Supplied, but too far down a series chain: refills can't keep up
+        this.unhappyTimer += dt * this.flowDeficit;
+        this.isCritical = this.unhappyTimer > (this.maxUnhappyTime * 0.6);
+        if (this.unhappyTimer >= this.maxUnhappyTime) {
+          this.unhappyTimer = 0;
+          if (onComplaint) onComplaint(this, 'ต่อพ่วงยาวเกินไป! ไฟ/น้ำไหลไม่ทัน');
+        }
       } else {
         if (this.unhappyTimer > 0) {
           this.unhappyTimer = Math.max(0, this.unhappyTimer - dt * 2.5);
@@ -155,6 +163,9 @@
       if (!this.hasPower) activeBadges.push('power');
       if (!this.hasWater) activeBadges.push('water');
       if (this.hasWater && !this.hasDrainage) activeBadges.push('drain');
+      // Slow (long series chain) utilities show their badge blinking
+      const slowBadges = (this.slowTypes || []).map(t => (t === 'sewage' ? 'drain' : t)).filter(t => !activeBadges.includes(t));
+      activeBadges.push(...slowBadges);
 
       const container = badgeContainer || pixiGfx.parent;
       if (!this.badgeSprites && container && typeof PIXI !== 'undefined') {
@@ -185,6 +196,7 @@
           const idx = activeBadges.indexOf(type);
           if (idx !== -1) {
             sp.visible = true;
+            sp.alpha = slowBadges.includes(type) ? 0.5 + 0.4 * Math.sin(this.pulseAngle * 2) : 1;
             sp.x = startX + idx * spacing;
             sp.y = badgeY;
             if (sp.texture && sp.texture.baseTexture && sp.texture.baseTexture.valid) {

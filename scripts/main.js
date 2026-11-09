@@ -48,6 +48,7 @@
         else if (key === '3') this.ui.selectTool('sewage');
         else if (key === '4') this.ui.selectTool('build_air_filter');
         else if (key === 'r') this.ui.selectTool('repair');
+        else if (key === 'x' || key === 'delete') this.ui.selectTool('delete');
         else if (key === 'tab') {
           // Cycle wire type power -> water -> sewage (works mid-drag: the wire type is read on release)
           e.preventDefault();
@@ -538,6 +539,11 @@
         const pulseR = 48 + Math.sin(this.pulseTime * 6) * 3;
         gfxO.lineStyle(3, 0xffd166, 0.9);
         gfxO.drawCircle(sc.x, sc.y, pulseR);
+        // Wire reach: anything whose center is inside this circle can be connected
+        gfxO.lineStyle(2, 0xffffff, 0.5);
+        gfxO.beginFill(0xffffff, 0.06);
+        gfxO.drawCircle(sc.x, sc.y, global.POWATER.CONFIG.MAX_WIRE_LENGTH || 140);
+        gfxO.endFill();
       }
 
       // 6. Live Dragging Preview Wire (Manhattan + two 45-degree corner turns)
@@ -548,6 +554,9 @@
         let wireColor = 0xffd166;
         if (this.game.activeTool === 'water') wireColor = 0x00b4d8;
         else if (this.game.activeTool === 'sewage') wireColor = 0xc77dff;
+        const hoverNode = this.game.getNodeAt(p2.x, p2.y);
+        const endPt = (hoverNode && hoverNode.id !== this.dragStartNode.id) ? hoverNode.getCenter() : p2;
+        if (Math.hypot(endPt.x - p1.x, endPt.y - p1.y) > (global.POWATER.CONFIG.MAX_WIRE_LENGTH || 140)) wireColor = 0xe63946; // too long
 
         const previewPath = (global.POWATER.ConnectionEntity && global.POWATER.ConnectionEntity.buildManhattanPoints)
           ? global.POWATER.ConnectionEntity.buildManhattanPoints(p1, p2, 0, 22)
@@ -584,7 +593,7 @@
       }
 
       // 7. Interactive Fast Tutorial Visual Guide (Manhattan Guide Line & Target Highlight)
-      if (this.game.isTutorialMode && this.game.tutorialStep >= 1 && this.game.tutorialStep <= 5) {
+      if (this.game.isTutorialMode && this.game.tutorialStep >= 1 && this.game.tutorialStep <= 7) {
         const step = this.game.tutorialStep;
         const house = this.game.houses[0];
         let srcNode = null;
@@ -603,11 +612,11 @@
           srcNode = house;
           dstNode = this.game.buildings.find(b => b.config && b.config.type === 'waste_filter');
           guideColor = 0xc77dff;
-        } else if (step === 4) {
-          srcNode = house;
-          dstNode = this.game.tutorialHouse2;
+        } else if (step === 4 || step === 6) {
+          srcNode = step === 4 ? house : this.game.tutorialHouse2;
+          dstNode = step === 4 ? this.game.tutorialHouse2 : this.game.tutorialHouse3;
           guideColor = { power: 0xffd166, water: 0x00b4d8, sewage: 0xc77dff }[this.game.activeTool] || 0xffd166;
-        } else if (step === 5) {
+        } else if (step === 7) {
           srcNode = this.game.buildings.find(b => b.isBroken) || this.game.buildings.find(b => b.config && b.config.type === 'water_pump');
           guideColor = 0xef476f;
         }
@@ -643,7 +652,7 @@
           gfxO.lineStyle(3, guideColor, 0.9);
           gfxO.drawCircle(c1.x, c1.y, rPulse);
           gfxO.drawCircle(c2.x, c2.y, rPulse + 6);
-        } else if (srcNode && step === 5) {
+        } else if (srcNode && step === 7) {
           const c1 = srcNode.getCenter();
           const rPulse = 48 + Math.sin(this.pulseTime * 6) * 6;
           gfxO.lineStyle(3.5, 0xef476f, 0.95);

@@ -25,7 +25,10 @@
     HOUSE_COMPLETE_BONUS: 50, // Instant +50 when a house becomes complete for the first time
     WEEKLY_REVENUE_PER_COMPLETE_HOUSE: 40, // +40 per completed house every week (7 days)
     REVENUE_PER_HAPPY_HOUSE_SEC: 0.8, // Small continuous operational trickle
-    MIN_HOUSE_DISTANCE: 135,
+    MIN_HOUSE_DISTANCE: 100,
+    MAX_WIRE_LENGTH: 140, // wire/pipe reach (center to center) = 2.5 x house height (56px)
+    CHAIN_FREE_HOPS: 2, // links from a source that run at full flow
+    CHAIN_FLOW_LOSS_PER_HOP: 0.25, // flow lost per extra link in series (0 flow = not supplied)
 
     // New Systems (POWATER CORP.pdf)
     REPAIR_CHECK_INTERVAL_SECONDS: 120, // Every 2 minutes (120s)
@@ -238,6 +241,28 @@
 
     // Feature Video Demonstrations triggered by clicking the [▶] icon above each toolbar button
     FEATURE_VIDEOS: {
+      lose_pollution: {
+        id: 'lose_pollution',
+        title: '🎬 ตัวอย่างการแพ้ 1/2: มลภาวะเกินขีดจำกัด',
+        subtitle: 'โรงปั่นไฟและน้ำเสียปล่อยมลภาวะทุกวินาที ถ้าหลอด ☢️ เต็ม = Game Over ทันที',
+        steps: [
+          '1. หลังผ่านไป 3 นาที มลภาวะเริ่มนับ: โรงปั่นไฟ +0.3/วิ, น้ำเสียที่ไม่มีท่อระบาย +0.15/วิ/หลัง',
+          '2. ถ้าปล่อยไว้ หลอด ☢️ ด้านบนจะเต็มจนถึงขีดจำกัดของด่าน',
+          '3. ป้องกัน: วางเครื่องกรองอากาศ [4] (-0.2/วิ) ต่อท่อน้ำเสียทุกบ้าน และอัปเกรดลดมลภาวะ'
+        ],
+        useAction: { type: 'video', value: 'lose_complaint', label: '▶ วิดีโอถัดไป: แพ้เพราะถูกร้องเรียน' }
+      },
+      lose_complaint: {
+        id: 'lose_complaint',
+        title: '🎬 ตัวอย่างการแพ้ 2/2: ประชาชนร้องเรียนครบ 3 ครั้ง',
+        subtitle: 'บ้านที่ขาดไฟ/น้ำ/ท่อน้ำเสีย หรืออยู่ปลายสายพ่วงยาวๆ จะเติมไม่ทันและร้องเรียน',
+        steps: [
+          '1. ต่อพ่วงบ้านต่อกันยิ่งยาว ไฟและน้ำยิ่งไหลช้า (ตั้งแต่ทอดที่ 3 ลดลงทีละ 25%)',
+          '2. บ้านปลายสายเติมไม่ทัน แถบความไม่พอใจเต็ม = ร้องเรียน 1 Strike และ Win Timer รีเซ็ต',
+          '3. ครบ 3 Strike (Amsterdam 1) = Game Over! แก้: สร้างโรงไฟฟ้า/ปั๊ม/ถังบำบัดใกล้บ้านเพื่อตัดสายพ่วงให้สั้นลง'
+        ],
+        useAction: { type: 'action', value: 'startBangkok', label: '🚀 เข้าใจแล้ว เริ่มด่าน Bangkok' }
+      },
       power: {
         id: 'power',
         title: '🎬 วิดีโอสาธิต: การเชื่อมสายไฟฟ้า (Manhattan 45° Power Line)',
@@ -591,6 +616,9 @@
       if (typeof gr.weeklyBaseMunicipalGrant === 'number') CONFIG.WEEKLY_BASE_GRANT = gr.weeklyBaseMunicipalGrant;
       if (typeof gr.continuousRevenuePerHousePerSec === 'number') CONFIG.REVENUE_PER_HAPPY_HOUSE_SEC = gr.continuousRevenuePerHousePerSec;
       if (typeof gr.minHouseDistancePixels === 'number') CONFIG.MIN_HOUSE_DISTANCE = gr.minHouseDistancePixels;
+      if (typeof gr.maxWireLengthPixels === 'number') CONFIG.MAX_WIRE_LENGTH = gr.maxWireLengthPixels;
+      if (typeof gr.chainFreeHops === 'number') CONFIG.CHAIN_FREE_HOPS = gr.chainFreeHops;
+      if (typeof gr.chainFlowLossPerHop === 'number') CONFIG.CHAIN_FLOW_LOSS_PER_HOP = gr.chainFlowLossPerHop;
       if (typeof gr.upsizeEveryNHouses === 'number') {
         CONFIG.UPSIZE_BASE_HOUSES = gr.upsizeEveryNHouses;
         CONFIG.UPSIZE_STEP_HOUSES = gr.upsizeEveryNHouses;

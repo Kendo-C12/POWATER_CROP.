@@ -13,7 +13,7 @@
   "maxHousesCap": 10,
   "cleanEnergyDiscount": 0.0,
   "buildCostDiscount": 0.0,
-  "unlimitedWaterChain": true,
+  "unlimitedWaterChain": false,
   "hasHighTide": false,
   "hasEarthquake": false,
   "hasBlackout": false,

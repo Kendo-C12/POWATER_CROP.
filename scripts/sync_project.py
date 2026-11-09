@@ -356,7 +356,7 @@ def build_layout_objects(river_image='river.png', river_w=280, river_h=720):
         ('btn_guide', 'btn_guide.png', 256, 192),
         ('grid_bg', 'grid_bg.png', 1280, 720),
         ('hud_bar', 'hud_bar.png', 1280, 44),
-        ('toolbar_dock', 'toolbar_dock.png', 746, 56),
+        ('toolbar_dock', 'toolbar_dock.png', 820, 56),
         ('logo_powater', 'logo_powater.png', 128, 128),
         ('icon_day', 'icon_day.png', 128, 128),
         ('icon_night', 'icon_night.png', 128, 128),
@@ -387,32 +387,32 @@ def make_base_instances():
             'name': 'hud_bar', 'persistentUuid': 'inst-hud-bar', 'width': 1280, 'x': 0, 'y': 0, 'zOrder': 8,
             'numberProperties': [], 'stringProperties': [], 'initialVariables': []
         },
-        # Sleek Rounded Toolbar Dock Tray behind 10 buttons (746x56)
+        # Sleek Rounded Toolbar Dock Tray behind 11 buttons (820x56)
         {
             'angle': 0, 'customSize': True, 'height': 56, 'layer': '', 'locked': False,
-            'name': 'toolbar_dock', 'persistentUuid': 'inst-toolbar-dock', 'width': 746, 'x': 267, 'y': 654, 'zOrder': 8,
+            'name': 'toolbar_dock', 'persistentUuid': 'inst-toolbar-dock', 'width': 820, 'x': 230, 'y': 654, 'zOrder': 8,
             'numberProperties': [], 'stringProperties': [], 'initialVariables': []
         },
         # 12 Toolbar Button PNG Sprites (Aligned along bottom dock tray)
-        { 'name': 'btn_power', 'x': 275, 'y': 658, 'width': 64, 'height': 48, 'zOrder': 10, 'persistentUuid': 'inst-btn-power', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
-        { 'name': 'btn_water', 'x': 349, 'y': 658, 'width': 64, 'height': 48, 'zOrder': 10, 'persistentUuid': 'inst-btn-water', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
-        { 'name': 'btn_drain', 'x': 423, 'y': 658, 'width': 64, 'height': 48, 'zOrder': 10, 'persistentUuid': 'inst-btn-drain', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
-        { 'name': 'btn_filter', 'x': 497, 'y': 658, 'width': 64, 'height': 48, 'zOrder': 10, 'persistentUuid': 'inst-btn-filter', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
-        { 'name': 'btn_repair', 'x': 571, 'y': 658, 'width': 64, 'height': 48, 'zOrder': 10, 'persistentUuid': 'inst-btn-repair', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
-        { 'name': 'btn_special', 'x': 645, 'y': 658, 'width': 64, 'height': 48, 'zOrder': 10, 'persistentUuid': 'inst-btn-special', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
-        { 'name': 'btn_pause', 'x': 719, 'y': 658, 'width': 64, 'height': 48, 'zOrder': 10, 'persistentUuid': 'inst-btn-pause', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
-        { 'name': 'btn_speed', 'x': 793, 'y': 658, 'width': 64, 'height': 48, 'zOrder': 10, 'persistentUuid': 'inst-btn-speed', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
-        { 'name': 'btn_upgrade', 'x': 867, 'y': 658, 'width': 64, 'height': 48, 'zOrder': 10, 'persistentUuid': 'inst-btn-upgrade', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
-        { 'name': 'btn_guide', 'x': 941, 'y': 658, 'width': 64, 'height': 48, 'zOrder': 10, 'persistentUuid': 'inst-btn-guide', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
+        { 'name': 'btn_power', 'x': 238, 'y': 658, 'width': 64, 'height': 48, 'zOrder': 10, 'persistentUuid': 'inst-btn-power', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
+        { 'name': 'btn_water', 'x': 312, 'y': 658, 'width': 64, 'height': 48, 'zOrder': 10, 'persistentUuid': 'inst-btn-water', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
+        { 'name': 'btn_drain', 'x': 386, 'y': 658, 'width': 64, 'height': 48, 'zOrder': 10, 'persistentUuid': 'inst-btn-drain', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
+        { 'name': 'btn_filter', 'x': 534, 'y': 658, 'width': 64, 'height': 48, 'zOrder': 10, 'persistentUuid': 'inst-btn-filter', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
+        { 'name': 'btn_repair', 'x': 608, 'y': 658, 'width': 64, 'height': 48, 'zOrder': 10, 'persistentUuid': 'inst-btn-repair', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
+        { 'name': 'btn_special', 'x': 682, 'y': 658, 'width': 64, 'height': 48, 'zOrder': 10, 'persistentUuid': 'inst-btn-special', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
+        { 'name': 'btn_pause', 'x': 756, 'y': 658, 'width': 64, 'height': 48, 'zOrder': 10, 'persistentUuid': 'inst-btn-pause', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
+        { 'name': 'btn_speed', 'x': 830, 'y': 658, 'width': 64, 'height': 48, 'zOrder': 10, 'persistentUuid': 'inst-btn-speed', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
+        { 'name': 'btn_upgrade', 'x': 904, 'y': 658, 'width': 64, 'height': 48, 'zOrder': 10, 'persistentUuid': 'inst-btn-upgrade', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
+        { 'name': 'btn_guide', 'x': 978, 'y': 658, 'width': 64, 'height': 48, 'zOrder': 10, 'persistentUuid': 'inst-btn-guide', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
         # 10 Clickable Feature Video Demo Icons ([▶]) directly above each feature button
-        { 'name': 'btn_video_help', 'x': 289, 'y': 626, 'width': 36, 'height': 24, 'zOrder': 10, 'persistentUuid': 'inst-vid-power', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
-        { 'name': 'btn_video_help', 'x': 363, 'y': 626, 'width': 36, 'height': 24, 'zOrder': 10, 'persistentUuid': 'inst-vid-water', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
-        { 'name': 'btn_video_help', 'x': 437, 'y': 626, 'width': 36, 'height': 24, 'zOrder': 10, 'persistentUuid': 'inst-vid-drain', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
-        { 'name': 'btn_video_help', 'x': 511, 'y': 626, 'width': 36, 'height': 24, 'zOrder': 10, 'persistentUuid': 'inst-vid-filter', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
-        { 'name': 'btn_video_help', 'x': 585, 'y': 626, 'width': 36, 'height': 24, 'zOrder': 10, 'persistentUuid': 'inst-vid-repair', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
-        { 'name': 'btn_video_help', 'x': 659, 'y': 626, 'width': 36, 'height': 24, 'zOrder': 10, 'persistentUuid': 'inst-vid-special', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
-        { 'name': 'btn_video_help', 'x': 881, 'y': 626, 'width': 36, 'height': 24, 'zOrder': 10, 'persistentUuid': 'inst-vid-upgrade', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
-        { 'name': 'btn_video_help', 'x': 955, 'y': 626, 'width': 36, 'height': 24, 'zOrder': 10, 'persistentUuid': 'inst-vid-guide', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] }
+        { 'name': 'btn_video_help', 'x': 252, 'y': 626, 'width': 36, 'height': 24, 'zOrder': 10, 'persistentUuid': 'inst-vid-power', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
+        { 'name': 'btn_video_help', 'x': 326, 'y': 626, 'width': 36, 'height': 24, 'zOrder': 10, 'persistentUuid': 'inst-vid-water', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
+        { 'name': 'btn_video_help', 'x': 400, 'y': 626, 'width': 36, 'height': 24, 'zOrder': 10, 'persistentUuid': 'inst-vid-drain', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
+        { 'name': 'btn_video_help', 'x': 548, 'y': 626, 'width': 36, 'height': 24, 'zOrder': 10, 'persistentUuid': 'inst-vid-filter', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
+        { 'name': 'btn_video_help', 'x': 622, 'y': 626, 'width': 36, 'height': 24, 'zOrder': 10, 'persistentUuid': 'inst-vid-repair', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
+        { 'name': 'btn_video_help', 'x': 696, 'y': 626, 'width': 36, 'height': 24, 'zOrder': 10, 'persistentUuid': 'inst-vid-special', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
+        { 'name': 'btn_video_help', 'x': 918, 'y': 626, 'width': 36, 'height': 24, 'zOrder': 10, 'persistentUuid': 'inst-vid-upgrade', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
+        { 'name': 'btn_video_help', 'x': 992, 'y': 626, 'width': 36, 'height': 24, 'zOrder': 10, 'persistentUuid': 'inst-vid-guide', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] }
     ]
 
 
@@ -421,7 +421,7 @@ def create_layout(name, title, river_image, river_w, river_h, river_inst, level_
     insts = make_base_instances()
     insts.append(river_inst)
     insts.extend(level_buildings)
-    insts.extend(level_houses)
+    # Houses are spawned at runtime only where wires can reach them (engine.spawnHouse)
 
     return {
         'b': 255,
@@ -519,9 +519,9 @@ tokyo_river = {
     'numberProperties': [], 'stringProperties': [], 'initialVariables': []
 }
 tokyo_buildings = [
-    { 'name': 'generator', 'x': 780, 'y': 240, 'width': 56, 'height': 56, 'zOrder': 4, 'persistentUuid': 'inst-tokyo-gen', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
+    { 'name': 'generator', 'x': 772, 'y': 252, 'width': 56, 'height': 56, 'zOrder': 4, 'persistentUuid': 'inst-tokyo-gen', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
     { 'name': 'water_pump', 'x': 600, 'y': 240, 'width': 56, 'height': 56, 'zOrder': 4, 'persistentUuid': 'inst-tokyo-pump', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
-    { 'name': 'waste_filter', 'x': 630, 'y': 480, 'width': 56, 'height': 56, 'zOrder': 4, 'persistentUuid': 'inst-tokyo-filter', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] }
+    { 'name': 'waste_filter', 'x': 622, 'y': 442, 'width': 56, 'height': 56, 'zOrder': 4, 'persistentUuid': 'inst-tokyo-filter', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] }
 ]
 tokyo_houses = [
     { 'name': 'house', 'x': 840, 'y': 100, 'width': 84, 'height': 56, 'zOrder': 3, 'persistentUuid': 'inst-tokyo-h1', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
@@ -537,9 +537,9 @@ rome_river = {
     'numberProperties': [], 'stringProperties': [], 'initialVariables': []
 }
 rome_buildings = [
-    { 'name': 'generator', 'x': 832, 'y': 220, 'width': 56, 'height': 56, 'zOrder': 4, 'persistentUuid': 'inst-rome-gen', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
+    { 'name': 'generator', 'x': 832, 'y': 212, 'width': 56, 'height': 56, 'zOrder': 4, 'persistentUuid': 'inst-rome-gen', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
     { 'name': 'water_pump', 'x': 590, 'y': 220, 'width': 56, 'height': 56, 'zOrder': 4, 'persistentUuid': 'inst-rome-pump', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
-    { 'name': 'waste_filter', 'x': 440, 'y': 580, 'width': 56, 'height': 56, 'zOrder': 4, 'persistentUuid': 'inst-rome-filter', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] }
+    { 'name': 'waste_filter', 'x': 682, 'y': 322, 'width': 56, 'height': 56, 'zOrder': 4, 'persistentUuid': 'inst-rome-filter', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] }
 ]
 rome_houses = [
     { 'name': 'house', 'x': 880, 'y': 120, 'width': 84, 'height': 56, 'zOrder': 3, 'persistentUuid': 'inst-rome-h1', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
@@ -555,9 +555,9 @@ amsterdam_river = {
     'numberProperties': [], 'stringProperties': [], 'initialVariables': []
 }
 amsterdam_buildings = [
-    { 'name': 'generator', 'x': 800, 'y': 200, 'width': 56, 'height': 56, 'zOrder': 4, 'persistentUuid': 'inst-ams-gen', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
+    { 'name': 'generator', 'x': 792, 'y': 212, 'width': 56, 'height': 56, 'zOrder': 4, 'persistentUuid': 'inst-ams-gen', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
     { 'name': 'water_pump', 'x': 640, 'y': 250, 'width': 56, 'height': 56, 'zOrder': 4, 'persistentUuid': 'inst-ams-pump', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
-    { 'name': 'waste_filter', 'x': 680, 'y': 450, 'width': 56, 'height': 56, 'zOrder': 4, 'persistentUuid': 'inst-ams-filter', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
+    { 'name': 'waste_filter', 'x': 692, 'y': 432, 'width': 56, 'height': 56, 'zOrder': 4, 'persistentUuid': 'inst-ams-filter', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
     { 'name': 'air_filter', 'x': 840, 'y': 320, 'width': 56, 'height': 56, 'zOrder': 4, 'persistentUuid': 'inst-ams-air', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] }
 ]
 amsterdam_houses = [

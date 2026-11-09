@@ -1,8 +1,8 @@
-# POWATER CORP. (`v1.0.4.3`) — GDevelop 5 Project Documentation (`CLAUDE.md`)
+# POWATER CORP. (`v1.0.5.0`) — GDevelop 5 Project Documentation (`CLAUDE.md`)
 
 > **Team Green Gang**: Sukrit Limpakanon, Aristt Mahakitsiri, Gantinan Satjariyakul  
 > **Engine**: GDevelop 5 (`POWATER CROPS..json`) + Real PNG Sprite Assets + PixiJS Procedural River/Conduit Rendering  
-> **Version Naming**: `1.x.y.z` (`x` = Major Version, `y` = Small Addition Within Major Version, `z` = Bug Fixes) — Current: **`v1.0.4.3`**
+> **Version Naming**: `1.x.y.z` (`x` = Major Version, `y` = Small Addition Within Major Version, `z` = Bug Fixes) — Current: **`v1.0.5.0`**
 
 ---
 
@@ -36,6 +36,12 @@
 - **Instant House Completion Bonus**: Completing a house's utility connections awards **`+$50` immediately**.
 - **Weekly Revenue**: At the end of every in-game week (7 days), the city awards **`[Completed Houses] * $40 / week`** (plus base municipal grant).
 
+### 🔌 Wiring Rules (`v1.0.5.0`)
+- **Max wire length**: every wire/pipe spans at most **`140px` center-to-center** (2.5 × house height of `56px`, `globalRules.maxWireLengthPixels`). Dragging shows the reach circle; the preview turns red when too long.
+- **Series slowdown**: the first `2` links from a source run at full flow; each extra link loses **25%** (`chainFreeHops`, `chainFlowLossPerHop`), and a 6th link carries nothing. A supplied house with lost flow keeps filling its unhappy bar (blinking utility badge) and eventually complains — *lose condition #2*. Rome's unlimited aqueducts exempt water.
+- **Delete**: right-click a wire, or the `🗑️ DELETE [X]` tool (also `Delete` key).
+- **Reachable spawning**: houses (including the 3 starting houses) only spawn where all three utilities can be wired in, directly or through a house chain (`engine.canSupplySpot`). Scene layouts no longer place houses; buildings were compacted in Tokyo/Rome/Amsterdam so a first house fits.
+
 ### 🔧 New `v1.0.0.0` Systems
 1. **Repair System**:
    - Every **2 minutes (`120s`)**, active pumps and generators have a **30% chance** to break down (`isBroken = true`), displaying a flashing red ring and the `badge_repair.png` wrench icon.
@@ -46,7 +52,7 @@
 3. **Map Upsize System**:
    - Every **`x + 10` houses** (`10`, `20`, `30`), the city triggers a **Map Upsize** (`upsizeTier` 1–3), expanding playable spawn bounds and scaling footprints until capped at **40 houses maximum (`จนตันที่ 40 หลัง`)**.
 4. **Fast Interactive Scene Tutorial (`Tutorial` Scene) & Feature Video Demos (`v1.0.2.0`)**:
-   - **Fast 60-Second Scene Tutorial**: Accessible via the dedicated GDevelop `Tutorial` scene or the `🎓 Fast Tutorial (60s)` button in the Level Select modal. 7 steps: wire Power, Water, Sewage (`+$50`) → **chain a newly spawned house to the first one** (house-to-house links, `Tab` switches wire type) → repair a broken pump → **Lose #1: pollution** (meter jumps to 80%, place an Eco Filter) → **Lose #2: complaints/strikes** (read & confirm). Animated Manhattan guide paths, HUD highlight on the pollution/strike pills, and an `⏭️ Auto-Step` button.
+   - **Fast 60-Second Scene Tutorial**: Accessible via the dedicated GDevelop `Tutorial` scene or the `🎓 Fast Tutorial (60s)` button in the Level Select modal. 9 steps: wire Power, Water, Sewage (`+$50`) → chain a new house from the first (wire reach circle, `Tab` switches wire type) → delete a wire & re-wire → chain a 3rd house and see series slowdown → repair a broken pump → **Lose #1: pollution** (meter jumps to 80%, place an Eco Filter) → **Lose #2: complaints/strikes** (read & confirm) → plays the two lose-scenario videos (`lose_pollution`, `lose_complaint`). Animated Manhattan guide paths, HUD highlight on the pollution/strike pills, and an `⏭️ Auto-Step` button.
    - **Clickable `[▶]` Video Icons Above Every Feature Button**: Each feature button on the bottom toolbar (`Power`, `Water`, `Sewage`, `Eco Filter`, `Repair`, `Test Lab`, `Upgrades`, `Guide`) has a clickable `icon_video_help.png` (`[▶]`) sprite badge directly above it (`y = 626`). Clicking any `[▶]` icon opens an interactive 60 FPS looping video preview demonstrating how that feature works, with play/pause controls, scrubber bar, and a **`⚡ Use This Feature Now`** button to immediately activate it.
 
 ---
@@ -73,8 +79,8 @@ All buildings, houses, rivers, HUD bars, toolbar docks, buttons, and status badg
 - **Status Badges & Icons (`assets/`)**:
   - `badge_power.png`, `badge_water.png`, `badge_drain.png`, `badge_repair.png` (Broken Equipment Wrench), `icon_day.png`, `icon_night.png`, `logo_powater.png`
 - **Toolbar & HUD Sprites (`assets/`)**:
-  - `grid_bg.png` (`1280x720`), `hud_bar.png` (`1280x44`), `toolbar_dock.png` (`746x56`, centered, no dividers)
-  - 10 Toolbar Buttons (64px wide, 10px gaps, x = `275 + 74*i`): `btn_power.png`, `btn_water.png`, `btn_drain.png`, `btn_filter.png`, `btn_repair.png`, `btn_special.png` (Disaster Test Lab), `btn_pause.png`, `btn_speed.png`, `btn_upgrade.png`, `btn_guide.png`
+  - `grid_bg.png` (`1280x720`), `hud_bar.png` (`1280x44`), `toolbar_dock.png` (`820x56`, centered, no dividers)
+  - 11 Toolbar Buttons (64px wide, 10px gaps, x = `238 + 74*i`; `DELETE` is vector-only, no PNG): `btn_power.png`, `btn_water.png`, `btn_drain.png`, DELETE, `btn_filter.png`, `btn_repair.png`, `btn_special.png` (Disaster Test Lab), `btn_pause.png`, `btn_speed.png`, `btn_upgrade.png`, `btn_guide.png`
   - 8 Feature Video Demo Icons above toolbar buttons: `icon_video_help.png` (`btn_video_help` sprite object, `48x32`)
 
 ---
@@ -107,6 +113,11 @@ All buildings, houses, rivers, HUD bars, toolbar docks, buttons, and status badg
 
 ## 7. Changelog
 
+- **`v1.0.5.0` (2026-11-10)**:
+  - Wiring rules: `140px` max wire length with reach circle + red preview; series-chain flow loss that leads to complaints; `🗑️ DELETE [X]` tool.
+  - Houses (incl. starting houses) spawn only where all three utilities are wireable; scene layouts no longer contain houses; Tokyo/Rome/Amsterdam buildings compacted (`minHouseDistancePixels` 135 → 100).
+  - Tutorial expanded to 9 steps (delete, series slowdown) and ends by playing two lose-scenario videos (pollution, complaints).
+  - `test_preview.js` covers wire length, spawn reachability, chain flow and the 9-step tutorial.
 - **`v1.0.4.3` (2026-11-10)**:
   - **Fixed: simulation froze while the cursor was over the HUD/toolbar** (`main.js` returned before `game.update()` whenever `ui.update()` reported a UI hover). Time, pollution, spawning and complaints now keep running; only an open modal pauses the game. This is why pollution looked like it never increased.
   - Pollution HUD now shows a `☢️ เริ่มใน m:ss` countdown during the 3-minute pollution start delay instead of a silent `0.0`.

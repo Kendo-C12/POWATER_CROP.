@@ -300,6 +300,7 @@
       this.tutorialStep = 1;
       this.tutorialStepTimer = 0.0;
       this.tutorialHouse2 = null;
+      this.tutorialHouse3 = null;
       this.money = 300;
       this.activeTool = 'power';
 
@@ -314,35 +315,43 @@
       this.addFloatingText('🎓 เริ่มโหมดฝึกสอนด่วน (Fast Scene Tutorial)! ทำตามลูกศรแนะนำได้เลย', CONFIG.CANVAS_WIDTH / 2, 115, '#06d6a0');
     }
 
-    // Free spot near a node for tutorial spawns (same river side, not in river, not on top of anything)
+    // Free spot within wire reach of `near`; prefers spots far from buildings so chains are needed
     findTutorialSpot(near) {
       const c = near.getCenter ? near.getCenter() : { x: near.centerX, y: near.centerY };
-      const offs = [[0, 150], [0, -150], [160, 0], [-160, 0], [140, 140], [-140, 140], [140, -140], [-140, -140]];
-      for (let i = 0; i < offs.length; i++) {
-        const x = c.x + offs[i][0], y = c.y + offs[i][1];
-        if (x < 60 || x > CONFIG.CANVAS_WIDTH - 60 || y < 100 || y > CONFIG.CANVAS_HEIGHT - 120) continue;
-        if (this.map.isPointInRiver(x, y) || this.map.isNearRiver(x, y, 40)) continue;
-        const busy = [...this.houses, ...this.buildings].some(e => {
+      const r = (CONFIG.MAX_WIRE_LENGTH || 140) - 20;
+      const spots = [];
+      for (let i = 0; i < 16; i++) {
+        const ang = (i / 16) * Math.PI * 2;
+        const x = c.x + Math.cos(ang) * r, y = c.y + Math.sin(ang) * r;
+        if (x < 60 || x > CONFIG.CANVAS_WIDTH - 60 || y < 110 || y > CONFIG.CANVAS_HEIGHT - 120) continue;
+        if (this.map.isPointInRiver(x, y) || this.map.isNearRiver(x, y, 30)) continue;
+        const dists = [...this.houses, ...this.buildings].map(e => {
           const ec = e.getCenter ? e.getCenter() : { x: e.centerX, y: e.centerY };
-          return Math.hypot(ec.x - x, ec.y - y) < 95;
+          return Math.hypot(ec.x - x, ec.y - y);
         });
-        if (!busy) return { x, y };
+        if (Math.min(...dists) < 95) continue;
+        const farFromBuildings = Math.min(...this.buildings.map(bd => { const bc = bd.getCenter(); return Math.hypot(bc.x - x, bc.y - y); }));
+        spots.push({ x, y, score: farFromBuildings });
       }
-      return null;
+      spots.sort((p, q) => q.score - p.score);
+      return spots[0] || null;
     }
 
-    // Tutorial steps: 1 power, 2 water, 3 sewage, 4 chain a new house, 5 repair,
-    // 6 lose-by-pollution (place Eco Filter), 7 lose-by-strikes (read & confirm), 8 done
+    // Tutorial steps: 1 power, 2 water, 3 sewage, 4 chain a new house, 5 delete & re-wire,
+    // 6 series slowdown, 7 repair, 8 lose-by-pollution, 9 lose-by-strikes, 10 done (+ lose videos)
     updateTutorial(dt) {
       if (!this.isTutorialMode || this.tutorialStep <= 0) return;
       this.tutorialStepTimer += dt;
       const h0 = this.houses[0];
       const h1 = this.tutorialHouse2;
+      const h2 = this.tutorialHouse3;
       const pump = this.buildings.find(b => b.config && b.config.type === 'water_pump');
       if (!h0) return;
       const say = (msg, col) => this.addFloatingText(msg, CONFIG.CANVAS_WIDTH / 2, 150, col);
       const sfx = (name) => { if (global.POWATER.soundManager) global.POWATER.soundManager[name](); };
       const next = () => { this.tutorialStep++; this.tutorialStepTimer = 0; };
+      const full = (h) => h.hasPower && h.hasWater && h.hasDrainage;
+      const spawnNear = (node) => { const spot = this.findTutorialSpot(node); return spot ? this.spawnHouse(null, spot.x, spot.y) : null; };
 
       if (this.tutorialStep === 1 && h0.hasPower) {
         next();
@@ -357,39 +366,54 @@
       } else if (this.tutorialStep === 3 && h0.hasDrainage) {
         next();
         this.activeTool = 'power';
-        const spot = this.findTutorialSpot(h0);
-        this.tutorialHouse2 = spot ? this.spawnHouse(h0.side || null, spot.x, spot.y) : null;
-        say('✅ บ้านสมบูรณ์ +$50! มีบ้านหลังใหม่: ลากสายจากบ้านเดิมไปบ้านใหม่ได้เลย (Tab สลับ ไฟ/น้ำ/น้ำเสีย)', '#ffd166');
+        this.tutorialHouse2 = spawnNear(h0);
+        say('✅ บ้านสมบูรณ์ +$50! บ้านใหม่อยู่ไกลจากโรงงาน: ลากสายพ่วงจากบ้านเดิมไปบ้านใหม่ (สายยาวได้ไม่เกินวงกลม)', '#ffd166');
         sfx('playUpgrade');
-      } else if (this.tutorialStep === 4 && (!h1 || (h1.hasPower && h1.hasWater && h1.hasDrainage))) {
+      } else if (this.tutorialStep === 4 && (!h1 || full(h1))) {
+        next();
+        this.activeTool = 'delete';
+        this.tutorialWireDeleted = false;
+        say('✅ ต่อพ่วงสำเร็จ! ลองลบสาย: คลิกขวาที่สาย หรือกด 🗑️ DELETE [X] แล้วคลิกที่สาย จากนั้นลากต่อใหม่', '#adb5bd');
+        sfx('playUpgrade');
+      } else if (this.tutorialStep === 5 && this.tutorialWireDeleted && this.houses.every(full)) {
+        next();
+        this.activeTool = 'power';
+        this.tutorialHouse3 = spawnNear(h1 || h0);
+        say('✅ ลบและต่อใหม่สำเร็จ! บ้านหลังที่ 3 มาแล้ว: พ่วงต่อจากบ้านหลังที่ 2 แล้วดูว่าเกิดอะไรขึ้น', '#ffd166');
+        sfx('playUpgrade');
+      } else if (this.tutorialStep === 6 && (!h2 || full(h2))) {
         next();
         this.activeTool = 'repair';
         if (pump) pump.breakDown();
-        say('✅ ต่อพ่วงบ้านสำเร็จ! ปั๊มน้ำเสียแล้ว: คลิกที่ปั๊ม หรือกด REPAIR [R] แล้วคลิกปั๊มเพื่อซ่อม', '#ff5a5f');
+        say(h2 && h2.flowDeficit > 0
+          ? `🐢 บ้านปลายสายได้แค่ ${Math.round((1 - h2.flowDeficit) * 100)}% เพราะพ่วงยาว! ต่อไป: ปั๊มน้ำเสีย คลิกที่ปั๊มเพื่อซ่อม`
+          : '✅ ต่อสำเร็จ! ต่อไป: ปั๊มน้ำเสีย คลิกที่ปั๊ม หรือกด REPAIR [R] แล้วคลิกปั๊มเพื่อซ่อม', '#ff5a5f');
         sfx('playPollutionWarn');
-      } else if (this.tutorialStep === 5 && pump && !pump.isBroken) {
+      } else if (this.tutorialStep === 7 && pump && !pump.isBroken) {
         next();
         this.activeTool = 'build_air_filter';
         this.tutorialFilterCount = this.buildings.filter(b => b.config.type === 'air_filter').length;
         this.pollution = this.currentLevel.maxPollution * 0.8;
         say('☢️ วิธีแพ้ที่ 1: มลภาวะเต็มหลอด = Game Over! วางเครื่องกรองอากาศ [4] เพื่อลดมลภาวะ', '#ff5a5f');
         sfx('playPollutionWarn');
-      } else if (this.tutorialStep === 6 && this.buildings.filter(b => b.config.type === 'air_filter').length > (this.tutorialFilterCount || 0)) {
+      } else if (this.tutorialStep === 8 && this.buildings.filter(b => b.config.type === 'air_filter').length > (this.tutorialFilterCount || 0)) {
         next();
         this.activeTool = null;
         say('✅ เครื่องกรองกำลังลดมลภาวะ! ต่อไป วิธีแพ้ที่ 2: การร้องเรียน (Strike)', '#06d6a0');
         sfx('playUpgrade');
       }
-      // Step 7 is read-only: the player confirms with the coach-bar button (skipTutorialStep)
+      // Step 9 is read-only: the player confirms with the coach-bar button (skipTutorialStep)
     }
 
     skipTutorialStep() {
       if (!this.isTutorialMode) return;
       const h0 = this.houses[0];
       const h1 = this.tutorialHouse2;
+      const h2 = this.tutorialHouse3;
       const gen = this.buildings.find(b => b.config && b.config.type === 'generator');
       const pump = this.buildings.find(b => b.config && b.config.type === 'water_pump');
       const filter = this.buildings.find(b => b.config && b.config.type === 'waste_filter');
+      const link3 = (a, b) => ['power', 'water', 'sewage'].forEach(t => this.connectNodes(t, a, b));
       if (this.tutorialStep === 1 && gen && h0) {
         this.connectNodes('power', gen, h0);
       } else if (this.tutorialStep === 2 && pump && h0) {
@@ -397,19 +421,29 @@
       } else if (this.tutorialStep === 3 && filter && h0) {
         this.connectNodes('sewage', h0, filter);
       } else if (this.tutorialStep === 4 && h0 && h1) {
-        ['power', 'water', 'sewage'].forEach(t => this.connectNodes(t, h0, h1));
+        link3(h0, h1);
       } else if (this.tutorialStep === 5) {
+        const c = this.connections[this.connections.length - 1];
+        if (c) {
+          this.connections = this.connections.filter(x => x !== c);
+          this.connectNodes(c.type, c.fromNode, c.toNode);
+        }
+        this.tutorialWireDeleted = true;
+      } else if (this.tutorialStep === 6 && h1 && h2) {
+        link3(h1, h2);
+      } else if (this.tutorialStep === 7) {
         const broken = this.buildings.find(b => b.isBroken);
         if (broken) broken.repair();
-      } else if (this.tutorialStep === 6) {
+      } else if (this.tutorialStep === 8) {
         const spot = h0 && this.findTutorialSpot(h0);
         if (spot) this.createBuilding('air_filter', spot.x, spot.y);
         else this.tutorialFilterCount = -1;
-      } else if (this.tutorialStep === 7) {
-        this.tutorialStep = 8;
+      } else if (this.tutorialStep === 9) {
+        this.tutorialStep = 10;
         this.pollution = 0;
-        this.addFloatingText('🎉 ฝึกสอนครบทุกขั้นตอน! เริ่มด่าน Bangkok ได้เลย', CONFIG.CANVAS_WIDTH / 2, 115, '#06d6a0');
+        this.addFloatingText('🎉 ฝึกสอนครบทุกขั้นตอน! ดูตัวอย่างการแพ้ 2 แบบ', CONFIG.CANVAS_WIDTH / 2, 150, '#06d6a0');
         if (global.POWATER.soundManager) global.POWATER.soundManager.playWin();
+        if (global.POWATER.uiManager) global.POWATER.uiManager.showFeatureVideoModal('lose_pollution');
       }
     }
 
@@ -480,10 +514,9 @@
         this.createBuilding('water_pump', 680, 270);
         this.createBuilding('waste_filter', 740, 470);
         this.createBuilding('generator_coal', 860, 270);
-        this.spawnHouse('right', 860, 110);
-        this.spawnHouse('right', 920, 460);
-        this.spawnHouse('left', 350, 320);
       }
+      // Starting houses spawn only where all three utilities can be wired in
+      for (let i = 0; i < 3 && this.houses.length < 3; i++) this.spawnHouse();
     }
 
     createBuilding(typeKey, centerX, centerY) {
@@ -529,41 +562,33 @@
       let y = forceY;
 
       if (x === null || y === null) {
-        const sideChoice = side || (Math.random() < 0.5 ? 'left' : 'right');
-        let valid = false;
-        let attempts = 0;
         // As Map Upsizes (tiers 0..3), allow tighter urban packing so up to 40 houses fit cleanly
-        const baseMinDist = CONFIG.MIN_HOUSE_DISTANCE || 135;
+        const baseMinDist = CONFIG.MIN_HOUSE_DISTANCE || 100;
         const minDist = Math.max(76, baseMinDist - this.upsizeTier * 18);
         const marginYTop = Math.max(62, 85 - this.upsizeTier * 7);
         const marginYBottom = Math.max(85, 110 - this.upsizeTier * 7);
         const marginX = Math.max(48, 75 - this.upsizeTier * 8);
-
-        while (!valid && attempts < 140) {
-          attempts++;
-          y = marginYTop + Math.random() * (CONFIG.CANVAS_HEIGHT - marginYTop - marginYBottom);
-          const riverCenterX = this.map.getRiverCenterAtY(y);
-
-          if (sideChoice === 'left') {
-            x = marginX + Math.random() * Math.max(40, (riverCenterX - marginX - this.map.riverWidth / 2 - 35));
-          } else {
-            const startX = riverCenterX + this.map.riverWidth / 2 + 40;
-            x = startX + Math.random() * Math.max(40, (CONFIG.CANVAS_WIDTH - startX - marginX));
-          }
-
+        const reach = CONFIG.MAX_WIRE_LENGTH || 140;
+        const anchors = [...this.houses, ...this.buildings.filter(b => b.config.type !== 'air_filter')];
+        let valid = false;
+        for (let attempts = 0; attempts < 400 && !valid && anchors.length > 0; attempts++) {
+          // Ring around an existing node, so the new house is always within wire reach of something
+          const a = anchors[Math.floor(Math.random() * anchors.length)].getCenter();
+          const ang = Math.random() * Math.PI * 2;
+          const r = minDist + Math.random() * Math.max(0, reach - 5 - minDist);
+          x = a.x + Math.cos(ang) * r;
+          y = a.y + Math.sin(ang) * r;
+          if (x < marginX || x > CONFIG.CANVAS_WIDTH - marginX || y < marginYTop || y > CONFIG.CANVAS_HEIGHT - marginYBottom) continue;
+          if (this.map.isPointInRiver(x, y) || this.map.isNearRiver(x, y, 20)) continue;
           const tooClose = [...this.houses, ...this.buildings].some(e => {
             const c = e.getCenter ? e.getCenter() : { x: e.centerX, y: e.centerY };
             return Math.hypot(c.x - x, c.y - y) < minDist;
           });
-          const inRiver = this.map.isPointInRiver(x, y);
-
-          if (!tooClose && !inRiver) {
-            valid = true;
-            side = sideChoice;
-          }
+          if (tooClose || !this.canSupplySpot(x, y)) continue;
+          valid = true;
         }
-
         if (!valid) return null;
+        side = x < this.map.getRiverCenterAtY(y) ? 'left' : 'right';
       }
 
       const scale = Math.max(0.75, 1.0 - this.upsizeTier * 0.07);
@@ -594,6 +619,33 @@
         global.POWATER.soundManager.playPlace();
       }
       return house;
+    }
+
+    // Could a house at (x, y) be wired to power, water and sewage (directly or through a chain of houses)?
+    canSupplySpot(x, y) {
+      const R = CONFIG.MAX_WIRE_LENGTH || 140;
+      const near = (a, b) => Math.hypot(a.x - b.x, a.y - b.y) <= R;
+      const reached = [{ x, y }];
+      const homes = this.houses.map(h => h.getCenter());
+      const used = new Set();
+      for (let i = 0; i < reached.length; i++) {
+        homes.forEach((h, j) => { if (!used.has(j) && near(reached[i], h)) { used.add(j); reached.push(h); } });
+      }
+      const UTIL = { generator: 'power', water_pump: 'water', waste_filter: 'sewage' };
+      const got = new Set();
+      this.buildings.forEach(b => {
+        const t = UTIL[b.config.type];
+        if (t && reached.some(p => near(p, b.getCenter()))) got.add(t);
+      });
+      return got.size === 3;
+    }
+
+    // Flow left after `hops` links in series (1 = full). Rome's unlimited aqueducts exempt water.
+    chainFlow(hops, type) {
+      if (type === 'water' && this.currentLevel && this.currentLevel.unlimitedWaterChain) return 1;
+      const free = CONFIG.CHAIN_FREE_HOPS || 2;
+      const loss = (typeof CONFIG.CHAIN_FLOW_LOSS_PER_HOP === 'number') ? CONFIG.CHAIN_FLOW_LOSS_PER_HOP : 0.25;
+      return Math.max(0, 1 - loss * Math.max(0, hops - free));
     }
 
     checkMapUpsize() {
@@ -1016,6 +1068,7 @@
         h.hasWater = false;
         h.hasDrainage = false;
         h.producesWaste = false;
+        h.hops = { power: Infinity, water: Infinity, sewage: Infinity };
         if (h.runtimeObject && h.runtimeObject.getVariables && h.runtimeObject.getVariables().has("IsPowered")) {
           h.runtimeObject.getVariables().get("IsPowered").setBoolean(false);
         }
@@ -1048,6 +1101,18 @@
 
       // 3. Simulate Sewage Drainage network
       this.simulateSewageNetwork();
+
+      // 4. Series chaining: each link past the free ones loses flow, so far-down houses can't keep up
+      this.houses.forEach(h => {
+        h.slowTypes = [];
+        let worst = 0;
+        [['power', h.hasPower], ['water', h.hasWater], ['sewage', h.hasDrainage && h.producesWaste]].forEach(([t, on]) => {
+          if (!on) return;
+          const lost = 1 - this.chainFlow(h.hops[t], t);
+          if (lost > 0) { h.slowTypes.push(t); worst = Math.max(worst, lost); }
+        });
+        h.flowDeficit = worst;
+      });
     }
 
     simulateTypeNetwork(type) {
@@ -1078,6 +1143,7 @@
         let availableCap = source.capacity;
         const visited = new Set();
         const queue = [source];
+        const depth = new Map([[source.id, 0]]);
         visited.add(source.id);
 
         while (queue.length > 0 && (availableCap === Infinity || availableCap > 0)) {
@@ -1092,11 +1158,15 @@
             }
 
             if (nextNode) {
+              const d = depth.get(current.id) + 1;
+              if (this.chainFlow(d, type) <= 0) return; // too far down the chain: nothing arrives
+              depth.set(nextNode.id, d);
               conn.active = true;
               visited.add(nextNode.id);
               queue.push(nextNode);
 
               if (nextNode.isHouse || nextNode.entityType === 'house') {
+                if (nextNode.hops) nextNode.hops[type] = Math.min(nextNode.hops[type], d);
                 let served = false;
                 if (type === 'power' && !nextNode.hasPower) {
                   nextNode.hasPower = true;
@@ -1133,6 +1203,7 @@
 
         const visited = new Set();
         const queue = [filter];
+        const depth = new Map([[filter.id, 0]]);
         visited.add(filter.id);
 
         while (queue.length > 0 && (remainingCap === Infinity || remainingCap > 0)) {
@@ -1147,11 +1218,15 @@
             }
 
             if (nextNode) {
+              const d = depth.get(current.id) + 1;
+              if (this.chainFlow(d, 'sewage') <= 0) return;
+              depth.set(nextNode.id, d);
               conn.active = true;
               visited.add(nextNode.id);
               queue.push(nextNode);
 
               if (nextNode.isHouse || nextNode.entityType === 'house') {
+                if (nextNode.hops) nextNode.hops.sewage = Math.min(nextNode.hops.sewage, d);
                 if (nextNode.producesWaste && !nextNode.hasDrainage) {
                   nextNode.hasDrainage = true;
                   filter.usedCapacity++;
@@ -1424,6 +1499,12 @@
 
       const p1 = nodeA.getCenter();
       const p2 = nodeB.getCenter();
+      const maxLen = CONFIG.MAX_WIRE_LENGTH || 140;
+      const len = Math.hypot(p2.x - p1.x, p2.y - p1.y);
+      if (len > maxLen) {
+        this.addFloatingText(`❌ สายยาวเกินไป! (${Math.round(len)} / สูงสุด ${maxLen})`, (p1.x + p2.x) / 2, (p1.y + p2.y) / 2 - 20, '#e63946');
+        return false;
+      }
       const crossesRiver = this.map.checkLineIntersectsRiver(p1, p2);
       const connCost = this.getConnectionCost(actualType, crossesRiver);
       if (connCost > 0 && this.money < connCost) {
@@ -1469,6 +1550,7 @@
         if (minDist < 15) {
           const typeLabel = c.type === 'power' ? 'สายไฟ' : (c.type === 'water' ? 'ท่อน้ำดี' : 'ท่อระบายน้ำ');
           this.connections.splice(i, 1);
+          this.tutorialWireDeleted = true;
           if (global.POWATER.soundManager) global.POWATER.soundManager.playClick();
           this.addFloatingText(`ลบ${typeLabel}แล้ว`, x, y, '#90e0ef');
           return true;

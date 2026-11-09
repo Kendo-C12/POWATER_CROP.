@@ -223,20 +223,50 @@ async function runTest() {
   await page.evaluate(() => { window.POWATER.game.activeTool = 'power'; });
   await page.keyboard.press('Tab');
   const afterTab = await page.evaluate(() => window.POWATER.game.activeTool);
-  // 7. Tutorial runs all 7 steps (house chaining, repair, pollution, strikes)
+  // 7. Tutorial runs all 9 steps (chaining, delete, series slowdown, repair, pollution, strikes) then shows lose video
   const tutSteps = await page.evaluate(() => {
     const g = window.POWATER.game;
     g.startTutorial();
     const seen = [];
-    for (let i = 0; i < 7; i++) { seen.push(g.tutorialStep); g.skipTutorialStep(); g.update(0.05); }
-    return { seen, final: g.tutorialStep, chained: !!(g.tutorialHouse2 && g.tutorialHouse2.hasPower && g.tutorialHouse2.hasDrainage) };
+    for (let i = 0; i < 9; i++) { seen.push(g.tutorialStep); g.skipTutorialStep(); g.update(0.05); }
+    const ui = window.POWATER.uiManager;
+    const r = { seen, final: g.tutorialStep, chained: !!(g.tutorialHouse3 && g.tutorialHouse3.hasPower && g.tutorialHouse3.hasDrainage), video: ui.activeModal === 'feature_video' && ui.modalData.videoKey };
+    ui.closeModal();
+    return r;
   });
   console.log('5-7. HUD hover / Tab / Tutorial:', { hoverElapsed, afterTab, tutSteps });
-  if (hoverElapsed < 1.0 || afterTab !== 'water' || tutSteps.final !== 8 || tutSteps.seen.join() !== '1,2,3,4,5,6,7' || !tutSteps.chained) {
+  if (hoverElapsed < 1.0 || afterTab !== 'water' || tutSteps.final !== 10 || tutSteps.seen.join() !== '1,2,3,4,5,6,7,8,9' || !tutSteps.chained || tutSteps.video !== 'lose_pollution') {
     throw new Error('HUD-hover simulation, Tab wire switch, or tutorial check failed!');
   }
   await page.evaluate(() => window.POWATER.game.startLevel(0));
   await page.mouse.move(640, 400);
+
+  // 8. Wire rules: max length, spawn reachability, series slowdown -> complaint
+  const rules = await page.evaluate(() => {
+    const g = window.POWATER.game, C = window.POWATER.CONFIG;
+    const R = C.MAX_WIRE_LENGTH;
+    const d = (a, b) => Math.hypot(a.getCenter().x - b.getCenter().x, a.getCenter().y - b.getCenter().y);
+    // a too-long wire is refused
+    const gen = g.buildings.find(b => b.config.type === 'generator');
+    const far = g.houses.find(h => d(h, gen) > R);
+    const farRefused = far ? !g.connectNodes('power', gen, far) : true;
+    // every spawned house can be wired to all three utilities
+    for (let i = 0; i < 12; i++) g.spawnHouse();
+    const allReachable = g.houses.every(h => g.canSupplySpot(h.getCenter().x, h.getCenter().y));
+    // series chain: hops 1..2 full, 3 = 75%, 6 = no flow
+    const flows = [1, 2, 3, 4, 5, 6].map(n => g.chainFlow(n, 'power'));
+    // a supplied house with a flow deficit eventually complains
+    const h = g.houses[0];
+    h.hasPower = h.hasWater = h.hasDrainage = true; h.flowDeficit = 0.5; h.unhappyTimer = 0;
+    let complained = false;
+    for (let t = 0; t < 70; t += 0.5) h.update(0.5, () => { complained = true; }, false);
+    return { farRefused, allReachable, houses: g.houses.length, flows, complained };
+  });
+  console.log('8. Wire rules:', rules);
+  if (!rules.farRefused || !rules.allReachable || rules.flows.join() !== '1,1,0.75,0.5,0.25,0' || !rules.complained) {
+    throw new Error('Wire length / spawn reachability / series slowdown check failed!');
+  }
+  await page.evaluate(() => window.POWATER.game.startLevel(0));
 
   const screenshotPath = path.join(__dirname, '..', 'test_screenshot.png');
   await page.screenshot({ path: screenshotPath });
