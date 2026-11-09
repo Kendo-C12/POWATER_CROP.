@@ -36,8 +36,7 @@
         "capacityHouses": 0,
         "pollutionReductionPerSec": 0.20,
         "canBreakDown": false
-      },
-      "demolishRefundRatio": 0.50
+      }
     },
     "connections": {
       "powerLineCost": 0,
@@ -93,7 +92,7 @@
     "weeklyBaseMunicipalGrant": 40,
     "continuousRevenuePerHousePerSec": 0.8,
     "minHouseDistancePixels": 100,
-    "maxWireLengthPixels": 140,
+    "maxWireLengthPixels": 315,
     "chainFreeHops": 2,
     "chainFlowLossPerHop": 0.25,
     "upsizeEveryNHouses": 10,

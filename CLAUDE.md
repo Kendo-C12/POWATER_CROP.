@@ -1,8 +1,8 @@
-# POWATER CORP. (`v1.0.5.0`) — GDevelop 5 Project Documentation (`CLAUDE.md`)
+# POWATER CORP. (`v1.0.5.1`) — GDevelop 5 Project Documentation (`CLAUDE.md`)
 
 > **Team Green Gang**: Sukrit Limpakanon, Aristt Mahakitsiri, Gantinan Satjariyakul  
 > **Engine**: GDevelop 5 (`POWATER CROPS..json`) + Real PNG Sprite Assets + PixiJS Procedural River/Conduit Rendering  
-> **Version Naming**: `1.x.y.z` (`x` = Major Version, `y` = Small Addition Within Major Version, `z` = Bug Fixes) — Current: **`v1.0.5.0`**
+> **Version Naming**: `1.x.y.z` (`x` = Major Version, `y` = Small Addition Within Major Version, `z` = Bug Fixes) — Current: **`v1.0.5.1`**
 
 ---
 
@@ -37,9 +37,9 @@
 - **Weekly Revenue**: At the end of every in-game week (7 days), the city awards **`[Completed Houses] * $40 / week`** (plus base municipal grant).
 
 ### 🔌 Wiring Rules (`v1.0.5.0`)
-- **Max wire length**: every wire/pipe spans at most **`140px` center-to-center** (2.5 × house height of `56px`, `globalRules.maxWireLengthPixels`). Dragging shows the reach circle; the preview turns red when too long.
+- **Max wire length**: every wire/pipe spans at most **`315px` center-to-center** (2.5 × house height of `56px` × 2.25, `globalRules.maxWireLengthPixels`). Dragging shows the reach circle; the preview turns red when too long.
 - **Series slowdown**: the first `2` links from a source run at full flow; each extra link loses **25%** (`chainFreeHops`, `chainFlowLossPerHop`), and a 6th link carries nothing. A supplied house with lost flow keeps filling its unhappy bar (blinking utility badge) and eventually complains — *lose condition #2*. Rome's unlimited aqueducts exempt water.
-- **Delete**: right-click a wire, or the `🗑️ DELETE [X]` tool (also `Delete` key).
+- **Delete**: right-click a wire, or the `🗑️ DELETE [X]` tool (also `Delete` key). Buildings (generators, pumps, filters) **cannot be demolished**.
 - **Reachable spawning**: houses (including the 3 starting houses) only spawn where all three utilities can be wired in, directly or through a house chain (`engine.canSupplySpot`). Scene layouts no longer place houses; buildings were compacted in Tokyo/Rome/Amsterdam so a first house fits.
 
 ### 🔧 New `v1.0.0.0` Systems
@@ -89,7 +89,7 @@ All buildings, houses, rivers, HUD bars, toolbar docks, buttons, and status badg
 
 - `POWATER CROPS..json`: Main GDevelop 5 project file containing all 5 scene layouts (`Main`, `Tutorial`, `Tokyo`, `Rome`, `Amsterdam`), sprite objects, visual event groups, and compiled JS engine bridge.
 - `config/`: Dedicated configuration folder in the project root:
-  - `config/global.json`: Global configuration for all stages, including `featureCosts` (building costs & capacities, wire/pipe connection costs, river crossing extra cost, demolish refund ratio, repair cost per building, `disasterTesting.testCost` (Disaster Test Lab, `$50`/test), and upgrade base costs/multipliers), `globalRules`, `pollutionRates`, and `disasters`.
+  - `config/global.json`: Global configuration for all stages, including `featureCosts` (building costs & capacities, wire/pipe connection costs, river crossing extra cost, repair cost per building, `disasterTesting.testCost` (Disaster Test Lab, `$50`/test), and upgrade base costs/multipliers), `globalRules`, `pollutionRates`, and `disasters`.
   - `config/tutorial.json`, `config/bangkok.json`, `config/tokyo.json`, `config/rome.json`, `config/amsterdam.json`: Individual per-stage configuration files controlling `startingBudget`, `houseSpawnIntervalSeconds`, `pollutionMultiplier`, `maxPollution`, `maxComplaints`, `winRequiredHouses`, `winHoldDurationSeconds`, `maxHousesCap`, discounts, disaster flags, and optional `featureCostOverrides`.
 - `scripts/config.js`: Game constants, `POWATER.applyStageConfig()` loader, `v1.0.0.0` level definitions, disaster rules, upgrades, and `v1.1–v1.4` feature roadmap.
 - `scripts/map.js`: River spline geometry, shoreline proximity checks, animated water current droplets, High Tide surge, and Amsterdam Flood rising water overlay.
@@ -113,6 +113,9 @@ All buildings, houses, rivers, HUD bars, toolbar docks, buttons, and status badg
 
 ## 7. Changelog
 
+- **`v1.0.5.1` (2026-11-10)**:
+  - Buildings can no longer be demolished (delete tool / right-click only removes wires); removed `demolishRefundRatio`.
+  - Wire reach widened 2.25× (`140px` → `315px`).
 - **`v1.0.5.0` (2026-11-10)**:
   - Wiring rules: `140px` max wire length with reach circle + red preview; series-chain flow loss that leads to complaints; `🗑️ DELETE [X]` tool.
   - Houses (incl. starting houses) spawn only where all three utilities are wireable; scene layouts no longer contain houses; Tokyo/Rome/Amsterdam buildings compacted (`minHouseDistancePixels` 135 → 100).

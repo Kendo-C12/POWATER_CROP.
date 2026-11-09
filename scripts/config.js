@@ -26,7 +26,7 @@
     WEEKLY_REVENUE_PER_COMPLETE_HOUSE: 40, // +40 per completed house every week (7 days)
     REVENUE_PER_HAPPY_HOUSE_SEC: 0.8, // Small continuous operational trickle
     MIN_HOUSE_DISTANCE: 100,
-    MAX_WIRE_LENGTH: 140, // wire/pipe reach (center to center) = 2.5 x house height (56px)
+    MAX_WIRE_LENGTH: 315, // wire/pipe reach (center to center) = 2.5 x house height (56px) x 2.25
     CHAIN_FREE_HOPS: 2, // links from a source that run at full flow
     CHAIN_FLOW_LOSS_PER_HOP: 0.25, // flow lost per extra link in series (0 flow = not supplied)
 
@@ -211,7 +211,6 @@
         bonusPerLevel: 0.25
       }
     },
-    DEMOLISH_REFUND_RATIO: 0.50,
     REPAIR_COST_PER_BUILDING: 0,
     RIVER_CROSSING_EXTRA_COST: 0,
 
@@ -654,9 +653,6 @@
     const fc = stageCfg.featureCosts || {};
     const bld = fc.buildings || stageCfg.buildings;
     if (bld && typeof bld === 'object' && CONFIG.BUILDINGS) {
-      if (typeof bld.demolishRefundRatio === 'number') {
-        CONFIG.DEMOLISH_REFUND_RATIO = bld.demolishRefundRatio;
-      }
       const mapBld = [
         ['generatorCoal', 'GENERATOR_COAL'],
         ['waterPump', 'WATER_PUMP'],

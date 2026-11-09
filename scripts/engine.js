@@ -318,7 +318,7 @@
     // Free spot within wire reach of `near`; prefers spots far from buildings so chains are needed
     findTutorialSpot(near) {
       const c = near.getCenter ? near.getCenter() : { x: near.centerX, y: near.centerY };
-      const r = (CONFIG.MAX_WIRE_LENGTH || 140) - 20;
+      const r = (CONFIG.MAX_WIRE_LENGTH || 315) - 20;
       const spots = [];
       for (let i = 0; i < 16; i++) {
         const ang = (i / 16) * Math.PI * 2;
@@ -367,7 +367,7 @@
         next();
         this.activeTool = 'power';
         this.tutorialHouse2 = spawnNear(h0);
-        say('✅ บ้านสมบูรณ์ +$50! บ้านใหม่อยู่ไกลจากโรงงาน: ลากสายพ่วงจากบ้านเดิมไปบ้านใหม่ (สายยาวได้ไม่เกินวงกลม)', '#ffd166');
+        say('✅ บ้านสมบูรณ์ +$50! บ้านใหม่มาแล้ว: ลากสายพ่วงจากบ้านเดิมไปบ้านใหม่ (สายยาวได้ไม่เกินวงกลม)', '#ffd166');
         sfx('playUpgrade');
       } else if (this.tutorialStep === 4 && (!h1 || full(h1))) {
         next();
@@ -568,7 +568,7 @@
         const marginYTop = Math.max(62, 85 - this.upsizeTier * 7);
         const marginYBottom = Math.max(85, 110 - this.upsizeTier * 7);
         const marginX = Math.max(48, 75 - this.upsizeTier * 8);
-        const reach = CONFIG.MAX_WIRE_LENGTH || 140;
+        const reach = CONFIG.MAX_WIRE_LENGTH || 315;
         const anchors = [...this.houses, ...this.buildings.filter(b => b.config.type !== 'air_filter')];
         let valid = false;
         for (let attempts = 0; attempts < 400 && !valid && anchors.length > 0; attempts++) {
@@ -623,7 +623,7 @@
 
     // Could a house at (x, y) be wired to power, water and sewage (directly or through a chain of houses)?
     canSupplySpot(x, y) {
-      const R = CONFIG.MAX_WIRE_LENGTH || 140;
+      const R = CONFIG.MAX_WIRE_LENGTH || 315;
       const near = (a, b) => Math.hypot(a.x - b.x, a.y - b.y) <= R;
       const reached = [{ x, y }];
       const homes = this.houses.map(h => h.getCenter());
@@ -1499,7 +1499,7 @@
 
       const p1 = nodeA.getCenter();
       const p2 = nodeB.getCenter();
-      const maxLen = CONFIG.MAX_WIRE_LENGTH || 140;
+      const maxLen = CONFIG.MAX_WIRE_LENGTH || 315;
       const len = Math.hypot(p2.x - p1.x, p2.y - p1.y);
       if (len > maxLen) {
         this.addFloatingText(`❌ สายยาวเกินไป! (${Math.round(len)} / สูงสุด ${maxLen})`, (p1.x + p2.x) / 2, (p1.y + p2.y) / 2 - 20, '#e63946');
@@ -1557,28 +1557,10 @@
         }
       }
 
-      const bIdx = this.buildings.findIndex(b => {
-        const c = b.getCenter();
-        return Math.hypot(c.x - x, c.y - y) <= 40;
-      });
-      if (bIdx !== -1) {
-        const b = this.buildings[bIdx];
-        const refundRatio = (typeof CONFIG.DEMOLISH_REFUND_RATIO === 'number') ? CONFIG.DEMOLISH_REFUND_RATIO : 0.5;
-        const refund = Math.round(this.getBuildingCost(b.config) * refundRatio);
-        this.money += refund;
-
-        this.connections = this.connections.filter(c => c.fromNode.id !== b.id && c.toNode.id !== b.id);
-        if (b.destroy) b.destroy();
-        if (b.runtimeObject && this.runtimeScene) {
-          try {
-            b.runtimeObject.deleteFromScene(this.runtimeScene);
-          } catch (e) {}
-        }
-        this.buildings.splice(bIdx, 1);
-
-        if (global.POWATER.soundManager) global.POWATER.soundManager.playClick();
-        this.addFloatingText(`รื้อถอน (คืนเงิน +$${refund})`, x, y, '#ffd166');
-        return true;
+      // Buildings (generators, pumps, filters) are permanent: only wires can be removed
+      if (this.buildings.some(b => { const c = b.getCenter(); return Math.hypot(c.x - x, c.y - y) <= 40; })) {
+        this.addFloatingText('❌ ไม่สามารถรื้อถอนอาคารได้ (ลบได้เฉพาะสาย)', x, y - 20, '#e63946');
+        return false;
       }
 
       return false;

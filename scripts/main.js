@@ -542,7 +542,7 @@
         // Wire reach: anything whose center is inside this circle can be connected
         gfxO.lineStyle(2, 0xffffff, 0.5);
         gfxO.beginFill(0xffffff, 0.06);
-        gfxO.drawCircle(sc.x, sc.y, global.POWATER.CONFIG.MAX_WIRE_LENGTH || 140);
+        gfxO.drawCircle(sc.x, sc.y, global.POWATER.CONFIG.MAX_WIRE_LENGTH || 315);
         gfxO.endFill();
       }
 
@@ -556,7 +556,7 @@
         else if (this.game.activeTool === 'sewage') wireColor = 0xc77dff;
         const hoverNode = this.game.getNodeAt(p2.x, p2.y);
         const endPt = (hoverNode && hoverNode.id !== this.dragStartNode.id) ? hoverNode.getCenter() : p2;
-        if (Math.hypot(endPt.x - p1.x, endPt.y - p1.y) > (global.POWATER.CONFIG.MAX_WIRE_LENGTH || 140)) wireColor = 0xe63946; // too long
+        if (Math.hypot(endPt.x - p1.x, endPt.y - p1.y) > (global.POWATER.CONFIG.MAX_WIRE_LENGTH || 315)) wireColor = 0xe63946; // too long
 
         const previewPath = (global.POWATER.ConnectionEntity && global.POWATER.ConnectionEntity.buildManhattanPoints)
           ? global.POWATER.ConnectionEntity.buildManhattanPoints(p1, p2, 0, 22)

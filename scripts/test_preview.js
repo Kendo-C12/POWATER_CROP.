@@ -248,8 +248,13 @@ async function runTest() {
     const d = (a, b) => Math.hypot(a.getCenter().x - b.getCenter().x, a.getCenter().y - b.getCenter().y);
     // a too-long wire is refused
     const gen = g.buildings.find(b => b.config.type === 'generator');
-    const far = g.houses.find(h => d(h, gen) > R);
-    const farRefused = far ? !g.connectNodes('power', gen, far) : true;
+    const gc = gen.getCenter();
+    const far = { id: 'far', isHouse: true, getCenter: () => ({ x: gc.x + R + 30, y: gc.y }) };
+    const farRefused = !g.connectNodes('power', gen, far);
+    // buildings cannot be demolished
+    const nBuild = g.buildings.length;
+    g.deleteAt(gc.x, gc.y);
+    const buildingKept = g.buildings.length === nBuild;
     // every spawned house can be wired to all three utilities
     for (let i = 0; i < 12; i++) g.spawnHouse();
     const allReachable = g.houses.every(h => g.canSupplySpot(h.getCenter().x, h.getCenter().y));
@@ -260,10 +265,10 @@ async function runTest() {
     h.hasPower = h.hasWater = h.hasDrainage = true; h.flowDeficit = 0.5; h.unhappyTimer = 0;
     let complained = false;
     for (let t = 0; t < 70; t += 0.5) h.update(0.5, () => { complained = true; }, false);
-    return { farRefused, allReachable, houses: g.houses.length, flows, complained };
+    return { R, farRefused, buildingKept, allReachable, houses: g.houses.length, flows, complained };
   });
   console.log('8. Wire rules:', rules);
-  if (!rules.farRefused || !rules.allReachable || rules.flows.join() !== '1,1,0.75,0.5,0.25,0' || !rules.complained) {
+  if (rules.R !== 315 || !rules.farRefused || !rules.buildingKept || !rules.allReachable || rules.flows.join() !== '1,1,0.75,0.5,0.25,0' || !rules.complained) {
     throw new Error('Wire length / spawn reachability / series slowdown check failed!');
   }
   await page.evaluate(() => window.POWATER.game.startLevel(0));
