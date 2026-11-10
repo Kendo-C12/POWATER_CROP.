@@ -248,6 +248,8 @@
       this.gracePeriodWarningShown = false;
       this.pollutionStartedNotified = false;
       this.airFilterReadyAt = 0;
+      this.pollutionWarned = false;
+      this.levelCleared = false;
 
       this.dayNightTimer = 0.0;
       this.isNight = false;
@@ -1383,6 +1385,14 @@
         } catch (e) {}
       }
 
+      // First time pollution passes the advice threshold: tell the player and play the Eco Filter demo
+      if (!this.pollutionWarned && !this.isTutorialMode && this.pollution >= this.currentLevel.maxPollution * (CONFIG.POLLUTION_ADVICE_RATIO || 0.33)) {
+        this.pollutionWarned = true;
+        this.addFloatingText('☢️ มลพิษสูงแล้ว! วางเครื่องกรองอากาศ [4] เพื่อลดมลพิษ', CONFIG.CANVAS_WIDTH / 2, 130, '#ffb703');
+        if (global.POWATER.soundManager) global.POWATER.soundManager.playPollutionWarn();
+        if (global.POWATER.uiManager && !global.POWATER.uiManager.activeModal) global.POWATER.uiManager.showFeatureVideoModal('air_filter');
+      }
+
       if (this.pollution >= this.currentLevel.maxPollution * CONFIG.POLLUTION_WARN_THRESHOLD) {
         if (Math.random() < 0.04 && global.POWATER.soundManager) {
           global.POWATER.soundManager.playPollutionWarn();
@@ -1452,7 +1462,7 @@
     }
 
     triggerGameWon() {
-      if (this.isGameWon) return;
+      if (this.isGameWon || this.levelCleared) return; // levelCleared: player chose to keep playing after winning
       this.isGameWon = true;
       if (global.POWATER.soundManager) global.POWATER.soundManager.playWin();
       if (global.POWATER.uiManager) global.POWATER.uiManager.showGameWonModal();

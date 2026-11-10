@@ -1,8 +1,8 @@
-# POWATER CORP. (`v1.0.7.2`) — GDevelop 5 Project Documentation (`CLAUDE.md`)
+# POWATER CORP. (`v1.0.7.3`) — GDevelop 5 Project Documentation (`CLAUDE.md`)
 
 > **Team Green Gang**: Sukrit Limpakanon, Aristt Mahakitsiri, Gantinan Satjariyakul  
 > **Engine**: GDevelop 5 (`POWATER CROPS..json`) + Real PNG Sprite Assets + PixiJS Procedural River/Conduit Rendering  
-> **Version Naming**: `1.x.y.z` (`x` = Major Version, `y` = Small Addition Within Major Version, `z` = Bug Fixes) — Current: **`v1.0.7.2`**
+> **Version Naming**: `1.x.y.z` (`x` = Major Version, `y` = Small Addition Within Major Version, `z` = Bug Fixes) — Current: **`v1.0.7.3`**
 
 ---
 
@@ -33,6 +33,9 @@
 - **Game speed**: the `SPEED` button cycles **1X → 2X → 4X → 1X**.
 
 - **Pollution limit is calculated (`engine.computeMaxPollution`)**: at level start, `maxPollution` = the pollution a *minimal* winning city emits from pollution start until only `pollutionWinMarginSeconds` (`20s`) of the win hold are left. Minimal city = the starting coal generator, `ceil(houses / filter capacity)` waste filters, the starting air filters, every house drained, houses growing from 5 to 15 at the all-connected spawn speed. Result: Bangkok `105.5`, Tokyo `101.4`, Rome `103.5`, Amsterdam `90.2` (the `maxPollution` in `config/<city>.json` is now only a floor, used by the tutorial). Any extra generator/filter or untreated sewage pushes the city over earlier; Eco Filters and upgrades buy time.
+
+- **Pollution advice**: the first time pollution reaches **33%** of the limit (`globalRules.pollutionAdviceRatio`), a `☢️ มลพิษสูงแล้ว!` message appears and the Eco Filter demo video auto-plays (it shows the pollution bar climbing past the 33% mark, placing filters via `FILTER [4]`, and the bar falling).
+- **After winning**: `CONTINUE` / ✕ on the victory screen keeps the level running (`levelCleared` stops the win from re-firing).
 
 ### 💀 Lose Conditions
 1. **Citizen Complaints**: Reaching the level's maximum complaint limit (`3` strikes in Bangkok, Tokyo, and Rome; **`1` strike = Instant Game Over** in Amsterdam).
@@ -129,6 +132,9 @@ All buildings, houses, rivers, HUD bars, toolbar docks, buttons, and status badg
 
 ## 7. Changelog
 
+- **`v1.0.7.3` (2026-11-10)**:
+  - Fixed: after winning, `CONTINUE` / ✕ left the game frozen (`isGameWon` stayed true); the level now keeps running.
+  - Pollution at 33% of the limit warns once and auto-plays the Eco Filter video; the video was redrawn with a pollution bar that climbs, then drops as filters are placed.
 - **`v1.0.7.2` (2026-11-10)**:
   - Reach zones keep fixed colours (green 1x disc, yellow 2.5x ring); only the area outside 2.5x turns red when the drag is too long.
 - **`v1.0.7.1` (2026-11-10)**:

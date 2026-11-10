@@ -866,6 +866,11 @@
     }
 
     closeModal() {
+      if (this.activeModal === 'victory' && this.game) {
+        // "Continue in this level": un-freeze the simulation; levelCleared stops the win from re-firing
+        this.game.isGameWon = false;
+        this.game.levelCleared = true;
+      }
       this.activeModal = null;
       if (this.modalContainer) this.modalContainer.visible = false;
       this.modalButtons = [];
@@ -1184,16 +1189,58 @@
         drawCursor(ax, vy + 150, t >= 0.38 && t <= 0.5);
       }
       else if (vKey === 'air_filter') {
-        const bx = vx + 180, by = vy + 100;
-        const hx = vx + 360, hy = vy + 100;
-        if (t >= 0.25) {
-          addSprite('AirFilter.png', bx, by, 54, 54);
-          g.lineStyle(2.5, 0x2ec4b6, 0.9);
-          g.drawCircle(bx, by, 34 + Math.sin(t * 18) * 4);
+        // 0-0.4: coal plant smokes, pollution bar climbs past the warning line
+        // 0.4-0.55: click FILTER [4], then click free land   0.55-1: filters pull the bar back down
+        const placed = t >= 0.5, placed2 = t >= 0.6;
+        const level = t < 0.5 ? 0.12 + t * 1.3 : Math.max(0.15, 0.77 - (t - 0.5) * (placed2 ? 1.25 : 0.6));
+        const px = vx + 130, py = vy + 125;
+        addSprite('Power.png', px, py, 52, 52);
+        for (let i = 0; i < 4; i++) {
+          const k = (t * 2.5 + i / 4) % 1;
+          g.lineStyle(0);
+          g.beginFill(0x6c757d, (placed2 ? 0.25 : 0.55) * (1 - k));
+          g.drawCircle(px + Math.sin(k * 6 + i) * 7, py - 30 - k * 55, 7 + k * 12);
+          g.endFill();
         }
-        addSprite('House.png', hx, hy, 68, 46);
-        addLabel('🍃 ดูดซับมลพิษอัตโนมัติ -0.2 หน่วย/วินาที', vx + vw / 2, vy + 24, 0x06d6a0, 12);
-        drawCursor(bx, by, t >= 0.2 && t <= 0.35);
+        addSprite('House.png', vx + 230, vy + 150, 60, 40);
+        const fx = vx + 250, fy = vy + 75, fx2 = vx + 340, fy2 = vy + 135;
+        [[placed, fx, fy], [placed2, fx2, fy2]].forEach(([on, x, y]) => {
+          if (!on) return;
+          addSprite('AirFilter.png', x, y, 46, 46);
+          g.lineStyle(2.5, 0x2ec4b6, 0.9);
+          g.drawCircle(x, y, 30 + Math.sin(t * 18) * 4);
+          for (let i = 0; i < 3; i++) { // green "absorb" pulses
+            const k = (t * 3 + i / 3) % 1;
+            g.lineStyle(2, 0x06d6a0, 0.7 * (1 - k));
+            g.drawCircle(x, y, 18 + k * 50);
+          }
+        });
+        // Pollution bar (same look as the HUD pill) with the 33% warning mark
+        const bx = vx + vw - 190, by = vy + 58, bw = 160, bh = 16;
+        g.lineStyle(1.5, 0xffffff, 0.5);
+        g.beginFill(0x000000, 0.5);
+        g.drawRoundedRect(bx, by, bw, bh, 6);
+        g.endFill();
+        g.lineStyle(0);
+        g.beginFill(level > 0.66 ? 0xe63946 : (level > 0.33 ? 0xffb703 : 0x06d6a0), 1);
+        g.drawRoundedRect(bx, by, Math.max(6, bw * level), bh, 6);
+        g.endFill();
+        g.lineStyle(2, 0xffffff, 0.9);
+        g.moveTo(bx + bw * 0.33, by - 4);
+        g.lineTo(bx + bw * 0.33, by + bh + 4);
+        addLabel(`☢️ มลพิษ ${Math.round(level * 100)}%`, bx + bw / 2, by + 32, level > 0.33 ? 0xffb703 : 0x06d6a0, 12);
+        addLabel(placed ? (placed2 ? '🍃 วางหลายเครื่อง = ลดเร็วขึ้น (-0.2/วิ ต่อเครื่อง)' : '🍃 เครื่องกรองดูดมลพิษอัตโนมัติ ไม่ต้องต่อสาย')
+          : (level > 0.33 ? '⚠️ มลพิษเกิน 33%! กด FILTER [4] แล้ววางบนพื้นที่ว่าง' : '🏭 โรงไฟฟ้าและน้ำเสียทำให้มลพิษเพิ่มขึ้น'), vx + vw / 2, vy + 24, placed ? 0x06d6a0 : 0xffd166, 12);
+        // Cursor: toolbar FILTER button, then the two drop spots
+        const btnX = vx + vw - 90, btnY = vy + vh - 30;
+        g.lineStyle(2, 0x06d6a0, 0.9);
+        g.beginFill(0x181332, 0.95);
+        g.drawRoundedRect(btnX - 34, btnY - 14, 68, 28, 6);
+        g.endFill();
+        addLabel('🍃 FILTER [4]', btnX, btnY, 0x06d6a0, 10);
+        if (t >= 0.38 && t < 0.45) drawCursor(btnX, btnY, true);
+        else if (t >= 0.45 && t < 0.55) drawCursor(fx, fy, t >= 0.49);
+        else if (t >= 0.55 && t < 0.65) drawCursor(fx2, fy2, t >= 0.59);
       }
       else if (vKey === 'lose_pollution') {
         // Two coal plants puff smoke while the pollution bar fills to the limit -> GAME OVER

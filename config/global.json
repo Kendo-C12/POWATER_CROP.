@@ -86,6 +86,7 @@
     "pollutionStartHouses": 5,
     "pollutionWinMarginSeconds": 20,
     "pollutionMinSurviveSeconds": 60,
+    "pollutionAdviceRatio": 0.33,
     "complaintStrikeTimerSeconds": 27.0,
     "defaultMaxComplaints": 3,
     "winRequiredHouses": 15,

@@ -17,6 +17,7 @@
     POLLUTION_START_HOUSES: 5, // pollution starts once the city has this many houses
     POLLUTION_WIN_MARGIN_SECONDS: 20, // maxPollution is sized so a minimal city loses with this much time left to win...
     POLLUTION_MIN_SURVIVE_SECONDS: 60, // ...but never before this many seconds of pollution
+    POLLUTION_ADVICE_RATIO: 0.33, // at this share of the limit: warn once and auto-play the Eco Filter video
     POLLUTION_WARN_THRESHOLD: 0.8,
 
     // Win Condition (POWATER CORP.pdf: บ้าน > 15 หลังมีน้ำและไฟใช้ตลอดเวลาเป็นเวลา 5-7 นาที)
@@ -306,8 +307,8 @@
         subtitle: 'เทคโนโลยีสะอาด: ลดมลภาวะในเมืองและแม่น้ำอัตโนมัติ -0.2 หน่วย/วินาที',
         steps: [
           '1. เมื่อมีบ้านครบ 5 หลัง ระบบมลภาวะจะเริ่มทำงานจากโรงปั่นไฟและน้ำเสีย',
-          '2. คลิกปุ่ม FILTER [4] แล้วคลิกวางเครื่องกรองมลภาวะบนพื้นที่ว่าง ($40)',
-          '3. เครื่องกรองจะทำงานอัตโนมัติทันทีโดยไม่ต้องต่อสาย ช่วยลดมลพิษ -0.2/วินาที!'
+          '2. มลพิษเกิน 33% (แถบ ☢️ ด้านบนเป็นสีส้ม) ให้คลิกปุ่ม FILTER [4] แล้วคลิกวางบนพื้นที่ว่าง ($40, คูลดาวน์ 5 วิ)',
+          '3. เครื่องกรองทำงานทันทีไม่ต้องต่อสาย ลดมลพิษ -0.2/วินาทีต่อเครื่อง วางหลายเครื่อง = แถบลดเร็วขึ้น!'
         ],
         useAction: { type: 'tool', value: 'build_air_filter', label: '🍃 เลือกสร้างเครื่องกรองมลภาวะ (USE FILTER)' }
       },
@@ -614,6 +615,7 @@
       if (typeof gr.pollutionStartHouses === 'number') CONFIG.POLLUTION_START_HOUSES = gr.pollutionStartHouses;
       if (typeof gr.pollutionWinMarginSeconds === 'number') CONFIG.POLLUTION_WIN_MARGIN_SECONDS = gr.pollutionWinMarginSeconds;
       if (typeof gr.pollutionMinSurviveSeconds === 'number') CONFIG.POLLUTION_MIN_SURVIVE_SECONDS = gr.pollutionMinSurviveSeconds;
+      if (typeof gr.pollutionAdviceRatio === 'number') CONFIG.POLLUTION_ADVICE_RATIO = gr.pollutionAdviceRatio;
       if (typeof gr.complaintStrikeTimerSeconds === 'number') CONFIG.STRIKE_TIMER_SECONDS = gr.complaintStrikeTimerSeconds;
       if (typeof gr.defaultMaxComplaints === 'number') CONFIG.MAX_COMPLAINTS = gr.defaultMaxComplaints;
       if (typeof gr.winRequiredHouses === 'number') CONFIG.WIN_REQUIRED_HOUSES = gr.winRequiredHouses;

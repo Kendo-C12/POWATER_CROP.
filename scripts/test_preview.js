@@ -396,6 +396,31 @@ async function runTest() {
   if (tut.first !== '840,280' || tut.second !== '1040,290' || tut.third !== '1130,170' || tut.won || tut.step !== 6) throw new Error('Tutorial fixed spots / early win check failed!');
   await page.evaluate(() => window.POWATER.game.startLevel(0));
 
+  // 8h. CONTINUE after winning keeps the level playable; 33% pollution warns once and opens the Eco Filter video
+  const after = await page.evaluate(() => {
+    const g = window.POWATER.game, u = window.POWATER.uiManager;
+    g.startLevel(0);
+    g.triggerGameWon();
+    const modal = u.activeModal;
+    u.closeModal(); // CONTINUE / X
+    const t0 = g.levelElapsedTime;
+    g.update(1); g.update(1);
+    const runs = g.levelElapsedTime > t0 + 1.5 && !g.isGameWon;
+    g.triggerGameWon();
+    const noRefire = !g.isGameWon && u.activeModal !== 'victory';
+    while (g.houses.length < 5 && g.spawnHouse()) {}
+    g.pollution = g.currentLevel.maxPollution * 0.34;
+    g.updatePollution(0.01);
+    const video = u.activeModal === 'feature_video' && u.modalData && u.modalData.videoKey;
+    u.closeModal();
+    g.updatePollution(0.01);
+    const once = u.activeModal !== 'feature_video';
+    return { modal, runs, noRefire, video, once };
+  });
+  console.log('8h. Continue after win / 33% pollution advice:', after);
+  if (after.modal !== 'victory' || !after.runs || !after.noRefire || after.video !== 'air_filter' || !after.once) throw new Error('Continue-after-win / pollution advice check failed!');
+  await page.evaluate(() => window.POWATER.game.startLevel(0));
+
   // 9. City map image drives water; city cutscene (story intro for Bangkok) precedes the briefing
   const story = await page.evaluate(() => {
     const g = window.POWATER.game, u = window.POWATER.uiManager, m = g.map;
