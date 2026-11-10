@@ -715,6 +715,29 @@
           vb._txtVid.position.set(Math.round(vb.x + vb.w * 0.5), Math.round(vb.y + vb.h * 0.5));
         }
       }
+
+      // Tutorial: bouncing arrow + glow on the toolbar button this step uses
+      const target = this.buttons.find(b => b.id === this.tutorialButtonFor());
+      if (target) {
+        const t = Date.now() / 1000;
+        const cx = target.x + target.w / 2, tip = 620 - Math.abs(Math.sin(t * 4)) * 12;
+        g.lineStyle(3, 0xffd166, 0.6 + 0.4 * Math.sin(t * 6));
+        g.drawRoundedRect(target.x - 4, target.y - 4, target.w + 8, target.h + 8, 9);
+        g.lineStyle(3, 0xffffff, 1);
+        g.beginFill(0xe63946, 1);
+        g.drawPolygon([cx, tip, cx - 16, tip - 20, cx - 6, tip - 20, cx - 6, tip - 46, cx + 6, tip - 46, cx + 6, tip - 20, cx + 16, tip - 20]);
+        g.endFill();
+      }
+    }
+
+    // Which toolbar button the current tutorial step needs (null = none)
+    tutorialButtonFor() {
+      const gm = this.game;
+      if (!gm || !gm.isTutorialMode || this.activeModal) return null;
+      const s = gm.tutorialStep;
+      const h = s === 4 ? gm.tutorialHouse2 : s === 6 ? gm.tutorialHouse3 : null;
+      if (h) return !h.hasPower ? 'power' : !h.hasWater ? 'water' : 'sewage'; // chaining: next missing utility
+      return { 1: 'power', 2: 'water', 3: 'sewage', 5: 'delete', 7: 'repair', 8: 'air_filter' }[s] || null;
     }
 
     // --- MODALS ---

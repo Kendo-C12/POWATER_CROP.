@@ -1,8 +1,8 @@
-# POWATER CORP. (`v1.0.8.0`) — GDevelop 5 Project Documentation (`CLAUDE.md`)
+# POWATER CORP. (`v1.0.8.1`) — GDevelop 5 Project Documentation (`CLAUDE.md`)
 
 > **Team Green Gang**: Sukrit Limpakanon, Aristt Mahakitsiri, Gantinan Satjariyakul  
 > **Engine**: GDevelop 5 (`POWATER CROPS..json`) + Real PNG Sprite Assets + PixiJS Procedural River/Conduit Rendering  
-> **Version Naming**: `1.x.y.z` (`x` = Major Version, `y` = Small Addition Within Major Version, `z` = Bug Fixes) — Current: **`v1.0.8.0`**
+> **Version Naming**: `1.x.y.z` (`x` = Major Version, `y` = Small Addition Within Major Version, `z` = Bug Fixes) — Current: **`v1.0.8.1`**
 
 ---
 
@@ -136,6 +136,8 @@ All buildings, houses, rivers, HUD bars, toolbar docks, buttons, and status badg
 
 ## 7. Changelog
 
+- **`v1.0.8.1` (2026-11-10)**:
+  - Tutorial points a bouncing red arrow (and glow) at the toolbar button each step uses: POWER/WATER/DRAIN (steps 1-3, and the next missing utility when chaining in 4 & 6), DELETE (5), REPAIR (7), FILTER (8) — `ui.tutorialButtonFor()`.
 - **`v1.0.8.0` (2026-11-10)**:
   - Scene `Main` renamed to `Bangkok` and listed 2nd (`Tutorial`, `Bangkok`, `Tokyo`, `Rome`, `Amsterdam`); `firstLayout` keeps Bangkok as the start scene. Updated `sceneName`, scene switching, city box image (`hud_slot_city_bangkok.png`) and the preview patcher (`BangkokCode`).
 - **`v1.0.7.9` (2026-11-10)**:
