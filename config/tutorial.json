@@ -18,5 +18,6 @@
   "hasEarthquake": false,
   "hasBlackout": false,
   "hasFlood": false,
-  "featureCostOverrides": {}
+  "featureCostOverrides": {},
+  "houseSpawnPoints": [[840, 280], [1040, 290], [1130, 170]]
 }

@@ -378,6 +378,24 @@ async function runTest() {
   }
   await page.evaluate(() => window.POWATER.game.startLevel(0));
 
+  // 8g. Tutorial: fixed house spots, and it can't be "won" mid-tutorial by its 1-house rule
+  const tut = await page.evaluate(() => {
+    const g = window.POWATER.game;
+    g.startTutorial();
+    const p = (h) => h && [Math.round(h.getCenter().x), Math.round(h.getCenter().y)].join(',');
+    const first = p(g.houses[0]);
+    for (let i = 0; i < 3; i++) { g.skipTutorialStep(); g.update(0.05); }
+    for (let t = 0; t < 60; t += 0.5) g.update(0.5);
+    const second = p(g.tutorialHouse2);
+    g.skipTutorialStep(); g.update(0.05); g.skipTutorialStep(); g.update(0.05);
+    const r = { first, second, third: p(g.tutorialHouse3), step: g.tutorialStep, won: g.isGameWon };
+    window.POWATER.uiManager.closeModal();
+    return r;
+  });
+  console.log('8g. Tutorial spots / no early win:', tut);
+  if (tut.first !== '840,280' || tut.second !== '1040,290' || tut.third !== '1130,170' || tut.won || tut.step !== 6) throw new Error('Tutorial fixed spots / early win check failed!');
+  await page.evaluate(() => window.POWATER.game.startLevel(0));
+
   // 9. City map image drives water; city cutscene (story intro for Bangkok) precedes the briefing
   const story = await page.evaluate(() => {
     const g = window.POWATER.game, u = window.POWATER.uiManager, m = g.map;

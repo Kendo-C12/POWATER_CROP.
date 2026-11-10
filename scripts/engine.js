@@ -318,15 +318,24 @@
       this.money = 300;
       this.activeTool = 'power';
 
-      // Keep only 1 house for fast 30-second interactive tutorial
-      while (this.houses.length > 1) {
+      // The tutorial uses its own fixed house spots (config/tutorial.json -> houseSpawnPoints):
+      // [0] starts wired-able to every building, [1] only via house 1, [2] only via house 2 (series slowdown)
+      while (this.houses.length > 0) {
         const extra = this.houses.pop();
         if (extra.destroy) extra.destroy();
         if (extra.runtimeObject && this.runtimeScene) {
           try { extra.runtimeObject.deleteFromScene(this.runtimeScene); } catch (e) {}
         }
       }
+      const p0 = this.tutorialSpot(0);
+      this.spawnHouse(null, p0.x, p0.y);
       this.addFloatingText('🎓 เริ่มโหมดฝึกสอนด่วน (Fast Scene Tutorial)! ทำตามลูกศรแนะนำได้เลย', CONFIG.CANVAS_WIDTH / 2, 115, '#06d6a0');
+    }
+
+    // i-th fixed tutorial house spot, or a free spot near the previous tutorial house
+    tutorialSpot(i, near) {
+      const p = ((CONFIG.TUTORIAL_LEVEL && CONFIG.TUTORIAL_LEVEL.houseSpawnPoints) || [])[i];
+      return p ? { x: p[0], y: p[1] } : (near ? this.findTutorialSpot(near) : { x: 840, y: 280 });
     }
 
     // Free spot within wire reach of `near`; prefers spots far from buildings so chains are needed
@@ -365,7 +374,7 @@
       const sfx = (name) => { if (global.POWATER.soundManager) global.POWATER.soundManager[name](); };
       const next = () => { this.tutorialStep++; this.tutorialStepTimer = 0; };
       const full = (h) => h.hasPower && h.hasWater && h.hasDrainage;
-      const spawnNear = (node) => { const spot = this.findTutorialSpot(node); return spot ? this.spawnHouse(null, spot.x, spot.y) : null; };
+      const spawnNear = (node, i) => { const spot = this.tutorialSpot(i, node); return spot ? this.spawnHouse(null, spot.x, spot.y) : null; };
 
       if (this.tutorialStep === 1 && h0.hasPower) {
         next();
@@ -380,7 +389,7 @@
       } else if (this.tutorialStep === 3 && h0.hasDrainage) {
         next();
         this.activeTool = 'power';
-        this.tutorialHouse2 = spawnNear(h0);
+        this.tutorialHouse2 = spawnNear(h0, 1);
         say('✅ บ้านสมบูรณ์ +$50! บ้านใหม่มาแล้ว: ลากสายพ่วงจากบ้านเดิมไปบ้านใหม่ (สายยาวได้ไม่เกินวงกลม)', '#ffd166');
         sfx('playUpgrade');
       } else if (this.tutorialStep === 4 && (!h1 || full(h1))) {
@@ -395,7 +404,7 @@
         const w = this.tutorialTargetWire;
         if (w) this.connections.push(w); // put it back for free so the tutorial keeps flowing
         this.tutorialTargetWire = null;
-        this.tutorialHouse3 = spawnNear(h1 || h0);
+        this.tutorialHouse3 = spawnNear(h1 || h0, 2);
         say('✅ ลบสายสำเร็จ! (ระบบต่อคืนให้แล้ว) บ้านหลังที่ 3 มาแล้ว: พ่วงต่อจากบ้านหลังที่ 2 แล้วดูว่าเกิดอะไรขึ้น', '#ffd166');
         sfx('playUpgrade');
       } else if (this.tutorialStep === 6 && (!h2 || full(h2))) {
@@ -659,7 +668,7 @@
 
     // Could a house at (x, y) be wired to power, water and sewage (directly or through a chain of houses)?
     canSupplySpot(x, y) {
-      const R = CONFIG.MAX_WIRE_LENGTH || 315;
+      const R = CONFIG.FAST_WIRE_LENGTH || 315; // spawning only counts full-speed (1x) wires, never the long slow ones
       const near = (a, b) => Math.hypot(a.x - b.x, a.y - b.y) <= R;
       const reached = [{ x, y }];
       const homes = this.houses.map(h => h.getCenter());
@@ -1423,7 +1432,7 @@
 
       if (hasBrokenEquipment || hasActiveDisaster) {
         this.winTimerState = 'PAUSED';
-      } else if (suppliedHouses >= this.winRequiredHouses && this.pollutionActive()) {
+      } else if (suppliedHouses >= this.winRequiredHouses && this.pollutionActive() && !this.isTutorialMode) { // the tutorial ends through its own steps
         this.winTimerState = 'RUNNING';
         this.winHoldTimer += dt;
         if (this.winHoldTimer >= this.winTargetDuration) {
