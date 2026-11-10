@@ -351,7 +351,7 @@ async function runTest() {
     return { mask: !!m.mask, waterCells: m.waterCells ? m.waterCells.length : 0, shoreOk, first, n, after };
   });
   console.log('9. Map water mask / cutscene:', story);
-  if (!story.mask || story.waterCells < 500 || !story.shoreOk || story.first !== 'ผู้บรรยาย' || story.n < 10 || story.after !== 'briefing') {
+  if (!story.mask || story.waterCells < 500 || !story.shoreOk || story.first !== 'ผู้บรรยาย' || story.n < 5 || story.n > 10 || story.after !== 'briefing') {
     throw new Error('Map water mask or city cutscene check failed!');
   }
 

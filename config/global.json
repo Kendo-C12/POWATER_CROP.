@@ -2,6 +2,7 @@
   "_comment": "POWATER CORP. v1.0.4.0 — Global Configuration File (config/global.json). Configures feature costs, economy, global rules, pollution rates, and disaster parameters across all stages.",
   "gameLore": {
     "playerRole": "Amigo TheGOATHimself — นักธุรกิจเพื่อสิ่งแวดล้อมระดับโลก (ตัวละครหลัก)",
+    "storyIntroParagraphs": [1, 3, 5, 9],
     "worldBackground": "The Urban Sustainability Crisis: ในช่วงหลายทศวรรษที่ผ่านมา เมืองขนาดใหญ่ทั่วโลกเติบโตอย่างรวดเร็ว การขยายตัวของประชากรทำให้ความต้องการน้ำสะอาดและพลังงานไฟฟ้าเพิ่มสูงขึ้นอย่างมหาศาล",
     "corePhilosophy": "เป้าหมายสูงสุดไม่ใช่การสร้างเมืองที่ใหญ่ที่สุด แต่คือการสร้างเมืองที่สามารถเติบโตได้อย่างยั่งยืน",
     "sdgs": [

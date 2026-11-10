@@ -1,8 +1,8 @@
-# POWATER CORP. (`v1.0.6.7`) — GDevelop 5 Project Documentation (`CLAUDE.md`)
+# POWATER CORP. (`v1.0.6.8`) — GDevelop 5 Project Documentation (`CLAUDE.md`)
 
 > **Team Green Gang**: Sukrit Limpakanon, Aristt Mahakitsiri, Gantinan Satjariyakul  
 > **Engine**: GDevelop 5 (`POWATER CROPS..json`) + Real PNG Sprite Assets + PixiJS Procedural River/Conduit Rendering  
-> **Version Naming**: `1.x.y.z` (`x` = Major Version, `y` = Small Addition Within Major Version, `z` = Bug Fixes) — Current: **`v1.0.6.7`**
+> **Version Naming**: `1.x.y.z` (`x` = Major Version, `y` = Small Addition Within Major Version, `z` = Bug Fixes) — Current: **`v1.0.6.8`**
 
 ---
 
@@ -12,7 +12,7 @@
 - **Core Concept & World Background (The Urban Sustainability Crisis)**:
   - เมืองขนาดใหญ่ทั่วโลกเติบโตอย่างรวดเร็ว ประชากรเพิ่มขึ้น โครงสร้างพื้นฐานเสื่อมสภาพ สภาพภูมิอากาศเปลี่ยนแปลง และความต้องการพลังงานสูงขึ้นอย่างต่อเนื่อง
   - **Story (`story/story.txt`)**: ผู้เล่นสวมบทบาทเป็น **Amigo TheGOATHimself** (`assets/amigo.png`) นักธุรกิจผู้มองเห็นคุณค่าของธรรมชาติเหนือผลกำไร ก่อตั้งองค์กรธุรกิจเพื่อสิ่งแวดล้อมระดับโลก และได้รับเชิญจากรัฐบาลทั่วโลกให้วางระบบน้ำและพลังงานของแต่ละเมือง ท่ามกลางกลุ่มทุนที่ไม่ต้องการให้โลกเปลี่ยนแปลง
-  - **City Cutscenes**: ก่อนเริ่มทุกเมืองจะมีฉากสั้น (Amigo + กล่องบทพูด, `ui.showCityCutscene`) — Bangkok เล่นบทนำจาก `story/story.txt` ก่อน แล้วตามด้วยบทพูดของเมือง (`config/<city>.json` → `cutscene`) จากนั้นจึงเปิด Briefing (คลิก/Space/Enter = ถัดไป, Esc/ข้าม = ข้ามทั้งหมด)
+  - **City Cutscenes**: ก่อนเริ่มทุกเมืองจะมีฉากสั้น (Amigo + กล่องบทพูด, `ui.showCityCutscene`) — Bangkok เล่นบทนำจาก `story/story.txt` ก่อน (เฉพาะย่อหน้าใน `config/global.json` → `gameLore.storyIntroParagraphs`, ตอนนี้ `[1, 3, 5, 9]` = 7 หน้า + บทพูดเมือง 3 หน้า = 10 บท) แล้วตามด้วยบทพูดของเมือง (`config/<city>.json` → `cutscene`) จากนั้นจึงเปิด Briefing (คลิก/Space/Enter = ถัดไป, Esc/ข้าม = ข้ามทั้งหมด)
   - **Core Philosophy**: *"ทุกการตัดสินใจมีต้นทุน ทุกโครงการมีผลกระทบต่อสิ่งแวดล้อม และทุกความผิดพลาดส่งผลต่อคุณภาพชีวิตของประชาชน เป้าหมายสูงสุดไม่ใช่การสร้างเมืองที่ใหญ่ที่สุด แต่คือการสร้างเมืองที่สามารถเติบโตได้อย่างยั่งยืน"*
 - **Connection with UN SDGs**:
   - **SDG 6 (Clean Water and Sanitation)**: การจัดการน้ำสะอาดและระบบสุขาภิบาล เพื่อให้ประชาชนทุกครัวเรือนเข้าถึงน้ำที่มีคุณภาพ โดยสูบน้ำสะอาดริมแม่น้ำและบำบัดน้ำเสียริมตลิ่ง
@@ -125,6 +125,8 @@ All buildings, houses, rivers, HUD bars, toolbar docks, buttons, and status badg
 
 ## 7. Changelog
 
+- **`v1.0.6.8` (2026-11-10)**:
+  - Bangkok intro cut from 22 to 10 dialogue pages by dropping whole story paragraphs (none shortened); kept paragraphs 1, 3, 5, 9 via `gameLore.storyIntroParagraphs`. `story/story.txt` is unchanged.
 - **`v1.0.6.7` (2026-11-10)**:
   - `maxPollution` is now calculated per city from the pollution rates so a minimal city loses with 20s of the win hold left (after 100–114s of pollution); was a fixed 5.5–7.
 - **`v1.0.6.6` (2026-11-10)**:

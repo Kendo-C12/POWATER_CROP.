@@ -632,7 +632,9 @@
     }
 
     // Story intro paragraphs (story/story.txt, inlined by the build scripts)
-    if (Array.isArray(stageCfg.storyIntro)) CONFIG.STORY_INTRO = stageCfg.storyIntro;
+    // gameLore.storyIntroParagraphs (1-based) picks which whole paragraphs play; story.txt stays complete
+    const keepParas = stageCfg.gameLore && stageCfg.gameLore.storyIntroParagraphs;
+    if (Array.isArray(stageCfg.storyIntro)) CONFIG.STORY_INTRO = Array.isArray(keepParas) ? keepParas.map(i => stageCfg.storyIntro[i - 1]).filter(Boolean) : stageCfg.storyIntro;
 
     // 2. Pollution Rates
     const pr = stageCfg.pollutionRates;
