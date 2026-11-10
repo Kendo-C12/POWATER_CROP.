@@ -371,6 +371,8 @@
             if (global.POWATER.soundManager) global.POWATER.soundManager.playClick();
             if (tb.id === 'tut_auto_step') {
               this.game.skipTutorialStep();
+            } else if (tb.id === 'tut_skip_demo') {
+              this.game.endTutorialDemo();
             } else if (tb.id === 'tut_start_bangkok') {
               this.switchToLevelIndex(0);
             }
@@ -441,17 +443,17 @@
       g.endFill();
 
       const msgs = {
-        1: '🎓 1/9: ลากสายไฟ (สีเหลือง) จาก โรงปั่นไฟ ไปยัง บ้าน — วงในสีเขียว = ส่งเต็มเร็ว, สีส้ม = สายยาวส่งช้าลง, สีแดง = ยาวเกิน',
+        1: '🎓 1/9: ลากสายไฟ (สีเหลือง) จาก โรงปั่นไฟ ไปยัง บ้าน — วงในสีเขียว = ส่งเต็มเร็ว, สีเหลือง = สายยาวส่งช้าลง, สีแดง = ยาวเกิน',
         2: '🎓 2/9: ลากท่อน้ำดี (สีฟ้า) จาก ปั๊มน้ำริมแม่น้ำ ไปยัง บ้าน — กด Tab เพื่อสลับชนิดสาย',
         3: '🎓 3/9: ลากท่อน้ำเสีย (สีม่วง) จาก บ้าน ไปยัง ถังบำบัดริมแม่น้ำ รับโบนัส +$50',
         4: '🎓 4/9: บ้านพ่วงต่อกันได้! ลากจาก บ้านเดิม ไป บ้านใหม่ ให้ครบ ไฟ/น้ำ/น้ำเสีย (สายยาวเกินวงในสีเขียว = ส่งช้าลง)',
         5: '🎓 5/9: ลบสาย 1 เส้น: คลิกที่สายตามลูกศรสีแดง (หรือคลิกขวาที่สาย) — อาคารรื้อถอนไม่ได้',
-        6: '🐢 6/9: พ่วงบ้านหลังที่ 3 ต่อจากหลังที่ 2 — ยิ่งพ่วงยาว ไฟ/น้ำยิ่งไหลช้า (ไอคอนกะพริบ) บ้านจะเติมไม่ทันและร้องเรียน',
+        6: '🐢 6/9: พ่วงบ้านหลังที่ 3 ต่อจากหลังที่ 2 — ยิ่งพ่วงยาวยิ่งไหลช้า: ไอคอนบนบ้านเป็นสีจางกะพริบ = ไฟ/น้ำ/น้ำเสียไหลไม่พอ บ้านจะร้องเรียน',
         7: '🎓 7/9: ปั๊มน้ำเสีย (ประแจแดง)! คลิกที่ปั๊ม หรือกด REPAIR [R] แล้วคลิกปั๊มเพื่อซ่อม',
         8: '☢️ 8/9 วิธีแพ้ที่ 1 — มลภาวะ: ค่า ☢️ ด้านบนเต็มขีดจำกัด = Game Over! (โรงไฟฟ้าและน้ำเสียเพิ่มมลภาวะ) วางเครื่องกรองอากาศ [4] เพื่อลด',
         9: '⚠️ 9/9 วิธีแพ้ที่ 2 — ร้องเรียน: บ้านขาดไฟ/น้ำ/ท่อน้ำเสีย หรือพ่วงยาวจนเติมไม่ทัน จะร้องเรียน 1 Strike — ครบ 3 Strike = Game Over'
       };
-      const stepMsg = msgs[step] || '🎉 ฝึกสอนสำเร็จครบ 100%! คลิก [▶] เหนือปุ่มเพื่อดูวิดีโอฟีเจอร์ หรือเริ่มด่าน Bangkok ได้เลย!';
+      const stepMsg = (this.game.tutorialDemo ? '🤖 บอทสาธิต (ดูก่อน แล้วค่อยลองเอง) — ' : '') + (msgs[step] || '🎉 ฝึกสอนสำเร็จครบ 100%! คลิก [▶] เหนือปุ่มเพื่อดูวิดีโอฟีเจอร์ หรือเริ่มด่าน Bangkok ได้เลย!');
 
       // Point at the HUD pill the lose-condition steps talk about
       const hl = step === 8 ? [660, 6, 172, 32] : (step === 9 ? [1056, 6, 214, 32] : null);
@@ -469,7 +471,7 @@
 
       // Auto-complete current step button (steps 1..9; step 9 is the "got it" confirm)
       if (step >= 1 && step <= 9) {
-        const autoBtn = { id: 'tut_auto_step', x: barX + barW - 275, y: barY + 6, w: 125, h: 32 };
+        const autoBtn = { id: this.game.tutorialDemo ? 'tut_skip_demo' : 'tut_auto_step', x: barX + barW - 275, y: barY + 6, w: 125, h: 32 };
         this.tutorialButtons.push(autoBtn);
         const isHov = (mouseX >= autoBtn.x && mouseX <= autoBtn.x + autoBtn.w && mouseY >= autoBtn.y && mouseY <= autoBtn.y + autoBtn.h);
         g.lineStyle(1.5, 0xffd166, 0.9);
@@ -477,7 +479,7 @@
         g.drawRoundedRect(autoBtn.x, autoBtn.y, autoBtn.w, autoBtn.h, 6);
         g.endFill();
 
-        const autoTxt = this.makeText(step === 9 ? '✅ เข้าใจแล้ว' : '⏭️ ทำขั้นตอนนี้ให้', {
+        const autoTxt = this.makeText(this.game.tutorialDemo ? '⏭️ ข้ามตัวอย่าง' : (step === 9 ? '✅ เข้าใจแล้ว' : '⏭️ ทำขั้นตอนนี้ให้'), {
           fontFamily: font, fontSize: 11, fontWeight: 'bold', fill: isHov ? 0x120d24 : 0xffd166
         }, 'tutorial');
         autoTxt.anchor.set(0.5);
@@ -523,6 +525,18 @@
         t.position.set(ft.x, ft.y);
         this.floatingTextContainer.addChild(t);
       }
+      // Faded, blinking badges = that utility does not flow enough: say it in words under the house
+      const names = { power: 'ไฟ', water: 'น้ำ', sewage: 'น้ำเสีย' };
+      (this.game.houses || []).forEach(h => {
+        if (!h.slowTypes || !h.slowTypes.length || !(h.hasPower || h.hasWater)) return;
+        const c = h.getCenter();
+        const t = this.makeText(`🐢 ${h.slowTypes.map(k => names[k]).join('/')} ไหลไม่พอ`, {
+          fontFamily: font, fontSize: 11, fontWeight: 'bold', fill: '#ffb703', stroke: '#0a0714', strokeThickness: 3
+        }, 'floating');
+        t.anchor.set(0.5);
+        t.position.set(c.x, c.y + 56);
+        this.floatingTextContainer.addChild(t);
+      });
     }
 
     handleButtonClick(btn) {
@@ -1945,8 +1959,14 @@
             return;
           }
 
-          if (btn.id === 'modal_close' || btn.id === 'btn_start' || btn.id === 'btn_ok' || btn.id === 'btn_cont' || btn.id === 'hud_start') {
+          if (btn.id === 'modal_close' || btn.id === 'btn_start' || btn.id === 'btn_ok' || btn.id === 'btn_cont') {
             this.closeModal();
+            return;
+          }
+
+          if (btn.id === 'hud_start') {
+            this.closeModal();
+            if (this.game) this.game.startTutorialDemo();
             return;
           }
 
