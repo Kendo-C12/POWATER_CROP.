@@ -1,8 +1,8 @@
-# POWATER CORP. (`v1.0.6.4`) — GDevelop 5 Project Documentation (`CLAUDE.md`)
+# POWATER CORP. (`v1.0.6.5`) — GDevelop 5 Project Documentation (`CLAUDE.md`)
 
 > **Team Green Gang**: Sukrit Limpakanon, Aristt Mahakitsiri, Gantinan Satjariyakul  
 > **Engine**: GDevelop 5 (`POWATER CROPS..json`) + Real PNG Sprite Assets + PixiJS Procedural River/Conduit Rendering  
-> **Version Naming**: `1.x.y.z` (`x` = Major Version, `y` = Small Addition Within Major Version, `z` = Bug Fixes) — Current: **`v1.0.6.4`**
+> **Version Naming**: `1.x.y.z` (`x` = Major Version, `y` = Small Addition Within Major Version, `z` = Bug Fixes) — Current: **`v1.0.6.5`**
 
 ---
 
@@ -44,6 +44,7 @@
 - **Series slowdown**: the first `2` links from a source run at full flow; each extra link loses **25%** (`chainFreeHops`, `chainFlowLossPerHop`), and a 6th link carries nothing. A supplied house with lost flow keeps filling its unhappy bar (blinking utility badge) and eventually complains — *lose condition #2*. Rome's unlimited aqueducts exempt water.
 - **Delete**: right-click a wire, or the `🗑️ DELETE [X]` tool (also `Delete` key). Buildings (generators, pumps, filters) **cannot be demolished**.
 - **All-connected speedup**: while every house has power, water and sewage, the house spawn timer runs **4× faster** (`globalRules.allConnectedSpawnSpeedup`, not in the tutorial), so players who keep up reach the 15-house win phase sooner.
+- **Spread-out spawning**: the spawner collects up to 10 legal spots and picks the one farthest from every existing house/building, so houses spread over both banks instead of clustering.
 - **Reachable spawning**: houses (including the 3 starting houses) only spawn where all three utilities can be wired in, directly or through a house chain (`engine.canSupplySpot`). Scene layouts no longer place houses; buildings were compacted in Tokyo/Rome/Amsterdam so a first house fits.
 
 ### 🔧 New `v1.0.0.0` Systems
@@ -121,6 +122,9 @@ All buildings, houses, rivers, HUD bars, toolbar docks, buttons, and status badg
 
 ## 7. Changelog
 
+- **`v1.0.6.5` (2026-11-10)**:
+  - Houses spawn spread out (best of 10 legal candidates by distance to the nearest node); mean nearest-neighbour distance in Bangkok rose from ~116px to ~153px.
+  - Capacity analysis (houses that fit, tier-3 bounds, reachable land only; random spawner fill / best packing): spacing `133px` — Bangkok ~23, Tokyo ~6, Rome ~25–31, Amsterdam ~15–19; spacing `100px` — Bangkok ~37–49, Tokyo ~10–14, Rome ~39–59, Amsterdam ~27–34. Tokyo's reachable land is small because the bay is wider than a wire.
 - **`v1.0.6.4` (2026-11-10)**:
   - Wire reach back to `315px` with no slow long-wire zone (reverts the `790px` / long-wire slowdown from `v1.0.6.1`).
   - Reach circle is filled translucent green while in range and turns red when the drag is too long.

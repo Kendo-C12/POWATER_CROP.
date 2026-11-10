@@ -581,8 +581,10 @@
         const marginX = Math.max(48, 75 - this.upsizeTier * 8);
         const reach = CONFIG.MAX_WIRE_LENGTH || 315;
         const anchors = [...this.houses, ...this.buildings.filter(b => b.config.type !== 'air_filter')];
-        let valid = false;
-        for (let attempts = 0; attempts < 400 && !valid && anchors.length > 0; attempts++) {
+        // Collect several legal spots and keep the one farthest from every existing node, so houses spread out
+        let best = null;
+        let found = 0;
+        for (let attempts = 0; attempts < 400 && found < 10 && anchors.length > 0; attempts++) {
           // Ring around an existing node, so the new house is always within wire reach of something
           const a = anchors[Math.floor(Math.random() * anchors.length)].getCenter();
           const ang = Math.random() * Math.PI * 2;
@@ -591,14 +593,17 @@
           y = a.y + Math.sin(ang) * r;
           if (x < marginX || x > CONFIG.CANVAS_WIDTH - marginX || y < marginYTop || y > CONFIG.CANVAS_HEIGHT - marginYBottom) continue;
           if (this.map.isPointInRiver(x, y) || this.map.isNearRiver(x, y, 40)) continue;
-          const tooClose = [...this.houses, ...this.buildings].some(e => {
+          const nearest = Math.min(...[...this.houses, ...this.buildings].map(e => {
             const c = e.getCenter ? e.getCenter() : { x: e.centerX, y: e.centerY };
-            return Math.hypot(c.x - x, c.y - y) < minDist;
-          });
-          if (tooClose || !this.canSupplySpot(x, y)) continue;
-          valid = true;
+            return Math.hypot(c.x - x, c.y - y);
+          }));
+          if (nearest < minDist || !this.canSupplySpot(x, y)) continue;
+          found++;
+          if (!best || nearest > best.d) best = { x, y, d: nearest };
         }
-        if (!valid) return null;
+        if (!best) return null;
+        x = best.x;
+        y = best.y;
         side = x < this.map.getRiverCenterAtY(y) ? 'left' : 'right';
       }
 
