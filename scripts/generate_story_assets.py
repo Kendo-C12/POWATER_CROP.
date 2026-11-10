@@ -184,7 +184,7 @@ def generate_scene_ui():
     K = 4  # supersample, saved at 2x for crisp editor zoom
     font = lambda size: ImageFont.truetype('C:/Windows/Fonts/leelawdb.ttf', size)
     city_boxes = [('hud_slot_city_' + k, 8, 185, f'{v} v1.0', (0, 180, 216)) for k, v in
-                  [('main', 'BANGKOK'), ('tutorial', 'TUTORIAL'), ('tokyo', 'TOKYO'), ('rome', 'ROME'), ('amsterdam', 'AMSTERDAM')]]
+                  [('bangkok', 'BANGKOK'), ('tutorial', 'TUTORIAL'), ('tokyo', 'TOKYO'), ('rome', 'ROME'), ('amsterdam', 'AMSTERDAM')]]
     for name, _x, w, label, col in HUD_SLOTS + city_boxes:
         h = 32
         img = Image.new('RGBA', (w * K, h * K), (0, 0, 0, 0))

@@ -64,7 +64,7 @@ assets = [
     ('btn_delete.png', 'assets/btn_delete.png'),
     ('house_spot.png', 'assets/house_spot.png'),
     ('hud_slot_city.png', 'assets/hud_slot_city.png'),
-    ('hud_slot_city_main.png', 'assets/hud_slot_city_main.png'),
+    ('hud_slot_city_bangkok.png', 'assets/hud_slot_city_bangkok.png'),
     ('hud_slot_city_tutorial.png', 'assets/hud_slot_city_tutorial.png'),
     ('hud_slot_city_tokyo.png', 'assets/hud_slot_city_tokyo.png'),
     ('hud_slot_city_rome.png', 'assets/hud_slot_city_rome.png'),
@@ -94,7 +94,7 @@ for name, file_path in assets:
             'userAdded': True
         })
 
-project['resources']['resources'] = [r for r in project['resources']['resources'] if 'Red house' not in r['name']]
+project['resources']['resources'] = [r for r in project['resources']['resources'] if 'Red house' not in r['name'] and r['name'] != 'hud_slot_city_main.png']
 res_items = [{'name': r['name']} for r in project['resources']['resources']]
 project['usedResources'] = res_items
 
@@ -551,7 +551,7 @@ main_houses = [
     { 'name': 'house', 'x': 878, 'y': 432, 'width': 84, 'height': 56, 'zOrder': 3, 'persistentUuid': 'inst-bkk-h2', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
     { 'name': 'house', 'x': 308, 'y': 292, 'width': 84, 'height': 56, 'zOrder': 3, 'persistentUuid': 'inst-bkk-h3', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] }
 ]
-layout_main = create_layout('Main', '1. Bangkok, Thailand', 'Bangkok.jpg', 1522, 1076, main_river, main_buildings, main_houses)
+layout_main = create_layout('Bangkok', '1. Bangkok, Thailand', 'Bangkok.jpg', 1522, 1076, main_river, main_buildings, main_houses)
 
 # Level 2: Tokyo Screen (Clean Energy -25% + Earthquake)
 tokyo_river = {
@@ -644,7 +644,8 @@ for lay, stage in [(layout_main, 'bangkok'), (layout_tutorial, 'tutorial'), (lay
             'persistentUuid': f'inst-spot-{stage}-{i + 1}', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False,
             'numberProperties': [], 'stringProperties': [], 'initialVariables': [{'name': 'order', 'type': 'number', 'value': i + 1}] })
 
-project['layouts'] = [layout_main, layout_tutorial, layout_tokyo, layout_rome, layout_amsterdam]
+project['layouts'] = [layout_tutorial, layout_main, layout_tokyo, layout_rome, layout_amsterdam]
+project['firstLayout'] = 'Bangkok'  # Tutorial is listed first, but the game still starts in Bangkok
 
 # Write back to POWATER CROPS..json
 with open(project_path, 'w', encoding='utf-8') as f:

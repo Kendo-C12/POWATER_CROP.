@@ -1857,8 +1857,8 @@
     }
 
     switchToLevelIndex(idx) {
-      const sceneNames = ['Main', 'Tokyo', 'Rome', 'Amsterdam'];
-      const targetScene = sceneNames[idx] || 'Main';
+      const sceneNames = ['Bangkok', 'Tokyo', 'Rome', 'Amsterdam'];
+      const targetScene = sceneNames[idx] || 'Bangkok';
       if (this.game && this.game.runtimeScene && this.game.runtimeScene.getGame) {
         const sceneStack = this.game.runtimeScene.getGame().getSceneStack();
         if (sceneStack && typeof sceneStack.replace === 'function') {

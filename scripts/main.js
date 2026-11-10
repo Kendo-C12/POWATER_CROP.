@@ -68,7 +68,7 @@
 
     reinitScene(runtimeScene) {
       this.currentRuntimeScene = runtimeScene;
-      this.currentSceneName = runtimeScene ? runtimeScene.getName() : 'Main';
+      this.currentSceneName = runtimeScene ? runtimeScene.getName() : 'Bangkok';
       this.bindKeyboardShortcuts();
 
       // 1. Initialize Audio Engine
@@ -277,7 +277,7 @@
     }
 
     update(runtimeScene) {
-      const currentName = runtimeScene ? runtimeScene.getName() : 'Main';
+      const currentName = runtimeScene ? runtimeScene.getName() : 'Bangkok';
       if (!this.initialized || this.currentRuntimeScene !== runtimeScene || this.currentSceneName !== currentName) {
         this.reinitScene(runtimeScene);
       }

@@ -374,7 +374,7 @@
     LEVELS: [
       {
         id: 'bangkok',
-        sceneName: 'Main',
+        sceneName: 'Bangkok',
         name: '1. Bangkok, Thailand',
         thaiName: 'ด่าน 1: กรุงเทพมหานคร (Tutorial & High Tide)',
         cityChallenge: 'กรุงเทพมหานครเผชิญกับปัญหาน้ำท่วมและระดับน้ำที่เปลี่ยนแปลง',

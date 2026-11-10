@@ -1,7 +1,7 @@
 {
   "_comment": "Stage 1: Bangkok, Thailand Configuration (config/bangkok.json)",
   "id": "bangkok",
-  "sceneName": "Main",
+  "sceneName": "Bangkok",
   "name": "1. Bangkok, Thailand",
   "cityChallenge": "กรุงเทพมหานครเผชิญกับปัญหาน้ำท่วมและระดับน้ำที่เปลี่ยนแปลง",
   "startingBudget": 150,

@@ -1,8 +1,8 @@
-# POWATER CORP. (`v1.0.7.9`) — GDevelop 5 Project Documentation (`CLAUDE.md`)
+# POWATER CORP. (`v1.0.8.0`) — GDevelop 5 Project Documentation (`CLAUDE.md`)
 
 > **Team Green Gang**: Sukrit Limpakanon, Aristt Mahakitsiri, Gantinan Satjariyakul  
 > **Engine**: GDevelop 5 (`POWATER CROPS..json`) + Real PNG Sprite Assets + PixiJS Procedural River/Conduit Rendering  
-> **Version Naming**: `1.x.y.z` (`x` = Major Version, `y` = Small Addition Within Major Version, `z` = Bug Fixes) — Current: **`v1.0.7.9`**
+> **Version Naming**: `1.x.y.z` (`x` = Major Version, `y` = Small Addition Within Major Version, `z` = Bug Fixes) — Current: **`v1.0.8.0`**
 
 ---
 
@@ -79,7 +79,7 @@
 
 | Level | Scene Name | Positive Condition `(+)` | Negative / Extreme Weather `(-)` | City Challenge (`บริบทความท้าทาย`) |
 | :--- | :--- | :--- | :--- | :--- |
-| **1. Bangkok** | `Main` | `(0)` None — First Level & Tutorial | **High Tide (`น้ำขึ้น`)**: Every 15 in-game days, river levels surge and riverside equipment requires frequent repair | **ปัญหาน้ำท่วมและระดับน้ำที่เปลี่ยนแปลง** |
+| **1. Bangkok** | `Bangkok` | `(0)` None — First Level & Tutorial | **High Tide (`น้ำขึ้น`)**: Every 15 in-game days, river levels surge and riverside equipment requires frequent repair | **ปัญหาน้ำท่วมและระดับน้ำที่เปลี่ยนแปลง** |
 | **2. Tokyo** | `Tokyo` | **Clean Energy `-25%` Cost**: Eco Filter (`$30`) subsidized by government | **Earthquake (`แผ่นดินไหว`)**: `10–15%` chance every 1 min after Protecting Time (`+5%/min` after 3 min without quake; guaranteed at 5 min, then `+5%/min` thereafter). Breaks all water & electric pumps! | **เตรียมรับมือแผ่นดินไหวและความเสียหายของโครงสร้างพื้นฐาน** |
 | **3. Rome** | `Rome` | **Unlimited Aqueducts**: Unlimited house-to-house water pipe chaining capacity | **Blackout (`ไฟดับ`)**: `12.5%` chance every 15 in-game days — all houses lose power (Win Timer pauses) | **บริหารระบบสาธารณูปโภคที่มีข้อจำกัดความต่อเนื่องของพลังงาน** |
 | **4. Amsterdam** | `Amsterdam` | **Infrastructure `-5%` Cost** & **House Spawning `20%` Slower** | **Zero Complaint Tolerance (`1 Complaint = Instant Game Over`)** + Earthquake + High Tide + **Main Flood every 4 weeks (`28 days`)** (recedes after `120s`, Win Timer pauses) | **รักษาสมดุลของระบบเมืองที่พัฒนาจนเกือบเต็มศักยภาพ พร้อมรับมือภัยพิบัติ** |
@@ -108,7 +108,7 @@ All buildings, houses, rivers, HUD bars, toolbar docks, buttons, and status badg
 
 ## 5. Project Structure & Build Pipeline
 
-- `POWATER CROPS..json`: Main GDevelop 5 project file containing all 5 scene layouts (`Main`, `Tutorial`, `Tokyo`, `Rome`, `Amsterdam`), sprite objects, visual event groups, and compiled JS engine bridge.
+- `POWATER CROPS..json`: Main GDevelop 5 project file containing all 5 scene layouts in order `Tutorial`, `Bangkok`, `Tokyo`, `Rome`, `Amsterdam` (start scene `firstLayout` = `Bangkok`), sprite objects, visual event groups, and compiled JS engine bridge.
 - `config/`: Dedicated configuration folder in the project root:
   - `config/global.json`: Global configuration for all stages, including `featureCosts` (building costs & capacities, wire/pipe connection costs, river crossing extra cost, repair cost per building, `disasterTesting.testCost` (Disaster Test Lab, `$50`/test), and upgrade base costs/multipliers), `globalRules`, `pollutionRates`, and `disasters`.
   - `config/tutorial.json`, `config/bangkok.json`, `config/tokyo.json`, `config/rome.json`, `config/amsterdam.json`: Individual per-stage configuration files controlling `startingBudget`, `houseSpawnIntervalSeconds`, `pollutionMultiplier`, `maxPollution`, `maxComplaints`, `winRequiredHouses`, `winHoldDurationSeconds`, `maxHousesCap`, discounts, disaster flags, and optional `featureCostOverrides`.
@@ -136,6 +136,8 @@ All buildings, houses, rivers, HUD bars, toolbar docks, buttons, and status badg
 
 ## 7. Changelog
 
+- **`v1.0.8.0` (2026-11-10)**:
+  - Scene `Main` renamed to `Bangkok` and listed 2nd (`Tutorial`, `Bangkok`, `Tokyo`, `Rome`, `Amsterdam`); `firstLayout` keeps Bangkok as the start scene. Updated `sceneName`, scene switching, city box image (`hud_slot_city_bangkok.png`) and the preview patcher (`BangkokCode`).
 - **`v1.0.7.9` (2026-11-10)**:
   - Flood is now a mild slowdown (all utilities 15% slower for 10s) instead of breaking riverside equipment.
 - **`v1.0.7.8` (2026-11-10)**:

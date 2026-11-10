@@ -160,6 +160,7 @@ gdjs.MainCode.func = function(runtimeScene) {{
 }};
 
 gdjs['MainCode'] = gdjs.MainCode;
+gdjs['BangkokCode'] = gdjs.MainCode;
 gdjs['TutorialCode'] = gdjs.MainCode;
 gdjs['TokyoCode'] = gdjs.MainCode;
 gdjs['RomeCode'] = gdjs.MainCode;
