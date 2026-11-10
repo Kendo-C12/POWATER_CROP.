@@ -544,8 +544,8 @@
         const pulseR = 48 + Math.sin(this.pulseTime * 6) * 3;
         gfxO.lineStyle(3, 0xffd166, 0.9);
         gfxO.drawCircle(sc.x, sc.y, pulseR);
-        // Wire reach: translucent fill = green while full speed, orange when long (slower), red once too long.
-        // The inner ring marks the full-speed length.
+        // Wire reach zones (fixed colours): green disc = full speed (1x), yellow ring = long & slower (up to 2.5x).
+        // Dragging past 2.5x turns everything outside the ring red; green and yellow stay as they are.
         const reachR = global.POWATER.CONFIG.MAX_WIRE_LENGTH || 790;
         const fastR = global.POWATER.CONFIG.FAST_WIRE_LENGTH || 315;
         let len = 0;
@@ -554,13 +554,26 @@
           const ep = (hn && hn.id !== activeSource.id) ? hn.getCenter() : { x: this.currentMouseX, y: this.currentMouseY };
           len = Math.hypot(ep.x - sc.x, ep.y - sc.y);
         }
-        const reachCol = len > reachR ? 0xe63946 : (len > fastR ? 0xf4a261 : 0x06d6a0);
-        gfxO.lineStyle(2.5, reachCol, 0.8);
-        gfxO.beginFill(reachCol, 0.14);
+        if (len > reachR) {
+          // red everywhere outside the ring: a huge disc with the ring cut out (the hole must lie inside
+          // its shape, so a screen-sized rect would not work - the ring is bigger than the screen)
+          gfxO.lineStyle(0);
+          gfxO.beginFill(0xe63946, 0.2);
+          gfxO.drawCircle(sc.x, sc.y, 2600);
+          gfxO.beginHole();
+          gfxO.drawCircle(sc.x, sc.y, reachR);
+          gfxO.endHole();
+          gfxO.endFill();
+        }
+        gfxO.lineStyle(3, len > reachR ? 0xe63946 : 0xf5b700, 0.95);
+        gfxO.beginFill(0xf5c400, 0.3);
         gfxO.drawCircle(sc.x, sc.y, reachR);
+        gfxO.beginHole();
+        gfxO.drawCircle(sc.x, sc.y, fastR);
+        gfxO.endHole();
         gfxO.endFill();
-        gfxO.lineStyle(2, 0x06d6a0, 0.7);
-        gfxO.beginFill(0x06d6a0, 0.08);
+        gfxO.lineStyle(2, 0x06d6a0, 0.8);
+        gfxO.beginFill(0x06d6a0, 0.16);
         gfxO.drawCircle(sc.x, sc.y, fastR);
         gfxO.endFill();
       }

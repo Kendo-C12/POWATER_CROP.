@@ -1,8 +1,8 @@
-# POWATER CORP. (`v1.0.7.1`) — GDevelop 5 Project Documentation (`CLAUDE.md`)
+# POWATER CORP. (`v1.0.7.2`) — GDevelop 5 Project Documentation (`CLAUDE.md`)
 
 > **Team Green Gang**: Sukrit Limpakanon, Aristt Mahakitsiri, Gantinan Satjariyakul  
 > **Engine**: GDevelop 5 (`POWATER CROPS..json`) + Real PNG Sprite Assets + PixiJS Procedural River/Conduit Rendering  
-> **Version Naming**: `1.x.y.z` (`x` = Major Version, `y` = Small Addition Within Major Version, `z` = Bug Fixes) — Current: **`v1.0.7.1`**
+> **Version Naming**: `1.x.y.z` (`x` = Major Version, `y` = Small Addition Within Major Version, `z` = Bug Fixes) — Current: **`v1.0.7.2`**
 
 ---
 
@@ -43,7 +43,7 @@
 - **Weekly Revenue**: At the end of every in-game week (7 days), the city awards **`[Completed Houses] * $40 / week`** (plus base municipal grant).
 
 ### 🔌 Wiring Rules (`v1.0.6.1`)
-- **Wire length**: up to **`315px`** center-to-center runs at full speed (`globalRules.fastWireLengthPixels`); wires can reach **`790px`** (2.5×, `maxWireLengthPixels`) but every extra `315px` counts as one more series hop (`engine.linkHops`), so long wires carry less. While dragging, the reach circle is filled translucent **green** (full speed), **orange** (long, slower) or **red** (too long); the inner green ring marks `315px`.
+- **Wire length**: up to **`315px`** center-to-center runs at full speed (`globalRules.fastWireLengthPixels`); wires can reach **`790px`** (2.5×, `maxWireLengthPixels`) but every extra `315px` counts as one more series hop (`engine.linkHops`), so long wires carry less. The reach zones always show fixed colours: translucent **green** disc up to `315px` (full speed) and **yellow** ring up to `790px` (slower); dragging past `790px` tints everything **outside** the ring red while green and yellow stay.
 - **Eco Filter cooldown**: `5s` of game time between two Eco Filter placements (`globalRules.airFilterCooldownSeconds`); the `FILTER` button shows `⏳ Ns`.
 - **Between levels**: money restarts at each city's `startingBudget`; bought upgrades carry over.
 - **Series slowdown**: the first `2` links from a source run at full flow; each extra link loses **25%** (`chainFreeHops`, `chainFlowLossPerHop`), and a 6th link carries nothing. A supplied house with lost flow keeps filling its unhappy bar (blinking utility badge) and eventually complains — *lose condition #2*. Rome's unlimited aqueducts exempt water.
@@ -129,6 +129,8 @@ All buildings, houses, rivers, HUD bars, toolbar docks, buttons, and status badg
 
 ## 7. Changelog
 
+- **`v1.0.7.2` (2026-11-10)**:
+  - Reach zones keep fixed colours (green 1x disc, yellow 2.5x ring); only the area outside 2.5x turns red when the drag is too long.
 - **`v1.0.7.1` (2026-11-10)**:
   - Spawning only counts full-speed `315px` wires (houses could appear where only a long, slow wire reached, so water never kept up).
   - Tutorial no longer ends early: its 1-house win rule fired after 30s (at step 6) and showed the "play the real level" screen; the win check is now off in tutorial mode.
