@@ -265,14 +265,13 @@
       }
       if (this.txtWinTimer) {
         const st = this.game.winTimerState || 'WAITING';
-        const eta = `⏳ จบใน ~${this.formatMMSS(this.game.estimateTimeToWin())}`;
         const req = this.game.winRequiredHouses || 15;
         const supplied = this.game.houses.filter(h => h.hasPower && h.hasWater).length;
         if (st === 'PAUSED') {
           this.txtWinTimer.text = `⏸️ ${supplied}/${req}หลัง (ซ่อมก่อน)`;
           this.txtWinTimer.style.fill = 0xff5a5f;
         } else {
-          this.txtWinTimer.text = `🏆 ${supplied}/${req}หลัง ${eta}`;
+          this.txtWinTimer.text = `🏆 เป้าหมาย ${supplied}/${req} หลัง`;
           this.txtWinTimer.style.fill = 0x90e0ef;
         }
       }
@@ -310,7 +309,7 @@
       if (!this.videoPaused) {
         this.videoTime = (this.videoTime + dt) % this.videoDuration;
       }
-      if (this.activeModal === 'cutscene') {
+      if (this.activeModal === 'cutscene' || this.activeModal === 'hud_intro') {
         this.cutTime = (this.cutTime || 0) + dt;
       }
 
@@ -860,6 +859,67 @@
       if (this.modalContainer) this.modalContainer.visible = true;
     }
 
+    // Before the tutorial: explain the top-bar boxes, then a button starts the tutorial
+    showHudIntro() {
+      this.activeModal = 'hud_intro';
+      this.modalData = {};
+      if (this.modalContainer) this.modalContainer.visible = true;
+    }
+
+    renderHudIntro(mouseX, mouseY) {
+      const g = this.modalGfx;
+      const font = 'system-ui, -apple-system, Segoe UI, Roboto, sans-serif';
+      const pulse = 0.6 + 0.4 * Math.sin((this.cutTime || 0) * 5);
+      g.beginFill(0x0a0714, 0.82); // dim everything except the top bar
+      g.drawRect(0, 44, 1280, 676);
+      g.endFill();
+      const text = (s, x, y, size, fill, opts = {}) => {
+        const t = this.makeText(s, Object.assign({ fontFamily: font, fontSize: size, fontWeight: 'bold', fill, wordWrap: !!opts.w, wordWrapWidth: opts.w || 0, breakWords: true, align: opts.align || 'center' }, opts.style || {}));
+        t.anchor.set(opts.ax ?? 0.5, opts.ay ?? 0);
+        t.position.set(x, y);
+        this.modalTextContainer.addChild(t);
+      };
+      // pill boxes (same as drawStatPill in the HUD) + explanation cards in two rows
+      const items = [
+        { x: 198, w: 112, row: 0, col: 0xffd166, title: '💰 เงิน', body: 'ใช้สร้างเครื่องกรอง ($40) และซ่อมอาคาร ได้ +$50 ทุกบ้านที่ต่อครบ และได้รายได้ทุกสัปดาห์' },
+        { x: 314, w: 148, row: 1, col: 0x06d6a0, title: '🏘️ บ้าน', body: 'บ้านที่ได้น้ำและไฟ / บ้านทั้งหมดในเมือง (Up = ระดับการขยายเมือง)' },
+        { x: 466, w: 190, row: 0, col: 0x90e0ef, title: '🏆 เป้าหมาย', body: 'ส่งน้ำและไฟให้บ้านครบตามจำนวน = ชนะด่าน (ด่านจริง 15 หลัง)' },
+        { x: 660, w: 172, row: 1, col: 0xffb703, title: '☢️ มลพิษ', body: 'เริ่มนับเมื่อมีบ้าน 5 หลัง แถบเต็ม = แพ้! เกิน 33% ให้วางเครื่องกรองอากาศ [4]' },
+        { x: 1056, w: 214, row: 0, col: 0xff5a5f, title: '⚠️ ร้องเรียน (Strike)', body: 'บ้านขาดน้ำ/ไฟ/ท่อน้ำเสียนานเกินไป = 1 Strike ครบช่องทั้งหมด = แพ้!' }
+      ];
+      const cw = 230, ch = 112;
+      items.forEach(it => {
+        const pcx = it.x + it.w / 2;
+        const cx = Math.min(1280 - cw / 2 - 10, Math.max(cw / 2 + 10, pcx));
+        const cy = it.row ? 250 : 90;
+        g.lineStyle(3, it.col, pulse);
+        g.drawRoundedRect(it.x - 3, 3, it.w + 6, 38, 9);
+        g.lineStyle(2.5, it.col, 0.9);
+        g.moveTo(pcx, 44);
+        g.lineTo(pcx, cy);
+        g.lineStyle(0);
+        g.beginFill(it.col, 0.95);
+        g.drawPolygon([pcx, 44, pcx - 7, 56, pcx + 7, 56]);
+        g.endFill();
+        g.lineStyle(2, it.col, 0.9);
+        g.beginFill(0x150f2c, 0.97);
+        g.drawRoundedRect(cx - cw / 2, cy, cw, ch, 10);
+        g.endFill();
+        text(it.title, cx, cy + 10, 15, it.col);
+        text(it.body, cx, cy + 36, 12, 0xffffff, { w: cw - 22, style: { fontWeight: 'normal', lineHeight: 18 } });
+      });
+      text('🎓 ก่อนเริ่ม Tutorial: รู้จักแถบด้านบนก่อน', 640, 410, 22, 0x06d6a0);
+      text('อ่านกล่องที่ชี้ไปแต่ละช่องด้านบน เมื่อเข้าใจแล้วกดปุ่มด้านล่างเพื่อเริ่มฝึกเล่น', 640, 446, 14, 0xadb5bd, { style: { fontWeight: 'normal' } });
+      const btn = { id: 'hud_start', x: 640 - 150, y: 488, w: 300, h: 52 };
+      this.modalButtons.push(btn);
+      const hov = mouseX >= btn.x && mouseX <= btn.x + btn.w && mouseY >= btn.y && mouseY <= btn.y + btn.h;
+      g.lineStyle(2, 0xffffff, hov ? 0.9 : 0.4);
+      g.beginFill(hov ? 0x08f7b5 : 0x06d6a0, 1);
+      g.drawRoundedRect(btn.x, btn.y, btn.w, btn.h, 12);
+      g.endFill();
+      text('✅ เข้าใจแล้ว เริ่ม Tutorial', 640, btn.y + 14, 18, 0x120d24);
+    }
+
     showGameWonModal() {
       this.activeModal = 'victory';
       if (this.modalContainer) this.modalContainer.visible = true;
@@ -890,6 +950,10 @@
 
       if (this.activeModal === 'cutscene') {
         this.renderCutscene(mouseX, mouseY);
+        return;
+      }
+      if (this.activeModal === 'hud_intro') {
+        this.renderHudIntro(mouseX, mouseY);
         return;
       }
 
@@ -1839,7 +1903,7 @@
             return;
           }
 
-          if (btn.id === 'modal_close' || btn.id === 'btn_start' || btn.id === 'btn_ok' || btn.id === 'btn_cont') {
+          if (btn.id === 'modal_close' || btn.id === 'btn_start' || btn.id === 'btn_ok' || btn.id === 'btn_cont' || btn.id === 'hud_start') {
             this.closeModal();
             return;
           }

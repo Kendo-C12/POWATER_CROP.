@@ -1,8 +1,8 @@
-# POWATER CORP. (`v1.0.7.3`) — GDevelop 5 Project Documentation (`CLAUDE.md`)
+# POWATER CORP. (`v1.0.7.4`) — GDevelop 5 Project Documentation (`CLAUDE.md`)
 
 > **Team Green Gang**: Sukrit Limpakanon, Aristt Mahakitsiri, Gantinan Satjariyakul  
 > **Engine**: GDevelop 5 (`POWATER CROPS..json`) + Real PNG Sprite Assets + PixiJS Procedural River/Conduit Rendering  
-> **Version Naming**: `1.x.y.z` (`x` = Major Version, `y` = Small Addition Within Major Version, `z` = Bug Fixes) — Current: **`v1.0.7.3`**
+> **Version Naming**: `1.x.y.z` (`x` = Major Version, `y` = Small Addition Within Major Version, `z` = Bug Fixes) — Current: **`v1.0.7.4`**
 
 ---
 
@@ -132,6 +132,9 @@ All buildings, houses, rivers, HUD bars, toolbar docks, buttons, and status badg
 
 ## 7. Changelog
 
+- **`v1.0.7.4` (2026-11-10)**:
+  - Tutorial opens with a top-bar intro (`ui.showHudIntro`): highlights and explains money, houses, goal, pollution and strikes, then `✅ เข้าใจแล้ว เริ่ม Tutorial` starts the steps.
+  - Removed the `⏳ จบใน` ETA from the HUD (and `engine.estimateTimeToWin`); the goal pill now reads `🏆 เป้าหมาย n/15 หลัง`.
 - **`v1.0.7.3` (2026-11-10)**:
   - Fixed: after winning, `CONTINUE` / ✕ left the game frozen (`isGameWon` stayed true); the level now keeps running.
   - Pollution at 33% of the limit warns once and auto-plays the Eco Filter video; the video was redrawn with a pollution bar that climbs, then drops as filters are placed.
@@ -142,7 +145,7 @@ All buildings, houses, rivers, HUD bars, toolbar docks, buttons, and status badg
   - Tutorial no longer ends early: its 1-house win rule fired after 30s (at step 6) and showed the "play the real level" screen; the win check is now off in tutorial mode.
   - Tutorial houses use fixed spots (`config/tutorial.json` → `houseSpawnPoints`: `(840,280)` next to all buildings, `(1040,290)` only via house 1, `(1130,170)` only via house 2 for the series-slowdown step).
 - **`v1.0.7.0` (2026-11-10)**:
-  - Removed the minimum win time: supplying the required houses wins the level immediately (still blocked while equipment is broken / a disaster is active). HUD shows `🏆 supplied/required ⏳ ~ETA`.
+  - Removed the minimum win time: supplying the required houses wins the level immediately (still blocked while equipment is broken / a disaster is active). HUD shows `🏆 เป้าหมาย supplied/required หลัง`.
   - Pollution budget horizon: `max(time to reach the required houses − 20s, 60s)` of minimal-city emission (`pollutionMinSurviveSeconds`).
   - Fixed house spawn layouts per city (`houseSpawnPoints`), each with a guaranteed easy wiring solution; verified by a bot playthrough of all 4 cities.
   - Waste filter capacity 12 → 15 (one filter serves the 15 required houses; a 2nd filter formed a separate network the chained houses could not use).

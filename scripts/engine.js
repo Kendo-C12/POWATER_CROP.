@@ -140,18 +140,6 @@
       return this.gameSpeed;
     }
 
-    // Real-time seconds until the level can be won at the current speed, assuming the player keeps up:
-    // wait for the missing houses to spawn, then hold the win timer
-    estimateTimeToWin() {
-      const req = this.winRequiredHouses || 15;
-      const interval = ((this.currentLevel && this.currentLevel.spawnInterval) || 18000) / 1000;
-      const missing = Math.max(0, req - this.houses.length);
-      const boost = this.allConnectedBoost ? (CONFIG.ALL_CONNECTED_SPAWN_SPEEDUP || 4) : 1;
-      const spawnWait = missing > 0 ? Math.max(0, missing * interval - this.spawnTimer) / boost : 0;
-      const hold = Math.max(0, (this.winTargetDuration ?? 0) - (this.winHoldTimer || 0));
-      return (spawnWait + hold) / (this.gameSpeed || 1);
-    }
-
     selectTool(toolId) {
       this.activeTool = toolId;
     }
@@ -332,6 +320,7 @@
       const p0 = this.tutorialSpot(0);
       this.spawnHouse(null, p0.x, p0.y);
       this.addFloatingText('🎓 เริ่มโหมดฝึกสอนด่วน (Fast Scene Tutorial)! ทำตามลูกศรแนะนำได้เลย', CONFIG.CANVAS_WIDTH / 2, 115, '#06d6a0');
+      if (global.POWATER.uiManager) global.POWATER.uiManager.showHudIntro(); // explain the top bar first
     }
 
     // i-th fixed tutorial house spot, or a free spot near the previous tutorial house

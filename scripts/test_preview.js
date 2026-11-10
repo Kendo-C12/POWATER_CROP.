@@ -290,15 +290,13 @@ async function runTest() {
     };
     const idle = t(false), wired = t(true);
     const all = g.houses.every(h => h.hasPower && h.hasWater && h.hasDrainage);
-    const eta1 = g.estimateTimeToWin();
     const speeds = [g.toggleSpeed(), g.toggleSpeed(), g.toggleSpeed()];
     g.toggleSpeed(); g.toggleSpeed(); // -> 4x
-    const eta4 = g.estimateTimeToWin();
     g.gameSpeed = 1;
-    return { idle, wired, all, speeds, eta1: Math.round(eta1), eta4: Math.round(eta4) };
+    return { idle, wired, all, speeds };
   });
   console.log('8b. All-connected spawn boost / speed / ETA:', boost);
-  if (!boost.all || boost.wired < boost.idle * 3 || boost.speeds.join() !== '2,4,1' || boost.eta1 <= 0 || Math.abs(boost.eta4 * 4 - boost.eta1) > 4) {
+  if (!boost.all || boost.wired < boost.idle * 3 || boost.speeds.join() !== '2,4,1') {
     throw new Error('Spawn speedup / 4x speed / win ETA check failed!');
   }
   await page.evaluate(() => window.POWATER.game.startLevel(0));
@@ -382,18 +380,20 @@ async function runTest() {
   const tut = await page.evaluate(() => {
     const g = window.POWATER.game;
     g.startTutorial();
+    const intro = window.POWATER.uiManager.activeModal;
+    window.POWATER.uiManager.closeModal();
     const p = (h) => h && [Math.round(h.getCenter().x), Math.round(h.getCenter().y)].join(',');
     const first = p(g.houses[0]);
     for (let i = 0; i < 3; i++) { g.skipTutorialStep(); g.update(0.05); }
     for (let t = 0; t < 60; t += 0.5) g.update(0.5);
     const second = p(g.tutorialHouse2);
     g.skipTutorialStep(); g.update(0.05); g.skipTutorialStep(); g.update(0.05);
-    const r = { first, second, third: p(g.tutorialHouse3), step: g.tutorialStep, won: g.isGameWon };
+    const r = { intro, first, second, third: p(g.tutorialHouse3), step: g.tutorialStep, won: g.isGameWon };
     window.POWATER.uiManager.closeModal();
     return r;
   });
   console.log('8g. Tutorial spots / no early win:', tut);
-  if (tut.first !== '840,280' || tut.second !== '1040,290' || tut.third !== '1130,170' || tut.won || tut.step !== 6) throw new Error('Tutorial fixed spots / early win check failed!');
+  if (tut.intro !== 'hud_intro' || tut.first !== '840,280' || tut.second !== '1040,290' || tut.third !== '1130,170' || tut.won || tut.step !== 6) throw new Error('Tutorial fixed spots / early win check failed!');
   await page.evaluate(() => window.POWATER.game.startLevel(0));
 
   // 8h. CONTINUE after winning keeps the level playable; 33% pollution warns once and opens the Eco Filter video
