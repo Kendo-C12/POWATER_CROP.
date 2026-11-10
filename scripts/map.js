@@ -26,6 +26,8 @@
       this.isHighTide = false;
       this.isFloodActive = false;
       this.ripples = [];
+      this.cell = 8; // water mask resolution (px)
+      this.mask = null;
 
       for (let i = 0; i < 32; i++) {
         this.ripples.push({
@@ -113,12 +115,75 @@
       return (defX + defW / 2) + shiftX;
     }
 
+    // Water comes from the city map image (scene object 'map_bg'): cyan water vs cream land on an 8px grid.
+    // Falls back to the old spline river when the image can't be read.
+    buildWaterMask() {
+      if (this.mask || this._maskFailed) return this.mask;
+      try {
+        const objs = this.runtimeScene && this.runtimeScene.getObjects ? this.runtimeScene.getObjects('map_bg') : null;
+        const bg = objs && objs[0];
+        const spr = bg && bg.getRendererObject ? bg.getRendererObject() : null;
+        const base = spr && spr.texture && spr.texture.baseTexture;
+        const src = base && base.valid && base.resource && base.resource.source;
+        if (!src || typeof document === 'undefined') return null;
+        const C = this.cell, cols = Math.ceil(this.width / C), rows = Math.ceil(this.height / C);
+        const cv = document.createElement('canvas');
+        cv.width = cols; cv.height = rows;
+        const ctx = cv.getContext('2d');
+        ctx.imageSmoothingQuality = 'high';
+        ctx.drawImage(src, bg.getX() / C, bg.getY() / C, bg.getWidth() / C, bg.getHeight() / C);
+        const px = ctx.getImageData(0, 0, cols, rows).data;
+        const mask = new Uint8Array(cols * rows);
+        for (let i = 0; i < mask.length; i++) mask[i] = (px[i * 4 + 3] > 0 && px[i * 4 + 2] - px[i * 4] > 50) ? 1 : 0;
+        this.cols = cols; this.rows = rows; this.mask = mask;
+        this.waterCells = []; this.edgeCells = []; this.waterRuns = [];
+        for (let r = 0; r < rows; r++) {
+          let runStart = -1;
+          for (let c = 0; c <= cols; c++) {
+            const w = c < cols && mask[r * cols + c];
+            if (w) {
+              this.waterCells.push(r * cols + c);
+              const land = (cc, rr) => cc >= 0 && rr >= 0 && cc < cols && rr < rows && !mask[rr * cols + cc];
+              if (land(c - 1, r) || land(c + 1, r) || land(c, r - 1) || land(c, r + 1)) this.edgeCells.push(r * cols + c);
+              if (runStart < 0) runStart = c;
+            } else if (runStart >= 0) {
+              this.waterRuns.push([runStart * C, r * C, (c - runStart) * C]);
+              runStart = -1;
+            }
+          }
+        }
+      } catch (e) {
+        this._maskFailed = true; // e.g. tainted canvas: keep the spline fallback
+      }
+      return this.mask;
+    }
+
+    waterAt(x, y) {
+      const c = Math.floor(x / this.cell), r = Math.floor(y / this.cell);
+      return c >= 0 && r >= 0 && c < this.cols && r < this.rows && this.mask[r * this.cols + c] === 1;
+    }
+
+    waterWithin(x, y, radius) {
+      const C = this.cell, rr = Math.ceil(radius / C);
+      const c0 = Math.floor(x / C), r0 = Math.floor(y / C);
+      for (let dr = -rr; dr <= rr; dr++) {
+        for (let dc = -rr; dc <= rr; dc++) {
+          if ((dc * dc + dr * dr) * C * C > (radius + C) * (radius + C)) continue;
+          const c = c0 + dc, r = r0 + dr;
+          if (c >= 0 && r >= 0 && c < this.cols && r < this.rows && this.mask[r * this.cols + c]) return true;
+        }
+      }
+      return false;
+    }
+
     isPointInRiver(x, y) {
+      if (this.buildWaterMask()) return this.isHighTide ? this.waterWithin(x, y, 10) : this.waterAt(x, y);
       const rx = this.getRiverCenterAtY(y);
       return Math.abs(x - rx) < (this.getRiverWidth() / 2);
     }
 
     isNearRiver(x, y, maxDist = 75) {
+      if (this.buildWaterMask()) return this.waterWithin(x, y, maxDist);
       const rx = this.getRiverCenterAtY(y);
       const halfW = this.getRiverWidth() / 2;
       const dist = Math.abs(x - rx);
@@ -126,6 +191,13 @@
     }
 
     checkLineIntersectsRiver(p1, p2) {
+      if (this.buildWaterMask()) {
+        const n = Math.max(1, Math.ceil(Math.hypot(p2.x - p1.x, p2.y - p1.y) / 6));
+        for (let i = 0; i <= n; i++) {
+          if (this.waterAt(p1.x + (p2.x - p1.x) * i / n, p1.y + (p2.y - p1.y) * i / n)) return true;
+        }
+        return false;
+      }
       const r1 = this.getRiverCenterAtY(p1.y);
       const r2 = this.getRiverCenterAtY(p2.y);
       const side1 = p1.x < r1 ? -1 : 1;
@@ -146,6 +218,7 @@
         if (r.t > 1.0) {
           r.t = 0;
           r.offsetFrac = (Math.random() - 0.5) * 0.75;
+          r.cell = -1;
         }
       });
     }
@@ -160,6 +233,39 @@
         const gC = Math.round(255 - (255 - 150) * this.pollutionVisual);
         const bC = Math.round(255 - (255 - 75) * this.pollutionVisual);
         riverObj.setColor(`${rC};${gC};${bC}`);
+      }
+
+      // Image-based water: pollution tint, high-tide shoreline glow and drifting ripples on real water cells
+      if (this.buildWaterMask()) {
+        const C = this.cell;
+        if (this.pollutionVisual > 0.02) {
+          pixiGfx.lineStyle(0);
+          pixiGfx.beginFill(0x7a8f3a, Math.min(0.5, this.pollutionVisual * 0.5));
+          this.waterRuns.forEach(([x, y, w]) => pixiGfx.drawRect(x, y, w, C));
+          pixiGfx.endFill();
+        }
+        if (this.isHighTide) {
+          pixiGfx.lineStyle(0);
+          pixiGfx.beginFill(0x00b4d8, 0.28 + Math.sin(this.waterTime * 4.0) * 0.1);
+          this.edgeCells.forEach(i => pixiGfx.drawCircle((i % this.cols) * C + C / 2, Math.floor(i / this.cols) * C + C / 2, 7));
+          pixiGfx.endFill();
+        }
+        if (this.waterCells.length) {
+          this.ripples.forEach(r => {
+            if (!(r.cell >= 0)) r.cell = this.waterCells[Math.floor(Math.random() * this.waterCells.length)];
+            const rx = (r.cell % this.cols) * C + (r.t - 0.5) * 18;
+            const ry = Math.floor(r.cell / this.cols) * C + Math.sin(r.t * Math.PI * 2) * 2;
+            pixiGfx.beginFill(this.pollutionVisual > 0.5 ? 0xb4dc64 : 0xffffff, 0.35 * Math.sin(r.t * Math.PI));
+            pixiGfx.drawEllipse(rx, ry, r.size, r.size * 0.32);
+            pixiGfx.endFill();
+          });
+        }
+        if (this.isFloodActive) {
+          pixiGfx.beginFill(0x0077b6, 0.25 + Math.sin(this.waterTime * 3.5) * 0.08);
+          pixiGfx.drawRect(0, 44, this.width, this.height - 44);
+          pixiGfx.endFill();
+        }
+        return;
       }
 
       // 2. High Tide glowing shoreline surge

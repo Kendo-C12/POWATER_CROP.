@@ -19,5 +19,19 @@
   "hasEarthquake": false,
   "hasBlackout": true,
   "hasFlood": false,
-  "featureCostOverrides": {}
+  "featureCostOverrides": {},
+  "cutscene": [
+    {
+      "speaker": "สภาเมืองโรม",
+      "text": "ท่อส่งน้ำโบราณของเรายังแข็งแรง พ่วงน้ำระหว่างบ้านได้ไม่จำกัด แต่ไฟฟ้าดับบ่อยครั้งริมแม่น้ำไทเบอร์"
+    },
+    {
+      "speaker": "Amigo TheGOATHimself",
+      "text": "เมืองที่ยืนหยัดมาสองพันปีสอนผมว่า ความยั่งยืนคือการออกแบบให้ระบบเดินต่อได้ แม้บางส่วนจะล้มลง"
+    },
+    {
+      "speaker": "Amigo TheGOATHimself",
+      "text": "ภารกิจ: รับมือไฟดับในโรม — ระหว่างไฟดับ Win Timer จะหยุด จงวางระบบให้ฟื้นกลับมาเร็วที่สุด"
+    }
+  ]
 }

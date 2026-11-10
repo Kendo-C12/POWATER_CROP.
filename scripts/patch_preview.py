@@ -19,7 +19,7 @@ if not os.path.exists(prev_dir):
 
 # 1. Copy all assets to preview root and assets/
 for f in os.listdir(assets_dir):
-    if f.endswith('.png'):
+    if f.endswith(('.png', '.jpg')):
         src = os.path.join(assets_dir, f)
         shutil.copy2(src, os.path.join(prev_dir, f))
         prev_assets = os.path.join(prev_dir, 'assets')
@@ -47,6 +47,11 @@ for stg_name in ['tutorial', 'bangkok', 'tokyo', 'rome', 'amsterdam']:
         with open(stg_path, 'r', encoding='utf-8') as scf:
             merged_config['stages'][stg_name] = json.load(scf)
 
+
+story_path = os.path.join(ROOT_DIR, 'story', 'story.txt')
+if os.path.exists(story_path):
+    with open(story_path, 'r', encoding='utf-8') as stf:
+        merged_config['storyIntro'] = [p.strip() for p in stf.read().split('\n\n') if p.strip()]
 stage_cfg_inline = json.dumps(merged_config, ensure_ascii=False, indent=2)
 print('config/*.json copied to preview/config/ directory.')
 

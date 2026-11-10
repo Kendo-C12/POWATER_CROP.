@@ -324,7 +324,7 @@
         const ang = (i / 16) * Math.PI * 2;
         const x = c.x + Math.cos(ang) * r, y = c.y + Math.sin(ang) * r;
         if (x < 60 || x > CONFIG.CANVAS_WIDTH - 60 || y < 110 || y > CONFIG.CANVAS_HEIGHT - 120) continue;
-        if (this.map.isPointInRiver(x, y) || this.map.isNearRiver(x, y, 30)) continue;
+        if (this.map.isPointInRiver(x, y) || this.map.isNearRiver(x, y, 40)) continue;
         const dists = [...this.houses, ...this.buildings].map(e => {
           const ec = e.getCenter ? e.getCenter() : { x: e.centerX, y: e.centerY };
           return Math.hypot(ec.x - x, ec.y - y);
@@ -511,9 +511,10 @@
       }
 
       if (!foundAny) {
-        this.createBuilding('water_pump', 680, 270);
-        this.createBuilding('waste_filter', 740, 470);
-        this.createBuilding('generator_coal', 860, 270);
+        // Same spots as the Bangkok scene layout (on the Chao Phraya shore of assets/Bangkok.jpg)
+        this.createBuilding('water_pump', 590, 280);
+        this.createBuilding('waste_filter', 710, 360);
+        this.createBuilding('generator_coal', 720, 200);
       }
       // Starting houses spawn only where all three utilities can be wired in
       for (let i = 0; i < 3 && this.houses.length < 3; i++) this.spawnHouse();
@@ -579,7 +580,7 @@
           x = a.x + Math.cos(ang) * r;
           y = a.y + Math.sin(ang) * r;
           if (x < marginX || x > CONFIG.CANVAS_WIDTH - marginX || y < marginYTop || y > CONFIG.CANVAS_HEIGHT - marginYBottom) continue;
-          if (this.map.isPointInRiver(x, y) || this.map.isNearRiver(x, y, 20)) continue;
+          if (this.map.isPointInRiver(x, y) || this.map.isNearRiver(x, y, 40)) continue;
           const tooClose = [...this.houses, ...this.buildings].some(e => {
             const c = e.getCenter ? e.getCenter() : { x: e.centerX, y: e.centerY };
             return Math.hypot(c.x - x, c.y - y) < minDist;

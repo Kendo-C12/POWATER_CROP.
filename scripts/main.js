@@ -43,6 +43,11 @@
       window.addEventListener('keydown', (e) => {
         if (!this.game || !this.ui) return;
         const key = (e.key || '').toLowerCase();
+        if (this.ui.activeModal === 'cutscene') {
+          if (key === ' ' || key === 'enter') { e.preventDefault(); this.ui.advanceCutscene(false); }
+          else if (key === 'escape') this.ui.advanceCutscene(true);
+          return;
+        }
         if (key === '1') this.ui.selectTool('power');
         else if (key === '2') this.ui.selectTool('water');
         else if (key === '3') this.ui.selectTool('sewage');
@@ -102,7 +107,7 @@
         else if (sName.includes('amsterdam') || sName.includes('endless') || sName.includes('metropolis')) levelIdx = 3;
 
         this.game.startLevel(levelIdx);
-        this.ui.showLevelBriefing(this.game.currentLevel);
+        this.ui.showCityCutscene(this.game.currentLevel);
       }
 
       this.initialized = true;

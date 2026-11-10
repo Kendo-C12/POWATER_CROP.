@@ -1,22 +1,22 @@
 {
   "_comment": "POWATER CORP. v1.0.4.0 — Global Configuration File (config/global.json). Configures feature costs, economy, global rules, pollution rates, and disaster parameters across all stages.",
   "gameLore": {
-    "playerRole": "Mayor of the City (นายกเทศมนตรี / ผู้บริหารสูงสุดของเมือง)",
-    "chiefAdvisor": "Amigo TheGOATHimself (Chief Environmental & Infrastructure Consultant)",
+    "playerRole": "Amigo TheGOATHimself — นักธุรกิจเพื่อสิ่งแวดล้อมระดับโลก (ตัวละครหลัก)",
     "worldBackground": "The Urban Sustainability Crisis: ในช่วงหลายทศวรรษที่ผ่านมา เมืองขนาดใหญ่ทั่วโลกเติบโตอย่างรวดเร็ว การขยายตัวของประชากรทำให้ความต้องการน้ำสะอาดและพลังงานไฟฟ้าเพิ่มสูงขึ้นอย่างมหาศาล",
     "corePhilosophy": "เป้าหมายสูงสุดไม่ใช่การสร้างเมืองที่ใหญ่ที่สุด แต่คือการสร้างเมืองที่สามารถเติบโตได้อย่างยั่งยืน",
     "sdgs": [
       "SDG 6: Clean Water and Sanitation",
       "SDG 7: Affordable and Clean Energy",
       "SDG 15: Life on Land (Easter Egg & Mini-Achievement)"
-    ]
+    ],
+    "story": "story/story.txt"
   },
   "featureCosts": {
     "buildings": {
       "generatorCoal": {
         "cost": 30,
         "capacityHouses": null,
-        "pollutionRatePerSec": 0.30,
+        "pollutionRatePerSec": 0.3,
         "canBreakDown": true
       },
       "waterPump": {
@@ -34,7 +34,7 @@
       "airFilter": {
         "cost": 40,
         "capacityHouses": 0,
-        "pollutionReductionPerSec": 0.20,
+        "pollutionReductionPerSec": 0.2,
         "canBreakDown": false
       }
     },
@@ -55,7 +55,7 @@
         "baseCost": 10,
         "costMult": 1.8,
         "maxLevel": 5,
-        "bonusPerLevel": 0.20
+        "bonusPerLevel": 0.2
       },
       "poll_red": {
         "baseCost": 100,
@@ -67,7 +67,7 @@
         "baseCost": 10,
         "costMult": 1.8,
         "maxLevel": 5,
-        "bonusPerLevel": 0.20
+        "bonusPerLevel": 0.2
       },
       "waste_cap": {
         "baseCost": 25,
@@ -98,22 +98,22 @@
     "upsizeEveryNHouses": 10,
     "maxHousesCap": 40,
     "repairCheckIntervalSeconds": 120.0,
-    "repairBreakdownChance": 0.30
+    "repairBreakdownChance": 0.3
   },
   "pollutionRates": {
-    "coalGeneratorPerSec": 0.30,
+    "coalGeneratorPerSec": 0.3,
     "wastewaterOutletBasePerSec": 0.05,
     "wastewaterPerDrainedHousePerSec": 0.05,
     "untreatedSewagePerHousePerSec": 0.15,
-    "airFilterReductionPerSec": 0.20,
+    "airFilterReductionPerSec": 0.2,
     "naturalDilutionPerSec": 0.01,
-    "warningThresholdRatio": 0.80
+    "warningThresholdRatio": 0.8
   },
   "disasters": {
     "highTide": {
       "everyNDays": 15,
       "durationSeconds": 25.0,
-      "riversideBreakChance": 0.50
+      "riversideBreakChance": 0.5
     },
     "earthquake": {
       "checkEverySeconds": 60.0,

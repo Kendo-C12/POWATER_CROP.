@@ -315,6 +315,9 @@
       if (!this.videoPaused) {
         this.videoTime = (this.videoTime + dt) % this.videoDuration;
       }
+      if (this.activeModal === 'cutscene') {
+        this.cutTime = (this.cutTime || 0) + dt;
+      }
 
       // Sync button positions from GDevelop scene objects & hide static bitmap duplicates so 4K vector buttons have zero ghosting
       if (this.game && this.game.runtimeScene && this.game.runtimeScene.getObjects) {
@@ -726,6 +729,107 @@
       if (this.modalContainer) this.modalContainer.visible = true;
     }
 
+    // City cutscene before each city: story/story.txt intro (Bangkok) + per-city dialogue, then the briefing
+    showCityCutscene(level) {
+      const lvl = level || (this.game && this.game.currentLevel) || {};
+      const pages = [];
+      if (lvl.id === 'bangkok' && Array.isArray(CONFIG.STORY_INTRO)) {
+        CONFIG.STORY_INTRO.forEach(t => pages.push({ speaker: 'ผู้บรรยาย', text: t }));
+      }
+      (lvl.cutscene || []).forEach(p => pages.push(p));
+      if (pages.length === 0) { this.showLevelBriefing(lvl); return; }
+      // Long paragraphs become several pages (split at Thai phrase breaks) so they fit the dialogue box
+      const fitted = [];
+      pages.forEach(p => {
+        let cur = '';
+        String(p.text).split(' ').forEach(w => {
+          if (cur && (cur + ' ' + w).length > 190) { fitted.push({ speaker: p.speaker, text: cur }); cur = w; }
+          else cur = cur ? cur + ' ' + w : w;
+        });
+        if (cur) fitted.push({ speaker: p.speaker, text: cur });
+      });
+      this.activeModal = 'cutscene';
+      this.modalData = { level: lvl, pages: fitted, page: 0 };
+      this.cutTime = 0;
+      if (this.modalContainer) this.modalContainer.visible = true;
+    }
+
+    advanceCutscene(skipAll) {
+      const d = this.modalData;
+      if (!d || !d.pages) return;
+      const page = d.pages[d.page];
+      if (!skipAll && this.cutTime * 40 < page.text.length) { this.cutTime = 999; return; } // finish typing first
+      if (!skipAll && d.page < d.pages.length - 1) { d.page++; this.cutTime = 0; return; }
+      const lvl = d.level;
+      this.closeModal();
+      this.showLevelBriefing(lvl);
+    }
+
+    renderCutscene(mouseX, mouseY) {
+      const g = this.modalGfx;
+      const font = 'system-ui, -apple-system, Segoe UI, Roboto, sans-serif';
+      const d = this.modalData;
+      const page = d.pages[d.page];
+      const hover = (b) => mouseX >= b.x && mouseX <= b.x + b.w && mouseY >= b.y && mouseY <= b.y + b.h;
+
+      g.beginFill(0x0a0714, 0.55);
+      g.drawRect(0, 0, 1280, 720);
+      g.endFill();
+
+      // Amigo TheGOATHimself (gentle idle bob)
+      try {
+        const sp = new PIXI.Sprite(PIXI.Texture.from('amigo.png'));
+        sp.anchor.set(0.5, 1);
+        sp.height = 470;
+        sp.width = 470 * 500 / 608;
+        sp.position.set(215, 724 + Math.sin(this.cutTime * 2.2) * 4);
+        this.modalTextContainer.addChild(sp);
+      } catch (e) {}
+
+      // City badge + page counter
+      const cityTxt = this.makeText(`📍 ${(d.level && d.level.name) || ''}   ${d.page + 1}/${d.pages.length}`, { fontFamily: font, fontSize: 16, fontWeight: 'bold', fill: 0x0e8a9b });
+      g.lineStyle(3, 0x0e8a9b, 1);
+      g.beginFill(0xfff1d7, 0.97);
+      g.drawRoundedRect(20, 18, cityTxt.width + 32, 40, 12);
+      g.endFill();
+      cityTxt.position.set(36, 28);
+      this.modalTextContainer.addChild(cityTxt);
+
+      // Dialogue box in the map art style (cream + teal outline)
+      const bx = 400, by = 470, bw = 850, bh = 215;
+      g.lineStyle(5, 0x0e8a9b, 1);
+      g.beginFill(0xfff1d7, 0.98);
+      g.drawRoundedRect(bx, by, bw, bh, 18);
+      g.endFill();
+      const nameTxt = this.makeText(page.speaker || '', { fontFamily: font, fontSize: 17, fontWeight: 'bold', fill: 0xffffff });
+      g.lineStyle(0);
+      g.beginFill(0x0e8a9b, 1);
+      g.drawRoundedRect(bx + 22, by - 22, nameTxt.width + 32, 40, 10);
+      g.endFill();
+      nameTxt.position.set(bx + 38, by - 12);
+      this.modalTextContainer.addChild(nameTxt);
+
+      const shown = page.text.slice(0, Math.floor(this.cutTime * 40));
+      const bodyTxt = this.makeText(shown, { fontFamily: font, fontSize: 19, fill: 0x1d3b45, wordWrap: true, wordWrapWidth: bw - 64, lineHeight: 31 });
+      bodyTxt.position.set(bx + 32, by + 34);
+      this.modalTextContainer.addChild(bodyTxt);
+
+      const last = d.page === d.pages.length - 1;
+      const nextBtn = { id: 'cut_next', x: bx + bw - 190, y: by + bh - 56, w: 170, h: 42 };
+      const skipBtn = { id: 'cut_skip', x: 1150, y: 18, w: 110, h: 40 };
+      this.modalButtons.push(nextBtn, skipBtn);
+      [[nextBtn, last ? 'เริ่มภารกิจ ▶' : 'ถัดไป ▶', 0x06d6a0], [skipBtn, 'ข้าม ⏭', 0xadb5bd]].forEach(([b, label, col]) => {
+        g.lineStyle(3, 0x0e8a9b, 1);
+        g.beginFill(hover(b) ? col : 0xfff1d7, 1);
+        g.drawRoundedRect(b.x, b.y, b.w, b.h, 10);
+        g.endFill();
+        const t = this.makeText(label, { fontFamily: font, fontSize: 16, fontWeight: 'bold', fill: 0x0e5560 });
+        t.anchor.set(0.5);
+        t.position.set(b.x + b.w / 2, b.y + b.h / 2);
+        this.modalTextContainer.addChild(t);
+      });
+    }
+
     showLevelBriefing(level) {
       this.activeModal = 'briefing';
       this.modalData = { level: level || this.game.currentLevel };
@@ -780,6 +884,11 @@
       this.modalButtons = [];
       this.modalTextContainer.removeChildren();
       this.resetTextPool('modal');
+
+      if (this.activeModal === 'cutscene') {
+        this.renderCutscene(mouseX, mouseY);
+        return;
+      }
 
       g.beginFill(0x0a0714, 0.84);
       g.drawRect(0, 0, 1280, 720);
@@ -1228,7 +1337,7 @@
       }
 
       const briefingTxt = this.makeText(
-        `🏛️ บทบาทผู้เล่น: นายกเทศมนตรี (Mayor of the City)\n` +
+        `🎩 บทบาทผู้เล่น: Amigo TheGOATHimself\n` +
         `📍 ${lvl.thaiName || 'เมืองเป้าหมาย'}\n` +
         `🌍 บริบทความท้าทาย: ${lvl.cityChallenge || 'การพัฒนาเมืองอย่างยั่งยืน'}\n\n` +
         `${lvl.briefing || ''}\n\n` +
@@ -1236,7 +1345,7 @@
         `• ความท้าทาย (-): ${lvl.conditionMinus || '-'}\n` +
         `• การได้เงิน: บ้าน Complete รับทันที +$50 | รายได้รายสัปดาห์: [บ้าน Complete] x $40\n` +
         `• วิดีโอสาธิต: คลิกปุ่มไอคอน [▶] สีฟ้าเหนือปุ่มเครื่องมือด้านล่างเพื่อดูวิดีโอวิธีใช้แต่ละฟีเจอร์!\n\n` +
-        `🎩 Amigo TheGOATHimself (ที่ปรึกษาด้านสิ่งแวดล้อม): "${lvl.amigoQuote || ''}"`,
+        `🎩 Amigo TheGOATHimself: "${lvl.amigoQuote || ''}"`,
         { fontFamily: font, fontSize: 12, fill: 0xe9ecef, wordWrap: true, wordWrapWidth: mw - 46, lineHeight: 19 }
       );
       briefingTxt.position.set(mx + 23, my + 98);
@@ -1420,8 +1529,8 @@
           id: 'sdg15',
           title: 'SDG 15: LIFE ON LAND (🌱 EASTER EGG & MINI-ACHIEVEMENT)',
           desc: (this.showSdg15Story || isSdg15Unlocked)
-            ? '✅ บันทึกผู้ว่าฯ: "ตึกรามสร้างใหม่ได้ แต่ผืนป่ามิอาจฟื้นคืนได้ง่ายดาย... ผู้ว่าฯ ดูแลธรรมชาติไม่ปล่อยมลพิษทำลายสิ่งแวดล้อม นกและต้นไม้ยังคงเบ่งบานเคียงคู่มหานคร"'
-            : '🔒 Easter Egg: ติดตั้งเครื่องกรอง Eco Filter หรือรักษาระดับมลภาวะให้บริสุทธิ์เพื่อฟังเรื่องสั้นบันทึกผู้ว่าฯ (หรือคลิกปุ่มเพื่อเปิดอ่าน)',
+            ? '✅ บันทึกผืนป่าของ Amigo: "ตึกรามสร้างใหม่ได้ แต่ผืนป่ามิอาจฟื้นคืนได้ง่ายดาย... คุณดูแลธรรมชาติไม่ปล่อยมลพิษทำลายสิ่งแวดล้อม นกและต้นไม้ยังคงเบ่งบานเคียงคู่มหานคร"'
+            : '🔒 Easter Egg: ติดตั้งเครื่องกรอง Eco Filter หรือรักษาระดับมลภาวะให้บริสุทธิ์เพื่ออ่านบันทึกผืนป่าของ Amigo (หรือคลิกปุ่มเพื่อเปิดอ่าน)',
           color: 0x56ab2f,
           tag: isSdg15Unlocked ? 'ACHIEVED' : 'EASTER EGG'
         }
@@ -1474,7 +1583,7 @@
       this.modalGfx.drawRoundedRect(mx + 20, rmY, mw - 40, 235, 8);
       this.modalGfx.endFill();
 
-      const rmHeader = this.makeText('🏛️ สารจากนายกเทศมนตรี & แผนการพัฒนาเมืองยั่งยืน (Roadmap):', {
+      const rmHeader = this.makeText('🎩 สารจาก Amigo & แผนการพัฒนาเมืองยั่งยืน (Roadmap):', {
         fontFamily: font, fontSize: 12.5, fontWeight: 'bold', fill: 0x06d6a0
       });
       rmHeader.position.set(mx + 32, rmY + 10);
@@ -1577,7 +1686,7 @@
 
       const curLvl = this.game.currentLevel ? (this.game.currentLevel.name || 'Bangkok') : 'City';
       const msg = this.makeText(
-        `ยอดเยี่ยมมากท่านนายกเทศมนตรี! คุณบริหาร ${curLvl} ผ่านเงื่อนไขการชนะครบสมบูรณ์!\n\n` +
+        `ยอดเยี่ยมมาก คุณ Amigo! คุณบริหาร ${curLvl} ผ่านเงื่อนไขการชนะครบสมบูรณ์!\n\n` +
         `• ดูแลบ้านมากกว่า 15 หลังให้มีน้ำและไฟใช้ตลอดเวลาครบ 5 นาทีเต็ม!\n` +
         `• ควบคุมมลภาวะต่ำกว่าเกณฑ์และรับมือภัยพิบัติได้อย่างยอดเยี่ยม\n` +
         `• ตอบสนองเป้าหมาย SDGs 6, 7 และ 15 (Life on Land) รักษาสมดุลมหานครกับธรรมชาติอย่างยั่งยืน!`,
@@ -1635,6 +1744,13 @@
     }
 
     handleModalClick(mouseX, mouseY) {
+      if (this.activeModal === 'cutscene') {
+        const skip = this.modalButtons.find(b => b.id === 'cut_skip');
+        const onSkip = skip && mouseX >= skip.x && mouseX <= skip.x + skip.w && mouseY >= skip.y && mouseY <= skip.y + skip.h;
+        if (global.POWATER.soundManager) global.POWATER.soundManager.playClick();
+        this.advanceCutscene(onSkip); // click anywhere = next
+        return;
+      }
       for (let i = 0; i < this.modalButtons.length; i++) {
         const btn = this.modalButtons[i];
         if (mouseX >= btn.x && mouseX <= btn.x + btn.w && mouseY >= btn.y && mouseY <= btn.y + btn.h) {

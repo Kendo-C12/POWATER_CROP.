@@ -61,7 +61,12 @@ assets = [
     ('btn_upgrade.png', 'assets/btn_upgrade.png'),
     ('btn_sdgs.png', 'assets/btn_sdgs.png'),
     ('btn_guide.png', 'assets/btn_guide.png'),
-    ('icon_video_help.png', 'assets/icon_video_help.png')
+    ('icon_video_help.png', 'assets/icon_video_help.png'),
+    ('Bangkok.jpg', 'assets/Bangkok.jpg'),
+    ('Tokyo.jpg', 'assets/Tokyo.jpg'),
+    ('Rome.jpg', 'assets/Rome.jpg'),
+    ('Amsterdam.jpg', 'assets/Amsterdam.jpg'),
+    ('amigo.png', 'assets/amigo.png')
 ]
 
 for name, file_path in assets:
@@ -104,6 +109,11 @@ for stg_name in ['tutorial', 'bangkok', 'tokyo', 'rome', 'amsterdam']:
         with open(stg_path, 'r', encoding='utf-8') as scf:
             merged_config['stages'][stg_name] = json.load(scf)
 
+
+story_path = os.path.join(ROOT_DIR, 'story', 'story.txt')
+if os.path.exists(story_path):
+    with open(story_path, 'r', encoding='utf-8') as stf:
+        merged_config['storyIntro'] = [p.strip() for p in stf.read().split('\n\n') if p.strip()]
 stage_config_inline = json.dumps(merged_config, ensure_ascii=False, indent=2)
 
 combined_source = f"""// POWATER CORP. v1.0.3.1 - Singleplayer Infrastructure & Environmental Strategy Game
@@ -341,7 +351,8 @@ def build_layout_objects(river_image='river.png', river_w=280, river_h=720):
         ('water_pump', 'Blue barrel.png', 140, 140),
         ('waste_filter', 'Orange barrel.png', 140, 140),
         ('air_filter', 'AirFilter.png', 140, 140),
-        ('river', river_image, river_w, river_h),
+        ('map_bg', river_image, river_w, river_h),
+        ('amigo', 'amigo.png', 500, 608),
         ('btn_power', 'btn_power.png', 256, 192),
         ('btn_water', 'btn_water.png', 256, 192),
         ('btn_drain', 'btn_drain.png', 256, 192),
@@ -354,7 +365,6 @@ def build_layout_objects(river_image='river.png', river_w=280, river_h=720):
         ('btn_upgrade', 'btn_upgrade.png', 256, 192),
         ('btn_sdgs', 'btn_sdgs.png', 256, 192),
         ('btn_guide', 'btn_guide.png', 256, 192),
-        ('grid_bg', 'grid_bg.png', 1280, 720),
         ('hud_bar', 'hud_bar.png', 1280, 44),
         ('toolbar_dock', 'toolbar_dock.png', 820, 56),
         ('logo_powater', 'logo_powater.png', 128, 128),
@@ -375,12 +385,6 @@ def build_layout_objects(river_image='river.png', river_w=280, river_h=720):
 def make_base_instances():
     """Generates standard background, top HUD, toolbar dock tray, and 12 bottom button PNGs."""
     return [
-        # 0. Urban Grid Blueprint Background (Exact 1280x720 canvas frame)
-        {
-            'angle': 0, 'customSize': True, 'height': 720, 'layer': '', 'locked': False,
-            'name': 'grid_bg', 'persistentUuid': 'inst-grid-bg', 'width': 1280, 'x': 0, 'y': 0, 'zOrder': 0,
-            'numberProperties': [], 'stringProperties': [], 'initialVariables': []
-        },
         # Top HUD Bar Banner (Exact 1280x44)
         {
             'angle': 0, 'customSize': True, 'height': 44, 'layer': '', 'locked': False,
@@ -496,69 +500,69 @@ def create_layout(name, title, river_image, river_w, river_h, river_inst, level_
 
 # Level 1: Main / Bangkok Screen (Tutorial + High Tide every 15 days)
 main_river = {
-    'angle': 0, 'customSize': True, 'height': 720, 'layer': '', 'locked': False,
-    'name': 'river', 'persistentUuid': 'inst-river-bkk', 'width': 280, 'x': 490, 'y': 0, 'zOrder': 1,
+    'angle': 0, 'customSize': True, 'height': 905, 'layer': '', 'locked': False,
+    'name': 'map_bg', 'persistentUuid': 'inst-map-main', 'width': 1280, 'x': 0, 'y': -92, 'zOrder': 0,
     'numberProperties': [], 'stringProperties': [], 'initialVariables': []
 }
 main_buildings = [
-    { 'name': 'generator', 'x': 832, 'y': 242, 'width': 56, 'height': 56, 'zOrder': 4, 'persistentUuid': 'inst-bkk-gen', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
-    { 'name': 'water_pump', 'x': 652, 'y': 242, 'width': 56, 'height': 56, 'zOrder': 4, 'persistentUuid': 'inst-bkk-pump', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
-    { 'name': 'waste_filter', 'x': 712, 'y': 442, 'width': 56, 'height': 56, 'zOrder': 4, 'persistentUuid': 'inst-bkk-filter', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] }
+    { 'name': 'generator', 'x': 692, 'y': 172, 'width': 56, 'height': 56, 'zOrder': 4, 'persistentUuid': 'inst-bkk-gen', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
+    { 'name': 'water_pump', 'x': 562, 'y': 252, 'width': 56, 'height': 56, 'zOrder': 4, 'persistentUuid': 'inst-bkk-pump', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
+    { 'name': 'waste_filter', 'x': 682, 'y': 332, 'width': 56, 'height': 56, 'zOrder': 4, 'persistentUuid': 'inst-bkk-filter', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] }
 ]
 main_houses = [
     { 'name': 'house', 'x': 818, 'y': 82, 'width': 84, 'height': 56, 'zOrder': 3, 'persistentUuid': 'inst-bkk-h1', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
     { 'name': 'house', 'x': 878, 'y': 432, 'width': 84, 'height': 56, 'zOrder': 3, 'persistentUuid': 'inst-bkk-h2', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
     { 'name': 'house', 'x': 308, 'y': 292, 'width': 84, 'height': 56, 'zOrder': 3, 'persistentUuid': 'inst-bkk-h3', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] }
 ]
-layout_main = create_layout('Main', '1. Bangkok, Thailand', 'river.png', 280, 720, main_river, main_buildings, main_houses)
+layout_main = create_layout('Main', '1. Bangkok, Thailand', 'Bangkok.jpg', 1522, 1076, main_river, main_buildings, main_houses)
 
 # Level 2: Tokyo Screen (Clean Energy -25% + Earthquake)
 tokyo_river = {
-    'angle': 0, 'customSize': True, 'height': 720, 'layer': '', 'locked': False,
-    'name': 'river', 'persistentUuid': 'inst-river-tokyo', 'width': 240, 'x': 460, 'y': 0, 'zOrder': 1,
+    'angle': 0, 'customSize': True, 'height': 905, 'layer': '', 'locked': False,
+    'name': 'map_bg', 'persistentUuid': 'inst-map-tokyo', 'width': 1280, 'x': 0, 'y': -92, 'zOrder': 0,
     'numberProperties': [], 'stringProperties': [], 'initialVariables': []
 }
 tokyo_buildings = [
-    { 'name': 'generator', 'x': 772, 'y': 252, 'width': 56, 'height': 56, 'zOrder': 4, 'persistentUuid': 'inst-tokyo-gen', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
-    { 'name': 'water_pump', 'x': 600, 'y': 240, 'width': 56, 'height': 56, 'zOrder': 4, 'persistentUuid': 'inst-tokyo-pump', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
-    { 'name': 'waste_filter', 'x': 622, 'y': 442, 'width': 56, 'height': 56, 'zOrder': 4, 'persistentUuid': 'inst-tokyo-filter', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] }
+    { 'name': 'generator', 'x': 172, 'y': 292, 'width': 56, 'height': 56, 'zOrder': 4, 'persistentUuid': 'inst-tokyo-gen', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
+    { 'name': 'water_pump', 'x': 282, 'y': 392, 'width': 56, 'height': 56, 'zOrder': 4, 'persistentUuid': 'inst-tokyo-pump', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
+    { 'name': 'waste_filter', 'x': 312, 'y': 252, 'width': 56, 'height': 56, 'zOrder': 4, 'persistentUuid': 'inst-tokyo-filter', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] }
 ]
 tokyo_houses = [
     { 'name': 'house', 'x': 840, 'y': 100, 'width': 84, 'height': 56, 'zOrder': 3, 'persistentUuid': 'inst-tokyo-h1', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
     { 'name': 'house', 'x': 860, 'y': 420, 'width': 84, 'height': 56, 'zOrder': 3, 'persistentUuid': 'inst-tokyo-h2', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
     { 'name': 'house', 'x': 320, 'y': 280, 'width': 84, 'height': 56, 'zOrder': 3, 'persistentUuid': 'inst-tokyo-h3', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] }
 ]
-layout_tokyo = create_layout('Tokyo', '2. Tokyo, Japan', 'river_tokyo.png', 240, 720, tokyo_river, tokyo_buildings, tokyo_houses)
+layout_tokyo = create_layout('Tokyo', '2. Tokyo, Japan', 'Tokyo.jpg', 1522, 1076, tokyo_river, tokyo_buildings, tokyo_houses)
 
 # Level 3: Rome Screen (Unlimited Water Chaining + Blackout & Candle Restock)
 rome_river = {
-    'angle': 0, 'customSize': True, 'height': 720, 'layer': '', 'locked': False,
-    'name': 'river', 'persistentUuid': 'inst-river-rome', 'width': 400, 'x': 420, 'y': 0, 'zOrder': 1,
+    'angle': 0, 'customSize': True, 'height': 905, 'layer': '', 'locked': False,
+    'name': 'map_bg', 'persistentUuid': 'inst-map-rome', 'width': 1280, 'x': 0, 'y': -120, 'zOrder': 0,
     'numberProperties': [], 'stringProperties': [], 'initialVariables': []
 }
 rome_buildings = [
-    { 'name': 'generator', 'x': 832, 'y': 212, 'width': 56, 'height': 56, 'zOrder': 4, 'persistentUuid': 'inst-rome-gen', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
-    { 'name': 'water_pump', 'x': 590, 'y': 220, 'width': 56, 'height': 56, 'zOrder': 4, 'persistentUuid': 'inst-rome-pump', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
-    { 'name': 'waste_filter', 'x': 682, 'y': 322, 'width': 56, 'height': 56, 'zOrder': 4, 'persistentUuid': 'inst-rome-filter', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] }
+    { 'name': 'generator', 'x': 602, 'y': 292, 'width': 56, 'height': 56, 'zOrder': 4, 'persistentUuid': 'inst-rome-gen', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
+    { 'name': 'water_pump', 'x': 672, 'y': 152, 'width': 56, 'height': 56, 'zOrder': 4, 'persistentUuid': 'inst-rome-pump', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
+    { 'name': 'waste_filter', 'x': 522, 'y': 172, 'width': 56, 'height': 56, 'zOrder': 4, 'persistentUuid': 'inst-rome-filter', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] }
 ]
 rome_houses = [
     { 'name': 'house', 'x': 880, 'y': 120, 'width': 84, 'height': 56, 'zOrder': 3, 'persistentUuid': 'inst-rome-h1', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
     { 'name': 'house', 'x': 860, 'y': 460, 'width': 84, 'height': 56, 'zOrder': 3, 'persistentUuid': 'inst-rome-h2', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
     { 'name': 'house', 'x': 280, 'y': 320, 'width': 84, 'height': 56, 'zOrder': 3, 'persistentUuid': 'inst-rome-h3', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] }
 ]
-layout_rome = create_layout('Rome', '3. Rome, Italy', 'river_rome.png', 400, 720, rome_river, rome_buildings, rome_houses)
+layout_rome = create_layout('Rome', '3. Rome, Italy', 'Rome.jpg', 1522, 1076, rome_river, rome_buildings, rome_houses)
 
 # Level 4: Amsterdam Screen (Hardest Level: 1 Complaint = Game Over, Flood every 28 days + 500 EUR Flood Pump)
 amsterdam_river = {
-    'angle': 0, 'customSize': True, 'height': 720, 'layer': '', 'locked': False,
-    'name': 'river', 'persistentUuid': 'inst-river-amsterdam', 'width': 280, 'x': 490, 'y': 0, 'zOrder': 1,
+    'angle': 0, 'customSize': True, 'height': 905, 'layer': '', 'locked': False,
+    'name': 'map_bg', 'persistentUuid': 'inst-map-amsterdam', 'width': 1280, 'x': 0, 'y': -185, 'zOrder': 0,
     'numberProperties': [], 'stringProperties': [], 'initialVariables': []
 }
 amsterdam_buildings = [
-    { 'name': 'generator', 'x': 792, 'y': 212, 'width': 56, 'height': 56, 'zOrder': 4, 'persistentUuid': 'inst-ams-gen', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
-    { 'name': 'water_pump', 'x': 640, 'y': 250, 'width': 56, 'height': 56, 'zOrder': 4, 'persistentUuid': 'inst-ams-pump', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
-    { 'name': 'waste_filter', 'x': 692, 'y': 432, 'width': 56, 'height': 56, 'zOrder': 4, 'persistentUuid': 'inst-ams-filter', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
-    { 'name': 'air_filter', 'x': 840, 'y': 320, 'width': 56, 'height': 56, 'zOrder': 4, 'persistentUuid': 'inst-ams-air', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] }
+    { 'name': 'generator', 'x': 622, 'y': 462, 'width': 56, 'height': 56, 'zOrder': 4, 'persistentUuid': 'inst-ams-gen', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
+    { 'name': 'water_pump', 'x': 662, 'y': 312, 'width': 56, 'height': 56, 'zOrder': 4, 'persistentUuid': 'inst-ams-pump', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
+    { 'name': 'waste_filter', 'x': 512, 'y': 342, 'width': 56, 'height': 56, 'zOrder': 4, 'persistentUuid': 'inst-ams-filter', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
+    { 'name': 'air_filter', 'x': 482, 'y': 482, 'width': 56, 'height': 56, 'zOrder': 4, 'persistentUuid': 'inst-ams-air', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] }
 ]
 amsterdam_houses = [
     { 'name': 'house', 'x': 880, 'y': 100, 'width': 84, 'height': 56, 'zOrder': 3, 'persistentUuid': 'inst-ams-h1', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
@@ -566,23 +570,23 @@ amsterdam_houses = [
     { 'name': 'house', 'x': 280, 'y': 250, 'width': 84, 'height': 56, 'zOrder': 3, 'persistentUuid': 'inst-ams-h3', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
     { 'name': 'house', 'x': 300, 'y': 420, 'width': 84, 'height': 56, 'zOrder': 3, 'persistentUuid': 'inst-ams-h4', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] }
 ]
-layout_amsterdam = create_layout('Amsterdam', '4. Amsterdam, Netherlands', 'river_amsterdam.png', 280, 720, amsterdam_river, amsterdam_buildings, amsterdam_houses)
+layout_amsterdam = create_layout('Amsterdam', '4. Amsterdam, Netherlands', 'Amsterdam.jpg', 1522, 1076, amsterdam_river, amsterdam_buildings, amsterdam_houses)
 
 # Level 0: Dedicated Fast Scene Tutorial (60-Second Interactive Step-by-Step Guide)
 tutorial_river = {
-    'angle': 0, 'customSize': True, 'height': 720, 'layer': '', 'locked': False,
-    'name': 'river', 'persistentUuid': 'inst-river-tutorial', 'width': 280, 'x': 490, 'y': 0, 'zOrder': 1,
+    'angle': 0, 'customSize': True, 'height': 905, 'layer': '', 'locked': False,
+    'name': 'map_bg', 'persistentUuid': 'inst-map-tutorial', 'width': 1280, 'x': 0, 'y': -92, 'zOrder': 0,
     'numberProperties': [], 'stringProperties': [], 'initialVariables': []
 }
 tutorial_buildings = [
-    { 'name': 'generator', 'x': 832, 'y': 212, 'width': 56, 'height': 56, 'zOrder': 4, 'persistentUuid': 'inst-tut-gen', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
-    { 'name': 'water_pump', 'x': 652, 'y': 232, 'width': 56, 'height': 56, 'zOrder': 4, 'persistentUuid': 'inst-tut-pump', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
-    { 'name': 'waste_filter', 'x': 702, 'y': 432, 'width': 56, 'height': 56, 'zOrder': 4, 'persistentUuid': 'inst-tut-filter', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] }
+    { 'name': 'generator', 'x': 692, 'y': 172, 'width': 56, 'height': 56, 'zOrder': 4, 'persistentUuid': 'inst-tut-gen', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
+    { 'name': 'water_pump', 'x': 562, 'y': 252, 'width': 56, 'height': 56, 'zOrder': 4, 'persistentUuid': 'inst-tut-pump', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
+    { 'name': 'waste_filter', 'x': 682, 'y': 332, 'width': 56, 'height': 56, 'zOrder': 4, 'persistentUuid': 'inst-tut-filter', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] }
 ]
 tutorial_houses = [
     { 'name': 'house', 'x': 838, 'y': 342, 'width': 84, 'height': 56, 'zOrder': 3, 'persistentUuid': 'inst-tut-h1', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] }
 ]
-layout_tutorial = create_layout('Tutorial', '0. Fast Scene Tutorial', 'river.png', 280, 720, tutorial_river, tutorial_buildings, tutorial_houses)
+layout_tutorial = create_layout('Tutorial', '0. Fast Scene Tutorial', 'Bangkok.jpg', 1522, 1076, tutorial_river, tutorial_buildings, tutorial_houses)
 
 # Set all 5 layouts in project (Main, Tutorial, Tokyo, Rome, Amsterdam)
 project['layouts'] = [layout_main, layout_tutorial, layout_tokyo, layout_rome, layout_amsterdam]

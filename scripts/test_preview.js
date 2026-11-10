@@ -273,6 +273,22 @@ async function runTest() {
   }
   await page.evaluate(() => window.POWATER.game.startLevel(0));
 
+  // 9. City map image drives water; city cutscene (story intro for Bangkok) precedes the briefing
+  const story = await page.evaluate(() => {
+    const g = window.POWATER.game, u = window.POWATER.uiManager, m = g.map;
+    const shoreOk = g.buildings.filter(b => b.config.mustBeNearWater).every(b => m.isNearRiver(b.getCenter().x, b.getCenter().y, 75) && !m.isPointInRiver(b.getCenter().x, b.getCenter().y));
+    u.showCityCutscene(g.currentLevel);
+    const first = u.modalData.pages[0].speaker, n = u.modalData.pages.length;
+    u.advanceCutscene(true);
+    const after = u.activeModal;
+    u.closeModal();
+    return { mask: !!m.mask, waterCells: m.waterCells ? m.waterCells.length : 0, shoreOk, first, n, after };
+  });
+  console.log('9. Map water mask / cutscene:', story);
+  if (!story.mask || story.waterCells < 500 || !story.shoreOk || story.first !== 'ผู้บรรยาย' || story.n < 10 || story.after !== 'briefing') {
+    throw new Error('Map water mask or city cutscene check failed!');
+  }
+
   const screenshotPath = path.join(__dirname, '..', 'test_screenshot.png');
   await page.screenshot({ path: screenshotPath });
   console.log('Saved gameplay screenshot to:', screenshotPath);
