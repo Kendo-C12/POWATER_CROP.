@@ -954,7 +954,7 @@
       }
       if (this.isFloodActive) {
         const rem = Math.max(0, Math.ceil(this.floodMaxDuration - this.floodTimer));
-        alerts.push(`🌊 น้ำท่วม! ซ่อมอุปกรณ์ริมน้ำ แล้วรอน้ำลด (${rem}s)`);
+        alerts.push(`🌊 น้ำท่วม: ไหลช้าลง (${rem}s)`);
       }
       if (this.isBlackoutActive) {
         alerts.push(`⚡ BLACKOUT! ไฟดับชั่วคราว (${Math.ceil(this.blackoutTimer)}s)`);
@@ -1053,9 +1053,8 @@
       this.isFloodActive = true;
       this.floodMaxDuration = (CONFIG.DISASTERS && CONFIG.DISASTERS.FLOOD && CONFIG.DISASTERS.FLOOD.maxDurationSecondsBeforeGameOver) || 10;
       this.floodTimer = 0.0;
-      this.buildings.forEach(b => { if (b.config && b.config.mustBeNearWater && !b.isBroken) b.breakDown(); }); // pumps & filters flood
       this.addFloatingText(
-        `🌊 น้ำท่วมใหญ่! ปั๊มน้ำและถังบำบัดริมน้ำจมน้ำ — คลิกซ่อม (หรือ REPAIR [R]) แล้วรอน้ำลด ${Math.round(this.floodMaxDuration)} วินาที`,
+        `🌊 น้ำท่วม! ไฟ น้ำ และน้ำเสียไหลช้าลงเล็กน้อย ${Math.round(this.floodMaxDuration)} วินาที`,
         CONFIG.CANVAS_WIDTH / 2,
         100,
         '#e63946'
@@ -1143,6 +1142,12 @@
           const lost = 1 - this.chainFlow(h.hops[t], t);
           if (lost > 0) { h.slowTypes.push(t); worst = Math.max(worst, lost); }
         });
+        // Flood: every utility flows a little slower until the water recedes
+        const flood = this.isFloodActive ? (CONFIG.FLOOD_FLOW_LOSS || 0.15) : 0;
+        if (flood > 0 && (h.hasPower || h.hasWater || h.hasDrainage)) {
+          ['power', 'water', 'sewage'].forEach(t => { if (!h.slowTypes.includes(t)) h.slowTypes.push(t); });
+          worst = Math.max(worst, flood);
+        }
         h.flowDeficit = worst;
       });
     }

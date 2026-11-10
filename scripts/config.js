@@ -32,6 +32,7 @@
     MAX_WIRE_LENGTH: 790, // hard wire/pipe reach (center to center) = 2.5 x the fast length
     FAST_WIRE_LENGTH: 315, // full-speed length; longer links carry less (like extra series hops)
     AIR_FILTER_COOLDOWN_SECONDS: 5, // game seconds between two Eco Filter placements
+    FLOOD_FLOW_LOSS: 0.15, // during a flood every utility flows 15% slower (mild)
     ALL_CONNECTED_SPAWN_SPEEDUP: 4, // house spawn timer runs this much faster while every house is fully wired
     CHAIN_FREE_HOPS: 2, // links from a source that run at full flow
     CHAIN_FLOW_LOSS_PER_HOP: 0.25, // flow lost per extra link in series (0 flow = not supplied)
