@@ -241,6 +241,8 @@
       this.airFilterReadyAt = 0;
       this.pollutionWarned = false;
       this.levelCleared = false;
+      this.quakeCount = 0;
+      this.quakeBannerTimer = 0;
 
       this.dayNightTimer = 0.0;
       this.isNight = false;
@@ -932,9 +934,13 @@
 
       // Update active disaster status banner text
       const alerts = [];
+      if (this.quakeBannerTimer > 0) {
+        this.quakeBannerTimer = Math.max(0, this.quakeBannerTimer - dt);
+        alerts.push(`🌋 แผ่นดินไหวครั้งที่ ${this.quakeCount}!`);
+      }
       if (this.isFloodActive) {
         const rem = Math.max(0, Math.ceil(this.floodMaxDuration - this.floodTimer));
-        alerts.push(`🌊 FLOOD! ระดับน้ำท่วม (${rem}s)`);
+        alerts.push(`🌊 น้ำท่วม! ซ่อมอุปกรณ์ริมน้ำ แล้วรอน้ำลด (${rem}s)`);
       }
       if (this.isBlackoutActive) {
         alerts.push(`⚡ BLACKOUT! ไฟดับชั่วคราว (${Math.ceil(this.blackoutTimer)}s)`);
@@ -944,7 +950,7 @@
       }
       const brokenCount = this.buildings.filter(b => b.isBroken).length;
       if (brokenCount > 0) {
-        alerts.push(`🔧 ต้องซ่อม ${brokenCount} จุด`);
+        alerts.push(`🔧 ต้องซ่อม ${brokenCount} จุด (คลิกอาคาร / กด R)`);
       }
       this.activeDisasterText = alerts.join(' | ');
     }
@@ -989,6 +995,15 @@
 
     triggerEarthquake() {
       this.screenShakeTimer = 2.0;
+      this.quakeCount = (this.quakeCount || 0) + 1;
+      this.quakeBannerTimer = 4.0;
+      let snapped = 0;
+      for (let i = 0; i < 2 && this.connections.length > 0; i++) {
+        const c = this.connections.splice(Math.floor(Math.random() * this.connections.length), 1)[0];
+        const p = c.fromNode.getCenter(), q = c.toNode.getCenter();
+        this.addFloatingText('⚡ สายขาด!', (p.x + q.x) / 2, (p.y + q.y) / 2 - 10, '#ff5a5f');
+        snapped++;
+      }
       let brokenCount = 0;
       // POWATER CORP.pdf: "Need to Repair Every Water and Electric Pump"
       this.buildings.forEach(b => {
@@ -998,7 +1013,7 @@
         }
       });
       this.addFloatingText(
-        `🌋 EARTHQUAKE! แผ่นดินไหวรุนแรง! เครื่องปั๊มน้ำและโรงไฟฟ้าเสียหาย ${brokenCount} แห่ง ต้องซ่อมทันที!`,
+        `🌋 แผ่นดินไหวครั้งที่ ${this.quakeCount}! อาคารเสีย ${brokenCount} แห่ง${snapped ? ` สายขาด ${snapped} เส้น` : ''} — ซ่อมและต่อสายใหม่!`,
         CONFIG.CANVAS_WIDTH / 2,
         100,
         '#e63946'
@@ -1024,8 +1039,9 @@
       this.isFloodActive = true;
       this.floodMaxDuration = (CONFIG.DISASTERS && CONFIG.DISASTERS.FLOOD && CONFIG.DISASTERS.FLOOD.maxDurationSecondsBeforeGameOver) || 10;
       this.floodTimer = 0.0;
+      this.buildings.forEach(b => { if (b.config && b.config.mustBeNearWater && !b.isBroken) b.breakDown(); }); // pumps & filters flood
       this.addFloatingText(
-        `🌊 ภัยพิบัติหลัก: น้ำท่วมใหญ่ใน Amsterdam! ระดับน้ำจะลดลงใน ${Math.round(this.floodMaxDuration)}s`,
+        `🌊 น้ำท่วมใหญ่! ปั๊มน้ำและถังบำบัดริมน้ำจมน้ำ — คลิกซ่อม (หรือ REPAIR [R]) แล้วรอน้ำลด ${Math.round(this.floodMaxDuration)} วินาที`,
         CONFIG.CANVAS_WIDTH / 2,
         100,
         '#e63946'
