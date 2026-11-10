@@ -544,13 +544,19 @@
         const pulseR = 48 + Math.sin(this.pulseTime * 6) * 3;
         gfxO.lineStyle(3, 0xffd166, 0.9);
         gfxO.drawCircle(sc.x, sc.y, pulseR);
-        // Wire reach: inner circle = full speed, outer circle = max length (longer wires carry slower)
-        gfxO.lineStyle(2, 0xffffff, 0.5);
-        gfxO.beginFill(0xffffff, 0.06);
-        gfxO.drawCircle(sc.x, sc.y, global.POWATER.CONFIG.FAST_WIRE_LENGTH || 315);
+        // Wire reach: translucent green fill while the drag end is in range, red once it is too long
+        const reachR = global.POWATER.CONFIG.MAX_WIRE_LENGTH || 315;
+        let tooLong = false;
+        if (this.isDragging) {
+          const hn = this.game.getNodeAt(this.currentMouseX, this.currentMouseY);
+          const ep = (hn && hn.id !== activeSource.id) ? hn.getCenter() : { x: this.currentMouseX, y: this.currentMouseY };
+          tooLong = Math.hypot(ep.x - sc.x, ep.y - sc.y) > reachR;
+        }
+        const reachCol = tooLong ? 0xe63946 : 0x06d6a0;
+        gfxO.lineStyle(2.5, reachCol, 0.8);
+        gfxO.beginFill(reachCol, 0.16);
+        gfxO.drawCircle(sc.x, sc.y, reachR);
         gfxO.endFill();
-        gfxO.lineStyle(2, 0xf4a261, 0.4);
-        gfxO.drawCircle(sc.x, sc.y, global.POWATER.CONFIG.MAX_WIRE_LENGTH || 790);
       }
 
       // 6. Live Dragging Preview Wire (Manhattan + two 45-degree corner turns)
@@ -564,8 +570,7 @@
         const hoverNode = this.game.getNodeAt(p2.x, p2.y);
         const endPt = (hoverNode && hoverNode.id !== this.dragStartNode.id) ? hoverNode.getCenter() : p2;
         const dragLen = Math.hypot(endPt.x - p1.x, endPt.y - p1.y);
-        if (dragLen > (global.POWATER.CONFIG.MAX_WIRE_LENGTH || 790)) wireColor = 0xe63946; // too long
-        else if (dragLen > (global.POWATER.CONFIG.FAST_WIRE_LENGTH || 315)) wireColor = 0xf4a261; // long = slower
+        if (dragLen > (global.POWATER.CONFIG.MAX_WIRE_LENGTH || 315)) wireColor = 0xe63946; // too long
 
         const previewPath = (global.POWATER.ConnectionEntity && global.POWATER.ConnectionEntity.buildManhattanPoints)
           ? global.POWATER.ConnectionEntity.buildManhattanPoints(p1, p2, 0, 22)

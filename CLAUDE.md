@@ -1,8 +1,8 @@
-# POWATER CORP. (`v1.0.6.3`) — GDevelop 5 Project Documentation (`CLAUDE.md`)
+# POWATER CORP. (`v1.0.6.4`) — GDevelop 5 Project Documentation (`CLAUDE.md`)
 
 > **Team Green Gang**: Sukrit Limpakanon, Aristt Mahakitsiri, Gantinan Satjariyakul  
 > **Engine**: GDevelop 5 (`POWATER CROPS..json`) + Real PNG Sprite Assets + PixiJS Procedural River/Conduit Rendering  
-> **Version Naming**: `1.x.y.z` (`x` = Major Version, `y` = Small Addition Within Major Version, `z` = Bug Fixes) — Current: **`v1.0.6.3`**
+> **Version Naming**: `1.x.y.z` (`x` = Major Version, `y` = Small Addition Within Major Version, `z` = Bug Fixes) — Current: **`v1.0.6.4`**
 
 ---
 
@@ -40,7 +40,7 @@
 - **Weekly Revenue**: At the end of every in-game week (7 days), the city awards **`[Completed Houses] * $40 / week`** (plus base municipal grant).
 
 ### 🔌 Wiring Rules (`v1.0.6.1`)
-- **Wire length**: up to **`315px`** center-to-center runs at full speed (`globalRules.fastWireLengthPixels`); wires can reach **`790px`** (2.5×, `maxWireLengthPixels`) but every extra `315px` counts as one more series hop (`engine.linkHops`), so long wires carry less. Dragging shows both circles (white = full speed, orange = max); the preview turns orange when slow and red when too long.
+- **Max wire length**: every wire/pipe spans at most **`315px` center-to-center** (`globalRules.maxWireLengthPixels`). Dragging shows the reach circle filled translucent **green** while the wire end is in range and **red** once it is too long (the preview wire turns red too).
 - **Series slowdown**: the first `2` links from a source run at full flow; each extra link loses **25%** (`chainFreeHops`, `chainFlowLossPerHop`), and a 6th link carries nothing. A supplied house with lost flow keeps filling its unhappy bar (blinking utility badge) and eventually complains — *lose condition #2*. Rome's unlimited aqueducts exempt water.
 - **Delete**: right-click a wire, or the `🗑️ DELETE [X]` tool (also `Delete` key). Buildings (generators, pumps, filters) **cannot be demolished**.
 - **All-connected speedup**: while every house has power, water and sewage, the house spawn timer runs **4× faster** (`globalRules.allConnectedSpawnSpeedup`, not in the tutorial), so players who keep up reach the 15-house win phase sooner.
@@ -121,6 +121,9 @@ All buildings, houses, rivers, HUD bars, toolbar docks, buttons, and status badg
 
 ## 7. Changelog
 
+- **`v1.0.6.4` (2026-11-10)**:
+  - Wire reach back to `315px` with no slow long-wire zone (reverts the `790px` / long-wire slowdown from `v1.0.6.1`).
+  - Reach circle is filled translucent green while in range and turns red when the drag is too long.
 - **`v1.0.6.3` (2026-11-10)**:
   - HUD win pill shows `🏆 houses/required ⏳ จบใน ~m:ss` (estimated real time until the level can be won).
   - `SPEED` button cycles 1X → 2X → 4X → 1X.

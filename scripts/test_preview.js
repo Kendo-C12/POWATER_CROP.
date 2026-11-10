@@ -265,11 +265,10 @@ async function runTest() {
     h.hasPower = h.hasWater = h.hasDrainage = true; h.flowDeficit = 0.5; h.unhappyTimer = 0;
     let complained = false;
     for (let t = 0; t < 70; t += 0.5) h.update(0.5, () => { complained = true; }, false);
-    const longHops = g.linkHops({ fromNode: gen, toNode: { getCenter: () => ({ x: gc.x + 630, y: gc.y }) } });
-    return { R, longHops, farRefused, buildingKept, allReachable, houses: g.houses.length, flows, complained };
+    return { R, farRefused, buildingKept, allReachable, houses: g.houses.length, flows, complained };
   });
   console.log('8. Wire rules:', rules);
-  if (rules.R !== 790 || Math.abs(rules.longHops - 2) > 1e-9 || !rules.farRefused || !rules.buildingKept || !rules.allReachable || rules.flows.join() !== '1,1,0.75,0.5,0.25,0' || !rules.complained) {
+  if (rules.R !== 315 || !rules.farRefused || !rules.buildingKept || !rules.allReachable || rules.flows.join() !== '1,1,0.75,0.5,0.25,0' || !rules.complained) {
     throw new Error('Wire length / spawn reachability / series slowdown check failed!');
   }
   await page.evaluate(() => window.POWATER.game.startLevel(0));
@@ -277,6 +276,8 @@ async function runTest() {
   // 8b. Every house fully wired -> spawn timer runs faster
   const boost = await page.evaluate(() => {
     const g = window.POWATER.game;
+    g.houses.forEach(h => { try { h.runtimeObject.deleteFromScene(g.runtimeScene); } catch (e) {} });
+    g.houses = []; g.spawnTimer = 0; g.spawnHouse(null, 680, 280); // one house in direct reach of the Bangkok generator, pump and filter
     const t = (wire) => {
       g.connections = [];
       if (wire) {
