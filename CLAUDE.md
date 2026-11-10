@@ -1,8 +1,8 @@
-# POWATER CORP. (`v1.0.8.5`) — GDevelop 5 Project Documentation (`CLAUDE.md`)
+# POWATER CORP. (`v1.0.8.6`) — GDevelop 5 Project Documentation (`CLAUDE.md`)
 
 > **Team Green Gang**: Sukrit Limpakanon, Aristt Mahakitsiri, Gantinan Satjariyakul  
 > **Engine**: GDevelop 5 (`POWATER CROPS..json`) + Real PNG Sprite Assets + PixiJS Procedural River/Conduit Rendering  
-> **Version Naming**: `1.x.y.z` (`x` = Major Version, `y` = Small Addition Within Major Version, `z` = Bug Fixes) — Current: **`v1.0.8.5`**
+> **Version Naming**: `1.x.y.z` (`x` = Major Version, `y` = Small Addition Within Major Version, `z` = Bug Fixes) — Current: **`v1.0.8.6`**
 
 ---
 
@@ -136,6 +136,8 @@ All buildings, houses, rivers, HUD bars, toolbar docks, buttons, and status badg
 
 ## 7. Changelog
 
+- **`v1.0.8.6` (2026-11-10)**:
+  - Tutorial step 11: bouncing arrow + glow on the coach bar's `✅ เข้าใจแล้ว` button.
 - **`v1.0.8.5` (2026-11-10)**:
   - Tutorial now 11 steps: after deleting a wire (step 5) the wire is no longer restored automatically; new step 6 asks the player to reconnect it until houses 1 and 2 are complete again. New bot-example video `rewire`.
 - **`v1.0.8.4` (2026-11-10)**:
