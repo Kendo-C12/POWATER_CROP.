@@ -544,11 +544,13 @@
         const pulseR = 48 + Math.sin(this.pulseTime * 6) * 3;
         gfxO.lineStyle(3, 0xffd166, 0.9);
         gfxO.drawCircle(sc.x, sc.y, pulseR);
-        // Wire reach: anything whose center is inside this circle can be connected
+        // Wire reach: inner circle = full speed, outer circle = max length (longer wires carry slower)
         gfxO.lineStyle(2, 0xffffff, 0.5);
         gfxO.beginFill(0xffffff, 0.06);
-        gfxO.drawCircle(sc.x, sc.y, global.POWATER.CONFIG.MAX_WIRE_LENGTH || 315);
+        gfxO.drawCircle(sc.x, sc.y, global.POWATER.CONFIG.FAST_WIRE_LENGTH || 315);
         gfxO.endFill();
+        gfxO.lineStyle(2, 0xf4a261, 0.4);
+        gfxO.drawCircle(sc.x, sc.y, global.POWATER.CONFIG.MAX_WIRE_LENGTH || 790);
       }
 
       // 6. Live Dragging Preview Wire (Manhattan + two 45-degree corner turns)
@@ -561,7 +563,9 @@
         else if (this.game.activeTool === 'sewage') wireColor = 0xc77dff;
         const hoverNode = this.game.getNodeAt(p2.x, p2.y);
         const endPt = (hoverNode && hoverNode.id !== this.dragStartNode.id) ? hoverNode.getCenter() : p2;
-        if (Math.hypot(endPt.x - p1.x, endPt.y - p1.y) > (global.POWATER.CONFIG.MAX_WIRE_LENGTH || 315)) wireColor = 0xe63946; // too long
+        const dragLen = Math.hypot(endPt.x - p1.x, endPt.y - p1.y);
+        if (dragLen > (global.POWATER.CONFIG.MAX_WIRE_LENGTH || 790)) wireColor = 0xe63946; // too long
+        else if (dragLen > (global.POWATER.CONFIG.FAST_WIRE_LENGTH || 315)) wireColor = 0xf4a261; // long = slower
 
         const previewPath = (global.POWATER.ConnectionEntity && global.POWATER.ConnectionEntity.buildManhattanPoints)
           ? global.POWATER.ConnectionEntity.buildManhattanPoints(p1, p2, 0, 22)
@@ -657,6 +661,22 @@
           gfxO.lineStyle(3, guideColor, 0.9);
           gfxO.drawCircle(c1.x, c1.y, rPulse);
           gfxO.drawCircle(c2.x, c2.y, rPulse + 6);
+        } else if (step === 5 && this.game.tutorialTargetWire) {
+          // Bouncing arrow pointing at the exact wire to delete
+          const ep = this.game.tutorialTargetWire.getEndpoints();
+          const pts = (ep && ep.points) || [];
+          if (pts.length >= 2) {
+            const k = Math.max(1, Math.floor(pts.length / 2));
+            const tx = (pts[k - 1].x + pts[k].x) / 2, ty = (pts[k - 1].y + pts[k].y) / 2;
+            const bob = Math.abs(Math.sin(this.pulseTime * 4)) * 12;
+            const ay = ty - 14 - bob;
+            gfxO.lineStyle(3, 0xffffff, 1);
+            gfxO.beginFill(0xe63946, 1);
+            gfxO.drawPolygon([tx, ay, tx - 18, ay - 22, tx - 7, ay - 22, tx - 7, ay - 50, tx + 7, ay - 50, tx + 7, ay - 22, tx + 18, ay - 22]);
+            gfxO.endFill();
+            gfxO.lineStyle(3, 0xe63946, 0.6 + 0.3 * Math.sin(this.pulseTime * 6));
+            gfxO.drawCircle(tx, ty, 14 + Math.sin(this.pulseTime * 6) * 3);
+          }
         } else if (srcNode && step === 7) {
           const c1 = srcNode.getCenter();
           const rPulse = 48 + Math.sin(this.pulseTime * 6) * 6;

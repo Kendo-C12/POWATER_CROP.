@@ -26,7 +26,8 @@
     WEEKLY_REVENUE_PER_COMPLETE_HOUSE: 40, // +40 per completed house every week (7 days)
     REVENUE_PER_HAPPY_HOUSE_SEC: 0.8, // Small continuous operational trickle
     MIN_HOUSE_DISTANCE: 100,
-    MAX_WIRE_LENGTH: 315, // wire/pipe reach (center to center) = 2.5 x house height (56px) x 2.25
+    MAX_WIRE_LENGTH: 790, // hard wire/pipe reach (center to center) = 2.5 x the fast length
+    FAST_WIRE_LENGTH: 315, // full-speed length; longer links carry less (like extra series hops)
     CHAIN_FREE_HOPS: 2, // links from a source that run at full flow
     CHAIN_FLOW_LOSS_PER_HOP: 0.25, // flow lost per extra link in series (0 flow = not supplied)
 
@@ -616,6 +617,7 @@
       if (typeof gr.continuousRevenuePerHousePerSec === 'number') CONFIG.REVENUE_PER_HAPPY_HOUSE_SEC = gr.continuousRevenuePerHousePerSec;
       if (typeof gr.minHouseDistancePixels === 'number') CONFIG.MIN_HOUSE_DISTANCE = gr.minHouseDistancePixels;
       if (typeof gr.maxWireLengthPixels === 'number') CONFIG.MAX_WIRE_LENGTH = gr.maxWireLengthPixels;
+      if (typeof gr.fastWireLengthPixels === 'number') CONFIG.FAST_WIRE_LENGTH = gr.fastWireLengthPixels;
       if (typeof gr.chainFreeHops === 'number') CONFIG.CHAIN_FREE_HOPS = gr.chainFreeHops;
       if (typeof gr.chainFlowLossPerHop === 'number') CONFIG.CHAIN_FLOW_LOSS_PER_HOP = gr.chainFlowLossPerHop;
       if (typeof gr.upsizeEveryNHouses === 'number') {

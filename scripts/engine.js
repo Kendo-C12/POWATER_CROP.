@@ -318,7 +318,7 @@
     // Free spot within wire reach of `near`; prefers spots far from buildings so chains are needed
     findTutorialSpot(near) {
       const c = near.getCenter ? near.getCenter() : { x: near.centerX, y: near.centerY };
-      const r = (CONFIG.MAX_WIRE_LENGTH || 315) - 20;
+      const r = (CONFIG.FAST_WIRE_LENGTH || 315) - 20;
       const spots = [];
       for (let i = 0; i < 16; i++) {
         const ang = (i / 16) * Math.PI * 2;
@@ -367,19 +367,22 @@
         next();
         this.activeTool = 'power';
         this.tutorialHouse2 = spawnNear(h0);
-        say('✅ บ้านสมบูรณ์ +$50! บ้านใหม่มาแล้ว: ลากสายพ่วงจากบ้านเดิมไปบ้านใหม่ (สายยาวได้ไม่เกินวงกลม)', '#ffd166');
+        say('✅ บ้านสมบูรณ์ +$50! บ้านใหม่มาแล้ว: ลากสายพ่วงจากบ้านเดิมไปบ้านใหม่ (ในวงกลมเล็ก = ส่งเร็วสุด)', '#ffd166');
         sfx('playUpgrade');
       } else if (this.tutorialStep === 4 && (!h1 || full(h1))) {
         next();
         this.activeTool = 'delete';
-        this.tutorialWireDeleted = false;
-        say('✅ ต่อพ่วงสำเร็จ! ลองลบสาย: คลิกขวาที่สาย หรือกด 🗑️ DELETE [X] แล้วคลิกที่สาย จากนั้นลากต่อใหม่', '#adb5bd');
+        this.tutorialTargetWire = this.connections.find(c => c.type === 'power' && (c.fromNode === h1 || c.toNode === h1)) || this.connections[this.connections.length - 1];
+        say('✅ ต่อพ่วงสำเร็จ! ลองลบสาย 1 เส้น: คลิกที่สายตามลูกศร (หรือคลิกขวาที่สาย)', '#adb5bd');
         sfx('playUpgrade');
-      } else if (this.tutorialStep === 5 && this.tutorialWireDeleted && this.houses.every(full)) {
+      } else if (this.tutorialStep === 5 && !this.connections.includes(this.tutorialTargetWire)) {
         next();
         this.activeTool = 'power';
+        const w = this.tutorialTargetWire;
+        if (w) this.connections.push(w); // put it back for free so the tutorial keeps flowing
+        this.tutorialTargetWire = null;
         this.tutorialHouse3 = spawnNear(h1 || h0);
-        say('✅ ลบและต่อใหม่สำเร็จ! บ้านหลังที่ 3 มาแล้ว: พ่วงต่อจากบ้านหลังที่ 2 แล้วดูว่าเกิดอะไรขึ้น', '#ffd166');
+        say('✅ ลบสายสำเร็จ! (ระบบต่อคืนให้แล้ว) บ้านหลังที่ 3 มาแล้ว: พ่วงต่อจากบ้านหลังที่ 2 แล้วดูว่าเกิดอะไรขึ้น', '#ffd166');
         sfx('playUpgrade');
       } else if (this.tutorialStep === 6 && (!h2 || full(h2))) {
         next();
@@ -423,12 +426,7 @@
       } else if (this.tutorialStep === 4 && h0 && h1) {
         link3(h0, h1);
       } else if (this.tutorialStep === 5) {
-        const c = this.connections[this.connections.length - 1];
-        if (c) {
-          this.connections = this.connections.filter(x => x !== c);
-          this.connectNodes(c.type, c.fromNode, c.toNode);
-        }
-        this.tutorialWireDeleted = true;
+        this.connections = this.connections.filter(x => x !== this.tutorialTargetWire);
       } else if (this.tutorialStep === 6 && h1 && h2) {
         link3(h1, h2);
       } else if (this.tutorialStep === 7) {
@@ -569,7 +567,7 @@
         const marginYTop = Math.max(62, 85 - this.upsizeTier * 7);
         const marginYBottom = Math.max(85, 110 - this.upsizeTier * 7);
         const marginX = Math.max(48, 75 - this.upsizeTier * 8);
-        const reach = CONFIG.MAX_WIRE_LENGTH || 315;
+        const reach = CONFIG.FAST_WIRE_LENGTH || 315; // spawn within full-speed reach
         const anchors = [...this.houses, ...this.buildings.filter(b => b.config.type !== 'air_filter')];
         let valid = false;
         for (let attempts = 0; attempts < 400 && !valid && anchors.length > 0; attempts++) {
@@ -642,6 +640,13 @@
     }
 
     // Flow left after `hops` links in series (1 = full). Rome's unlimited aqueducts exempt water.
+    // Series cost of one link: 1 hop, plus extra for every FAST_WIRE_LENGTH beyond the full-speed length
+    linkHops(conn) {
+      const a = conn.fromNode.getCenter(), b = conn.toNode.getCenter();
+      const fast = CONFIG.FAST_WIRE_LENGTH || 315;
+      return 1 + Math.max(0, Math.hypot(a.x - b.x, a.y - b.y) - fast) / fast;
+    }
+
     chainFlow(hops, type) {
       if (type === 'water' && this.currentLevel && this.currentLevel.unlimitedWaterChain) return 1;
       const free = CONFIG.CHAIN_FREE_HOPS || 2;
@@ -1159,7 +1164,7 @@
             }
 
             if (nextNode) {
-              const d = depth.get(current.id) + 1;
+              const d = depth.get(current.id) + this.linkHops(conn);
               if (this.chainFlow(d, type) <= 0) return; // too far down the chain: nothing arrives
               depth.set(nextNode.id, d);
               conn.active = true;
@@ -1219,7 +1224,7 @@
             }
 
             if (nextNode) {
-              const d = depth.get(current.id) + 1;
+              const d = depth.get(current.id) + this.linkHops(conn);
               if (this.chainFlow(d, 'sewage') <= 0) return;
               depth.set(nextNode.id, d);
               conn.active = true;
@@ -1520,7 +1525,7 @@
 
       const typeLabels = { power: '⚡ เชื่อมสายไฟ', water: '💧 เชื่อมท่อน้ำดี', sewage: '🧪 เชื่อมท่อระบายน้ำ' };
       const typeColors = { power: '#ffd166', water: '#00b4d8', sewage: '#c77dff' };
-      const costSuffix = connCost > 0 ? ` (-$${connCost})` : '';
+      const costSuffix = (connCost > 0 ? ` (-$${connCost})` : '') + (len > (CONFIG.FAST_WIRE_LENGTH || 315) ? ' 🐢 สายยาว ส่งช้าลง' : '');
       this.addFloatingText((typeLabels[actualType] || 'เชื่อมต่อสำเร็จ') + costSuffix, (p1.x + p2.x) / 2, (p1.y + p2.y) / 2 - 20, typeColors[actualType] || '#06d6a0');
 
       if (global.POWATER.soundManager) {
@@ -1551,7 +1556,6 @@
         if (minDist < 15) {
           const typeLabel = c.type === 'power' ? 'สายไฟ' : (c.type === 'water' ? 'ท่อน้ำดี' : 'ท่อระบายน้ำ');
           this.connections.splice(i, 1);
-          this.tutorialWireDeleted = true;
           if (global.POWATER.soundManager) global.POWATER.soundManager.playClick();
           this.addFloatingText(`ลบ${typeLabel}แล้ว`, x, y, '#90e0ef');
           return true;
@@ -1626,6 +1630,10 @@
     }
 
     addFloatingText(text, x, y, color = '#ffd166') {
+      const live = this.floatingTexts;
+      if (live.some(ft => ft.text === text && Math.abs(ft.x - x) < 60 && ft.life > 0.7)) return; // same message just shown
+      // Stack below any text still floating nearby instead of drawing on top of it
+      while (live.some(ft => Math.abs(ft.x - x) < 260 && Math.abs(ft.y - y) < 22)) y += 24;
       this.floatingTexts.push(new global.POWATER.FloatingTextEntity(text, x, y, color));
     }
   }

@@ -1,8 +1,8 @@
-# POWATER CORP. (`v1.0.6.0`) — GDevelop 5 Project Documentation (`CLAUDE.md`)
+# POWATER CORP. (`v1.0.6.1`) — GDevelop 5 Project Documentation (`CLAUDE.md`)
 
 > **Team Green Gang**: Sukrit Limpakanon, Aristt Mahakitsiri, Gantinan Satjariyakul  
 > **Engine**: GDevelop 5 (`POWATER CROPS..json`) + Real PNG Sprite Assets + PixiJS Procedural River/Conduit Rendering  
-> **Version Naming**: `1.x.y.z` (`x` = Major Version, `y` = Small Addition Within Major Version, `z` = Bug Fixes) — Current: **`v1.0.6.0`**
+> **Version Naming**: `1.x.y.z` (`x` = Major Version, `y` = Small Addition Within Major Version, `z` = Bug Fixes) — Current: **`v1.0.6.1`**
 
 ---
 
@@ -36,8 +36,8 @@
 - **Instant House Completion Bonus**: Completing a house's utility connections awards **`+$50` immediately**.
 - **Weekly Revenue**: At the end of every in-game week (7 days), the city awards **`[Completed Houses] * $40 / week`** (plus base municipal grant).
 
-### 🔌 Wiring Rules (`v1.0.5.0`)
-- **Max wire length**: every wire/pipe spans at most **`315px` center-to-center** (2.5 × house height of `56px` × 2.25, `globalRules.maxWireLengthPixels`). Dragging shows the reach circle; the preview turns red when too long.
+### 🔌 Wiring Rules (`v1.0.6.1`)
+- **Wire length**: up to **`315px`** center-to-center runs at full speed (`globalRules.fastWireLengthPixels`); wires can reach **`790px`** (2.5×, `maxWireLengthPixels`) but every extra `315px` counts as one more series hop (`engine.linkHops`), so long wires carry less. Dragging shows both circles (white = full speed, orange = max); the preview turns orange when slow and red when too long.
 - **Series slowdown**: the first `2` links from a source run at full flow; each extra link loses **25%** (`chainFreeHops`, `chainFlowLossPerHop`), and a 6th link carries nothing. A supplied house with lost flow keeps filling its unhappy bar (blinking utility badge) and eventually complains — *lose condition #2*. Rome's unlimited aqueducts exempt water.
 - **Delete**: right-click a wire, or the `🗑️ DELETE [X]` tool (also `Delete` key). Buildings (generators, pumps, filters) **cannot be demolished**.
 - **Reachable spawning**: houses (including the 3 starting houses) only spawn where all three utilities can be wired in, directly or through a house chain (`engine.canSupplySpot`). Scene layouts no longer place houses; buildings were compacted in Tokyo/Rome/Amsterdam so a first house fits.
@@ -52,7 +52,7 @@
 3. **Map Upsize System**:
    - Every **`x + 10` houses** (`10`, `20`, `30`), the city triggers a **Map Upsize** (`upsizeTier` 1–3), expanding playable spawn bounds and scaling footprints until capped at **40 houses maximum (`จนตันที่ 40 หลัง`)**.
 4. **Fast Interactive Scene Tutorial (`Tutorial` Scene) & Feature Video Demos (`v1.0.2.0`)**:
-   - **Fast 60-Second Scene Tutorial**: Accessible via the dedicated GDevelop `Tutorial` scene or the `🎓 Fast Tutorial (60s)` button in the Level Select modal. 9 steps: wire Power, Water, Sewage (`+$50`) → chain a new house from the first (wire reach circle, `Tab` switches wire type) → delete a wire & re-wire → chain a 3rd house and see series slowdown → repair a broken pump → **Lose #1: pollution** (meter jumps to 80%, place an Eco Filter) → **Lose #2: complaints/strikes** (read & confirm) → plays the two lose-scenario videos (`lose_pollution`, `lose_complaint`). Animated Manhattan guide paths, HUD highlight on the pollution/strike pills, and an `⏭️ Auto-Step` button.
+   - **Fast 60-Second Scene Tutorial**: Accessible via the dedicated GDevelop `Tutorial` scene or the `🎓 Fast Tutorial (60s)` button in the Level Select modal. 9 steps: wire Power, Water, Sewage (`+$50`) → chain a new house from the first (wire reach circle, `Tab` switches wire type) → delete the one wire under the red bouncing arrow (it is restored for free) → chain a 3rd house and see series slowdown → repair a broken pump → **Lose #1: pollution** (meter jumps to 80%, place an Eco Filter) → **Lose #2: complaints/strikes** (read & confirm) → plays the two lose-scenario videos (`lose_pollution`, `lose_complaint`). Animated Manhattan guide paths, HUD highlight on the pollution/strike pills, and an `⏭️ Auto-Step` button.
    - **Clickable `[▶]` Video Icons Above Every Feature Button**: Each feature button on the bottom toolbar (`Power`, `Water`, `Sewage`, `Eco Filter`, `Repair`, `Test Lab`, `Upgrades`, `Guide`) has a clickable `icon_video_help.png` (`[▶]`) sprite badge directly above it (`y = 626`). Clicking any `[▶]` icon opens an interactive 60 FPS looping video preview demonstrating how that feature works, with play/pause controls, scrubber bar, and a **`⚡ Use This Feature Now`** button to immediately activate it.
 
 ---
@@ -117,6 +117,10 @@ All buildings, houses, rivers, HUD bars, toolbar docks, buttons, and status badg
 
 ## 7. Changelog
 
+- **`v1.0.6.1` (2026-11-10)**:
+  - Wire reach 2.5× (`315px` → `790px`); wires longer than `315px` transport power/water/sewage slower (extra series hops), so tutorial houses are always wireable.
+  - Tutorial step 5: delete just one wire, pointed at by a red bouncing arrow from the moment the step starts; the wire is restored automatically.
+  - Fixed floating texts drawing on top of each other (new texts stack below nearby ones; duplicates are skipped).
 - **`v1.0.6.0` (2026-11-10)**:
   - New hand-drawn city maps `Tokyo.jpg`, `Rome.jpg`, `Amsterdam.jpg` (moved in from Downloads) + new `Bangkok.jpg` in the same style following the real Chao Phraya; they replace the river strips and grid background.
   - Water/shore gameplay now reads the map image (pump & filter placement, house spawning, river crossings, visual effects); scene buildings repositioned onto each map's shoreline.
