@@ -546,7 +546,7 @@
 
     DISASTERS: {
       EVERY_HOUSES: [4, 5], // a city disaster strikes every 4-5 new houses (never the same gap twice in a row)
-      HIGH_TIDE: { durationSeconds: 8.0, riversideBreakChance: 0.50 },
+      HIGH_TIDE: { durationSeconds: 2.0, riversideBreakChance: 0.50 },
       EARTHQUAKE: {},
       BLACKOUT: { durationSeconds: 8.0 },
       FLOOD: { maxDurationSecondsBeforeGameOver: 1.5 }

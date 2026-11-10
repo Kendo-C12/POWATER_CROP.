@@ -124,7 +124,7 @@
   "disasters": {
     "everyHouses": [4, 5],
     "highTide": {
-      "durationSeconds": 8.0,
+      "durationSeconds": 2.0,
       "riversideBreakChance": 0.5
     },
     "earthquake": {},
