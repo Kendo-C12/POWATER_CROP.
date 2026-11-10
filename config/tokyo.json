@@ -10,7 +10,7 @@
   "maxPollution": 7.0,
   "maxComplaints": 3,
   "winRequiredHouses": 15,
-  "winHoldDurationSeconds": 80.0,
+  "winHoldDurationSeconds": 0,
   "maxHousesCap": 40,
   "cleanEnergyDiscount": 0.25,
   "buildCostDiscount": 0.0,
@@ -33,5 +33,22 @@
       "speaker": "Amigo TheGOATHimself",
       "text": "ภารกิจ: สร้างเมืองที่ฟื้นตัวเร็วหลังแผ่นดินไหว ซ่อมอุปกรณ์ให้ไว และอย่าให้ประชาชนต้องรอนาน"
     }
+  ],
+  "houseSpawnPoints": [
+    [205, 424],
+    [253, 226],
+    [361, 178],
+    [103, 352],
+    [133, 238],
+    [169, 526],
+    [283, 340],
+    [271, 124],
+    [97, 454],
+    [151, 118],
+    [361, 70],
+    [55, 550],
+    [61, 172],
+    [61, 70],
+    [595, 118]
   ]
 }

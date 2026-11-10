@@ -28,7 +28,7 @@
       },
       "wasteFilter": {
         "cost": 40,
-        "capacityHouses": 12,
+        "capacityHouses": 15,
         "pollutionRatePerSec": 0.05,
         "canBreakDown": true
       },
@@ -85,10 +85,11 @@
     "protectingTimeSeconds": 120.0,
     "pollutionStartHouses": 5,
     "pollutionWinMarginSeconds": 20,
+    "pollutionMinSurviveSeconds": 60,
     "complaintStrikeTimerSeconds": 27.0,
     "defaultMaxComplaints": 3,
     "winRequiredHouses": 15,
-    "winHoldDurationSeconds": 80.0,
+    "winHoldDurationSeconds": 0,
     "houseCompleteInstantBonus": 50,
     "weeklyRevenuePerCompleteHouse": 40,
     "weeklyBaseMunicipalGrant": 40,

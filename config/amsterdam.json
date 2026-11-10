@@ -10,7 +10,7 @@
   "maxPollution": 6.0,
   "maxComplaints": 1,
   "winRequiredHouses": 15,
-  "winHoldDurationSeconds": 80.0,
+  "winHoldDurationSeconds": 0,
   "maxHousesCap": 40,
   "cleanEnergyDiscount": 0.05,
   "buildCostDiscount": 0.05,
@@ -33,5 +33,22 @@
       "speaker": "Amigo TheGOATHimself",
       "text": "ภารกิจสุดท้าย: ร้องเรียน 1 ครั้ง = จบเกม รับมือแผ่นดินไหว น้ำขึ้น และน้ำท่วม — พิสูจน์ว่าเมืองเติบโตไปพร้อมธรรมชาติได้"
     }
+  ],
+  "houseSpawnPoints": [
+    [785, 440],
+    [405, 420],
+    [715, 610],
+    [585, 610],
+    [385, 570],
+    [845, 570],
+    [445, 180],
+    [275, 460],
+    [305, 190],
+    [895, 450],
+    [245, 340],
+    [255, 610],
+    [985, 270],
+    [975, 610],
+    [145, 500]
   ]
 }

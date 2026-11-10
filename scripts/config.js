@@ -15,12 +15,13 @@
     STRIKE_TIMER_SECONDS: 27, // 27 seconds unsupplied = complaint
     GRACE_PERIOD_SECONDS: 120, // 2-minute Protecting Time / Grace Period
     POLLUTION_START_HOUSES: 5, // pollution starts once the city has this many houses
-    POLLUTION_WIN_MARGIN_SECONDS: 20, // maxPollution is sized so a minimal city loses with this much win hold left
+    POLLUTION_WIN_MARGIN_SECONDS: 20, // maxPollution is sized so a minimal city loses with this much time left to win...
+    POLLUTION_MIN_SURVIVE_SECONDS: 60, // ...but never before this many seconds of pollution
     POLLUTION_WARN_THRESHOLD: 0.8,
 
     // Win Condition (POWATER CORP.pdf: บ้าน > 15 หลังมีน้ำและไฟใช้ตลอดเวลาเป็นเวลา 5-7 นาที)
     WIN_REQUIRED_HOUSES: 15, // > 15 houses (15+ complete houses)
-    WIN_HOLD_DURATION_SECONDS: 80, // 1:20; counts only once pollution has started, pauses on Repair/Disaster, resets on Complaint
+    WIN_HOLD_DURATION_SECONDS: 0, // no minimum time: win as soon as the required houses are supplied (and nothing is broken)
 
     // Economy (POWATER CORP.pdf: ทำให้บ้าน complete - 50 ทันที, [จำนวน บ้านที่ complete]*40/ต่อสัปดาห์)
     HOUSE_COMPLETE_BONUS: 50, // Instant +50 when a house becomes complete for the first time
@@ -106,7 +107,7 @@
         thaiName: 'จุดปล่อยและกรองน้ำเสียริมแม่น้ำ',
         type: 'waste_filter',
         cost: 40,
-        capacity: 12,
+        capacity: 15,
         pollutionRate: 0.05,
         mustBeNearWater: true,
         canBreakDown: true,
@@ -261,7 +262,7 @@
         subtitle: 'บ้านที่ขาดไฟ/น้ำ/ท่อน้ำเสีย หรืออยู่ปลายสายพ่วงยาวๆ จะเติมไม่ทันและร้องเรียน',
         steps: [
           '1. ต่อพ่วงบ้านต่อกันยิ่งยาว ไฟและน้ำยิ่งไหลช้า (ตั้งแต่ทอดที่ 3 ลดลงทีละ 25%)',
-          '2. บ้านปลายสายเติมไม่ทัน แถบความไม่พอใจเต็ม = ร้องเรียน 1 Strike และ Win Timer รีเซ็ต',
+          '2. บ้านปลายสายเติมไม่ทัน แถบความไม่พอใจเต็ม = ร้องเรียน 1 Strike',
           '3. ครบ 3 Strike (Amsterdam 1) = Game Over! แก้: สร้างโรงไฟฟ้า/ปั๊ม/ถังบำบัดใกล้บ้านเพื่อตัดสายพ่วงให้สั้นลง'
         ],
         useAction: { type: 'action', value: 'startBangkok', label: '🚀 เข้าใจแล้ว เริ่มด่าน Bangkok' }
@@ -315,7 +316,7 @@
         title: '🎬 วิดีโอสาธิต: เครื่องมือซ่อมบำรุง (Repair Tool & Disasters)',
         subtitle: 'ระบบซ่อมแซมรายจุด: คลิกที่อุปกรณ์ที่เสียโดยตรง หรือกดปุ่ม REPAIR [R] เพื่อใช้เครื่องมือซ่อม',
         steps: [
-          '1. เมื่อเครื่องปั๊มหรือโรงปั่นไฟขัดข้อง จะขึ้นวงแหวนสีแดงและไอคอนประแจ (Win Timer จะหยุดชั่วคราว)',
+          '1. เมื่อเครื่องปั๊มหรือโรงปั่นไฟขัดข้อง จะขึ้นวงแหวนสีแดงและไอคอนประแจ (ชนะไม่ได้จนกว่าจะซ่อม)',
           '2. คลิกที่ตัวอาคารที่ชำรุดโดยตรง หรือกดปุ่ม REPAIR [R] เพื่อเข้าโหมดซ่อมแล้วคลิกซ่อมรายจุด',
           '3. เมื่อซ่อมแซมเสร็จสิ้น ระบบน้ำและไฟจะกลับมาจ่ายตามปกติและเวลาชนะจะเดินต่อ!'
         ],
@@ -356,10 +357,10 @@
       },
       guide: {
         id: 'guide',
-        title: '🎬 วิดีโอสาธิต: เงื่อนไขการชนะ 1:20 นาที (Win Timer) & โหมดฝึกสอน',
-        subtitle: 'ดูแลบ้าน > 15 หลังให้มีน้ำและไฟครบ 1:20 นาที (Pause เมื่อต้องซ่อม, Reset เมื่อถูกร้องเรียน)',
+        title: '🎬 วิดีโอสาธิต: เงื่อนไขการชนะ (จำนวนบ้าน) & โหมดฝึกสอน',
+        subtitle: 'ดูแลบ้าน > 15 หลังให้มีน้ำและไฟครบ = ชนะทันที (ห้ามมีอาคารเสีย เมื่อต้องซ่อม, Reset เมื่อถูกร้องเรียน)',
         steps: [
-          '1. เมื่อมีบ้านที่ได้รับน้ำและไฟมากกว่า 15 หลัง เวลาสะสมชัยชนะ (🏆 WIN: 01:20) จะเริ่มเดิน (หลังมลภาวะเริ่มนับแล้ว)',
+          '1. เมื่อมีบ้านที่ได้รับน้ำและไฟมากกว่า 15 หลัง เวลาสะสมชัยชนะ จะชนะด่านทันที (ถ้าไม่มีอาคารเสียอยู่)',
           '2. หากอุปกรณ์เสียหรือเกิดภัยพิบัติ เวลาจะหยุดรอ (PAUSED) แต่หากถูกร้องเรียน เวลาจะรีเซ็ตเป็น 00:00!',
           '3. คุณสามารถกดเริ่ม "โหมดฝึกสอนด่วน (Fast Scene Tutorial)" ได้จากหน้าต่างนี้ทุกเมื่อ!'
         ],
@@ -375,7 +376,7 @@
         name: '1. Bangkok, Thailand',
         thaiName: 'ด่าน 1: กรุงเทพมหานคร (Tutorial & High Tide)',
         cityChallenge: 'กรุงเทพมหานครเผชิญกับปัญหาน้ำท่วมและระดับน้ำที่เปลี่ยนแปลง',
-        briefing: 'ภารกิจของคุณ Amigo: บริหารจัดการระบบน้ำและพลังงานของกรุงเทพมหานคร เชื่อมต่อเครือข่าย Node ให้ประชาชนเข้าถึงสาธารณูปโภคอย่างทั่วถึง\nความท้าทายธรรมชาติ: ทุกๆ 15 วันในเกมจะเกิดน้ำขึ้น (High Tide) ส่งผลให้อุปกรณ์ริมแม่น้ำเจ้าพระยาชำรุดและต้องการการซ่อมแซมบ่อยขึ้น!\nเป้าหมายชนะ: ดูแลบ้าน > 15 หลังให้มีน้ำและไฟใช้ต่อเนื่อง 1:20 นาที!',
+        briefing: 'ภารกิจของคุณ Amigo: บริหารจัดการระบบน้ำและพลังงานของกรุงเทพมหานคร เชื่อมต่อเครือข่าย Node ให้ประชาชนเข้าถึงสาธารณูปโภคอย่างทั่วถึง\nความท้าทายธรรมชาติ: ทุกๆ 15 วันในเกมจะเกิดน้ำขึ้น (High Tide) ส่งผลให้อุปกรณ์ริมแม่น้ำเจ้าพระยาชำรุดและต้องการการซ่อมแซมบ่อยขึ้น!\nเป้าหมายชนะ: ดูแลบ้าน > 15 หลังให้มีน้ำและไฟใช้ครบ!',
         conditionPlus: 'ไม่มีเงื่อนไขลบ (ด่านเริ่มต้นและฝึกสอน Tutorial)',
         conditionMinus: 'Extreme Weather: น้ำขึ้นทุกๆ 15 วัน ทำให้อุปกรณ์ริมแม่น้ำเสียและต้องกดซ่อมบ่อยขึ้น',
         amigoQuote: 'ผมจะเชื่อมไฟ น้ำ และท่อน้ำเสียให้ครบทุกบ้าน บ้านที่สมบูรณ์ให้โบนัสทันที +$50 และรายได้รายสัปดาห์ +$40 แต่ต้องระวังน้ำขึ้นทุก 15 วัน!',
@@ -444,9 +445,9 @@
         name: '3. Rome, Italy',
         thaiName: 'ด่าน 3: โรม อิตาลี (Unlimited Aqueducts & Blackout)',
         cityChallenge: 'โรมต้องบริหารระบบสาธารณูปโภคที่มีข้อจำกัดด้านความต่อเนื่องของพลังงาน',
-        briefing: 'ภารกิจของคุณ Amigo: บริหารเมืองประวัติศาสตร์ที่มีระบบท่อส่งน้ำโรมันอันยอดเยี่ยม (ต่อท่อน้ำจากบ้านสู่บ้านได้ไม่จำกัด!)\nความท้าทายพลังงาน: โรมเผชิญกับข้อจำกัดความต่อเนื่องของพลังงาน มีโอกาสเกิดไฟดับครั้งใหญ่ (Blackout 12.5% ทุก 15 วัน) ส่งผลให้ไฟฟ้าขัดข้องชั่วคราวและ Win Timer หยุดเดิน!',
+        briefing: 'ภารกิจของคุณ Amigo: บริหารเมืองประวัติศาสตร์ที่มีระบบท่อส่งน้ำโรมันอันยอดเยี่ยม (ต่อท่อน้ำจากบ้านสู่บ้านได้ไม่จำกัด!)\nความท้าทายพลังงาน: โรมเผชิญกับข้อจำกัดความต่อเนื่องของพลังงาน มีโอกาสเกิดไฟดับครั้งใหญ่ (Blackout 12.5% ทุก 15 วัน) ส่งผลให้ไฟฟ้าขัดข้องชั่วคราวและชนะไม่ได้จนกว่าไฟจะกลับมา!',
         conditionPlus: '(+) ระบบท่อส่งน้ำโรมันชั้นเยี่ยม ต่อท่อน้ำจากบ้านต่อบ้านได้ไม่จำกัดความจุ',
-        conditionMinus: '(-) โอกาสไฟดับชั่วคราวทุก 15 วัน (12.5%) ส่งผลให้ไฟฟ้าดับและ Win Timer หยุดเดินชั่วคราว',
+        conditionMinus: '(-) โอกาสไฟดับชั่วคราวทุก 15 วัน (12.5%) ส่งผลให้ไฟฟ้าดับและชนะไม่ได้ชั่วคราว',
         amigoQuote: 'Benvenuti a Roma! ท่อส่งน้ำโรมันโบราณยังทรงพลัง แต่ไฟฟ้ามักขัดข้อง ผมต้องวางโครงข่ายให้พร้อมรับไฟดับชั่วคราว',
         riverName: 'Tiber River (แม่น้ำไทเบอร์)',
         leftSideLabel: 'Trastevere & Vatican',
@@ -572,6 +573,7 @@
     if (typeof override.buildCostDiscount === 'number') targetLvl.buildCostDiscount = override.buildCostDiscount;
     if (typeof override.unlimitedWaterChain === 'boolean') targetLvl.unlimitedWaterChain = override.unlimitedWaterChain;
     if (Array.isArray(override.cutscene)) targetLvl.cutscene = override.cutscene;
+    if (Array.isArray(override.houseSpawnPoints)) targetLvl.houseSpawnPoints = override.houseSpawnPoints;
     if (typeof override.hasHighTide === 'boolean') targetLvl.hasHighTide = override.hasHighTide;
     if (typeof override.hasEarthquake === 'boolean') targetLvl.hasEarthquake = override.hasEarthquake;
     if (typeof override.hasBlackout === 'boolean') targetLvl.hasBlackout = override.hasBlackout;
@@ -611,6 +613,7 @@
       if (typeof gr.protectingTimeSeconds === 'number') CONFIG.GRACE_PERIOD_SECONDS = gr.protectingTimeSeconds;
       if (typeof gr.pollutionStartHouses === 'number') CONFIG.POLLUTION_START_HOUSES = gr.pollutionStartHouses;
       if (typeof gr.pollutionWinMarginSeconds === 'number') CONFIG.POLLUTION_WIN_MARGIN_SECONDS = gr.pollutionWinMarginSeconds;
+      if (typeof gr.pollutionMinSurviveSeconds === 'number') CONFIG.POLLUTION_MIN_SURVIVE_SECONDS = gr.pollutionMinSurviveSeconds;
       if (typeof gr.complaintStrikeTimerSeconds === 'number') CONFIG.STRIKE_TIMER_SECONDS = gr.complaintStrikeTimerSeconds;
       if (typeof gr.defaultMaxComplaints === 'number') CONFIG.MAX_COMPLAINTS = gr.defaultMaxComplaints;
       if (typeof gr.winRequiredHouses === 'number') CONFIG.WIN_REQUIRED_HOUSES = gr.winRequiredHouses;

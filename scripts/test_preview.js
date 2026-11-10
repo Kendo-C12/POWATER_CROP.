@@ -298,7 +298,7 @@ async function runTest() {
     return { idle, wired, all, speeds, eta1: Math.round(eta1), eta4: Math.round(eta4) };
   });
   console.log('8b. All-connected spawn boost / speed / ETA:', boost);
-  if (!boost.all || boost.wired < boost.idle * 3 || boost.speeds.join() !== '2,4,1' || boost.eta1 < 80 || Math.abs(boost.eta4 * 4 - boost.eta1) > 4) {
+  if (!boost.all || boost.wired < boost.idle * 3 || boost.speeds.join() !== '2,4,1' || boost.eta1 <= 0 || Math.abs(boost.eta4 * 4 - boost.eta1) > 4) {
     throw new Error('Spawn speedup / 4x speed / win ETA check failed!');
   }
   await page.evaluate(() => window.POWATER.game.startLevel(0));
@@ -313,7 +313,7 @@ async function runTest() {
     return { before, after, hold: g.winTargetDuration };
   });
   console.log('8c. Pollution start / win hold:', pol);
-  if (pol.before.active || pol.before.n >= 5 || !pol.after.active || pol.hold !== 80) throw new Error('Pollution start at 5 houses / 80s hold check failed!');
+  if (pol.before.active || pol.before.n >= 5 || !pol.after.active || pol.hold !== 0) throw new Error('Pollution start at 5 houses / no win hold check failed!');
   await page.evaluate(() => window.POWATER.game.startLevel(0));
 
   // 8d. maxPollution is sized so a minimal city (all drained, 1 generator, filters as needed) loses with 20s of hold left
@@ -334,10 +334,23 @@ async function runTest() {
       if (g.pollution >= lvl.maxPollution) hitAt = t;
     }
     g.houses = realH; g.buildings = realB; g.pollution = 0;
-    return { max: lvl.maxPollution, holdLeft: Math.round(((req - s) * step + g.winTargetDuration - hitAt) * 10) / 10, polluted: Math.round(hitAt) };
+    return { max: lvl.maxPollution, reach15: (req - s) * step, polluted: Math.round(hitAt * 10) / 10 };
   });
   console.log('8d. Minimal-city pollution budget:', minimal);
-  if (Math.abs(minimal.holdLeft - 20) > 0.5 || minimal.polluted < 60) throw new Error('maxPollution budget check failed!');
+  // no win hold: a minimal city reaches 15 houses (and wins) well before the limit, which lasts >= 60s of pollution
+  if (minimal.polluted < 59.5 || minimal.polluted < minimal.reach15) throw new Error('maxPollution budget check failed!');
+
+  // 8f. Fixed house layout: houses appear at config/<city>.json houseSpawnPoints in order
+  const layout = await page.evaluate(() => {
+    const g = window.POWATER.game;
+    g.startLevel(0);
+    while (g.houses.length < 15 && g.spawnHouse()) {}
+    const pts = g.currentLevel.houseSpawnPoints || [];
+    return { n: pts.length, houses: g.houses.length, match: g.houses.every((h, i) => Math.abs(h.getCenter().x - pts[i][0]) < 1 && Math.abs(h.getCenter().y - pts[i][1]) < 1) };
+  });
+  console.log('8f. Fixed house layout:', layout);
+  if (layout.n !== 15 || layout.houses !== 15 || !layout.match) throw new Error('Fixed house layout check failed!');
+  await page.evaluate(() => window.POWATER.game.startLevel(0));
   await page.evaluate(() => window.POWATER.game.startLevel(0));
 
   // 8e. Eco Filter 5s cooldown; money restarts per level while upgrades carry over

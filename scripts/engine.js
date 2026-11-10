@@ -37,7 +37,7 @@
 
       // Win Condition State (POWATER CORP.pdf: >15 houses for 5-7 minutes)
       this.winHoldTimer = 0.0;
-      this.winTargetDuration = CONFIG.WIN_HOLD_DURATION_SECONDS || 300;
+      this.winTargetDuration = CONFIG.WIN_HOLD_DURATION_SECONDS ?? 0;
       this.winRequiredHouses = CONFIG.WIN_REQUIRED_HOUSES || 15;
       this.winTimerState = 'WAITING'; // 'WAITING' | 'RUNNING' | 'PAUSED'
 
@@ -148,7 +148,7 @@
       const missing = Math.max(0, req - this.houses.length);
       const boost = this.allConnectedBoost ? (CONFIG.ALL_CONNECTED_SPAWN_SPEEDUP || 4) : 1;
       const spawnWait = missing > 0 ? Math.max(0, missing * interval - this.spawnTimer) / boost : 0;
-      const hold = Math.max(0, (this.winTargetDuration || 300) - (this.winHoldTimer || 0));
+      const hold = Math.max(0, (this.winTargetDuration ?? 0) - (this.winHoldTimer || 0));
       return (spawnWait + hold) / (this.gameSpeed || 1);
     }
 
@@ -202,7 +202,7 @@
       }
       const lvl = this.currentLevel || {};
       this.maxComplaints = lvl.maxComplaints || CONFIG.MAX_COMPLAINTS || 3;
-      this.winTargetDuration = lvl.winHoldDurationSeconds || CONFIG.WIN_HOLD_DURATION_SECONDS || 300;
+      this.winTargetDuration = lvl.winHoldDurationSeconds ?? CONFIG.WIN_HOLD_DURATION_SECONDS ?? 0;
       this.winRequiredHouses = lvl.winRequiredHouses || CONFIG.WIN_REQUIRED_HOUSES || 15;
       this.maxHousesCap = lvl.maxHousesCap || CONFIG.MAX_HOUSES_CAP || 40;
       this.dayDuration = CONFIG.DAY_DURATION_IN_GAME_SECONDS || 15.0;
@@ -232,7 +232,7 @@
 
       // Win Timer reset (supports per-stage overrides from stage_config.json)
       this.winHoldTimer = 0.0;
-      this.winTargetDuration = this.currentLevel.winHoldDurationSeconds || CONFIG.WIN_HOLD_DURATION_SECONDS || 300;
+      this.winTargetDuration = this.currentLevel.winHoldDurationSeconds ?? CONFIG.WIN_HOLD_DURATION_SECONDS ?? 0;
       this.winRequiredHouses = this.currentLevel.winRequiredHouses || CONFIG.WIN_REQUIRED_HOUSES || 15;
       this.maxHousesCap = this.currentLevel.maxHousesCap || CONFIG.MAX_HOUSES_CAP || 40;
       this.dayDuration = CONFIG.DAY_DURATION_IN_GAME_SECONDS || 15.0;
@@ -522,7 +522,16 @@
         }
       }
 
-      if (!foundAny) {
+      // Remember each scene's own starting buildings: a restart in the same scene (Retry) has deleted the
+      // scene objects, so rebuild from this instead of falling back to the Bangkok spots
+      this.sceneStartLayouts = this.sceneStartLayouts || new Map();
+      if (foundAny && this.runtimeScene) {
+        this.sceneStartLayouts.set(this.runtimeScene, this.buildings.map(b => ({ key: b.config.type === 'generator' ? 'generator_coal' : b.config.type, ...b.getCenter() })));
+      }
+      const remembered = !foundAny && this.sceneStartLayouts.get(this.runtimeScene);
+      if (remembered) {
+        remembered.forEach(s => this.createBuilding(s.key, s.x, s.y));
+      } else if (!foundAny) {
         // Same spots as the Bangkok scene layout (on the Chao Phraya shore of assets/Bangkok.jpg)
         this.createBuilding('water_pump', 590, 280);
         this.createBuilding('waste_filter', 710, 360);
@@ -573,6 +582,15 @@
 
       let x = forceX;
       let y = forceY;
+
+      // Fixed layout: the first houses of each city (config/<city>.json -> houseSpawnPoints) always appear
+      // at the same designed spots, in order; random spawning takes over after the list
+      const fixed = (x === null && !this.isTutorialMode && this.currentLevel && this.currentLevel.houseSpawnPoints || [])[this.houses.length];
+      if (fixed) {
+        x = fixed[0];
+        y = fixed[1];
+        side = x < this.map.getRiverCenterAtY(y) ? 'left' : 'right';
+      }
 
       if (x === null || y === null) {
         // As Map Upsizes (tiers 0..3), allow tighter urban packing so up to 40 houses fit cleanly
@@ -1272,8 +1290,8 @@
       });
     }
 
-    // Pollution limit = everything a minimal winning city emits from pollution start until only
-    // POLLUTION_WIN_MARGIN_SECONDS of the win hold are left, so the bare minimum just survives that long.
+    // Pollution limit = everything a minimal winning city emits from pollution start until
+    // POLLUTION_WIN_MARGIN_SECONDS before it can win, but over at least POLLUTION_MIN_SURVIVE_SECONDS.
     // Minimal city: starting coal generator, ceil(required / filter capacity) waste filters, starting air
     // filters, every house drained; houses grow start..required at the all-connected spawn speed.
     computeMaxPollution() {
@@ -1289,12 +1307,13 @@
       const air = count(b => b.config.type === 'air_filter');
       const s = Math.min(req, CONFIG.POLLUTION_START_HOUSES || 5);
       const spawnStep = (lvl.spawnInterval || 18000) / 1000 / (CONFIG.ALL_CONNECTED_SPAWN_SPEEDUP || 4);
-      const tHold = Math.max(0, this.winTargetDuration - (CONFIG.POLLUTION_WIN_MARGIN_SECONDS || 20));
+      const tSpawn = (req - s) * spawnStep;
+      const horizon = Math.max(tSpawn + (this.winTargetDuration || 0) - (CONFIG.POLLUTION_WIN_MARGIN_SECONDS || 20), CONFIG.POLLUTION_MIN_SURVIVE_SECONDS || 60);
       // Emission per second with n drained houses (one more waste filter every `cap` houses)
       const rate = (n) => k * (gens * R.ELECTRIC_GENERATOR + Math.ceil(n / cap) * R.WASTEWATER_OUTLET_BASE + n * R.WASTEWATER_DISCHARGE_PER_HOUSE)
         - air * R.AIR_FILTER_REDUCTION - R.NATURAL_DILUTION;
-      let total = rate(req) * tHold; // holding with every required house
-      for (let n = s; n < req; n++) total += rate(n) * spawnStep; // growing from s to req houses
+      let total = rate(req) * Math.max(0, horizon - tSpawn); // all required houses for the rest of the horizon
+      for (let n = s; n < req; n++) total += rate(n) * Math.min(spawnStep, Math.max(0, horizon - (n - s) * spawnStep)); // growing s..req
       return Math.round(Math.max(lvl.baseMaxPollution, total) * 10) / 10;
     }
 

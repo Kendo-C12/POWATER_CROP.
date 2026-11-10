@@ -10,7 +10,7 @@
   "maxPollution": 5.5,
   "maxComplaints": 3,
   "winRequiredHouses": 15,
-  "winHoldDurationSeconds": 80.0,
+  "winHoldDurationSeconds": 0,
   "maxHousesCap": 40,
   "cleanEnergyDiscount": 0.0,
   "buildCostDiscount": 0.0,
@@ -31,7 +31,24 @@
     },
     {
       "speaker": "Amigo TheGOATHimself",
-      "text": "ภารกิจ: รับมือไฟดับในโรม — ระหว่างไฟดับ Win Timer จะหยุด จงวางระบบให้ฟื้นกลับมาเร็วที่สุด"
+      "text": "ภารกิจ: รับมือไฟดับในโรม — ระหว่างไฟดับจะชนะไม่ได้ จงวางระบบให้ฟื้นกลับมาเร็วที่สุด"
     }
+  ],
+  "houseSpawnPoints": [
+    [775, 310],
+    [485, 330],
+    [845, 180],
+    [695, 450],
+    [405, 220],
+    [565, 440],
+    [845, 440],
+    [925, 310],
+    [425, 470],
+    [625, 580],
+    [295, 90],
+    [975, 110],
+    [775, 580],
+    [495, 580],
+    [235, 360]
   ]
 }

@@ -137,6 +137,41 @@ def generate_amigo():
     print('Generated assets/amigo.png', img.size)
 
 
+def generate_logo(path=None, size=256):
+    """POWATER logo, dark variant: blue water drop split by a lightning bolt on a dark rounded square.
+    Coordinates are in a 500x500 design box (traced from the team's logo sheet)."""
+    S = 4 * size / 500  # supersampled scale
+    big = int(500 * S)
+    img = Image.new('RGBA', (big, big), (0, 0, 0, 0))
+    d = ImageDraw.Draw(img)
+    P = lambda pts: [(x * S, y * S) for x, y in pts]
+    BG, BLUE = (38, 38, 38, 255), (37, 99, 235, 255)
+
+    def bez(p0, p1, p2, n=24):
+        return [((1 - t) ** 2 * p0[0] + 2 * (1 - t) * t * p1[0] + t * t * p2[0],
+                 (1 - t) ** 2 * p0[1] + 2 * (1 - t) * t * p1[1] + t * t * p2[1]) for t in (i / n for i in range(n + 1))]
+
+    # Reference sheet coords (square 30..480 x 40..495) mapped into the 10..490 design square
+    M = lambda pts: [((x - 30) * 480 / 450 + 10, (y - 40) * 480 / 455 + 10) for x, y in pts]
+    d.rounded_rectangle([10 * S, 10 * S, 490 * S, 490 * S], radius=70 * S, fill=BG)
+    # Drop body + slim curved tip sweeping to the upper right
+    (cx, cy), = M([(239, 312)])
+    r = 136 * 480 / 450
+    d.ellipse([(cx - r) * S, (cy - r) * S, (cx + r) * S, (cy + r) * S], fill=BLUE)
+    d.polygon(P(M(bez((196, 182), (270, 118), (384, 88)) + bez((384, 88), (352, 120), (336, 190)) + [(300, 240)])), fill=BLUE)
+    # Lightning bolt cut out of the drop (background colour shows through)
+    d.polygon(P(M([(186, 181), (338, 192), (268, 252), (331, 261), (172, 424), (213, 265), (150, 258)])), fill=BG)
+    img = img.resize((size, size), Image.LANCZOS)
+    path = path or os.path.join(ASSETS, 'logo_powater.png')
+    img.save(path)
+    print('Generated', path, img.size)
+
+
 if __name__ == '__main__':
-    generate_bangkok()
-    generate_amigo()
+    import sys
+    if 'logo' in sys.argv:
+        generate_logo(*(sys.argv[2:3]))
+    else:
+        generate_bangkok()
+        generate_amigo()
+        generate_logo()
