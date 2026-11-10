@@ -140,7 +140,7 @@
 
     // Longest wire the player may drag right now (hard mode drops the 2.5x slow reach)
     maxWireLength() {
-      return this.hardMode ? (CONFIG.FAST_WIRE_LENGTH || 315) : (CONFIG.MAX_WIRE_LENGTH || 790);
+      return (this.hardMode && !this.isTutorialMode) ? (CONFIG.FAST_WIRE_LENGTH || 315) : (CONFIG.MAX_WIRE_LENGTH || 790);
     }
 
     selectTool(toolId) {
@@ -417,26 +417,29 @@
         sfx('playUpgrade');
       } else if (this.tutorialStep === 6 && (!h2 || full(h2))) {
         next();
+        this.activeTool = 'water';
+        say('🐢 บ้านหลังที่ 3 น้ำไหลไม่พอ (พ่วง 3 ทอด)! แก้: ลากท่อน้ำจากปั๊มน้ำ (ต้นน้ำ) ไปที่บ้านหลังที่ 3 โดยตรง', '#ffb703');
+        sfx('playPollutionWarn');
+      } else if (this.tutorialStep === 7 && (!h2 || (h2.hasWater && !(h2.slowTypes || []).includes('water')))) {
+        next();
         this.activeTool = 'repair';
         if (pump) pump.breakDown();
-        say(h2 && h2.flowDeficit > 0
-          ? `🐢 บ้านปลายสายได้แค่ ${Math.round((1 - h2.flowDeficit) * 100)}% เพราะพ่วงยาว! ต่อไป: ปั๊มน้ำเสีย คลิกที่ปั๊มเพื่อซ่อม`
-          : '✅ ต่อสำเร็จ! ต่อไป: ปั๊มน้ำเสีย คลิกที่ปั๊ม หรือกด REPAIR [R] แล้วคลิกปั๊มเพื่อซ่อม', '#ff5a5f');
-        sfx('playPollutionWarn');
-      } else if (this.tutorialStep === 7 && pump && !pump.isBroken) {
+        say('✅ น้ำไหลเต็มแล้ว! ต่อตรงจากต้นทาง = เร็วกว่าพ่วงยาว ต่อไป: ปั๊มน้ำเสีย คลิกที่ปั๊มเพื่อซ่อม', '#06d6a0');
+        sfx('playUpgrade');
+      } else if (this.tutorialStep === 8 && pump && !pump.isBroken) {
         next();
         this.activeTool = 'build_air_filter';
         this.tutorialFilterCount = this.buildings.filter(b => b.config.type === 'air_filter').length;
         this.pollution = this.currentLevel.maxPollution * 0.8;
         say('☢️ วิธีแพ้ที่ 1: มลภาวะเต็มหลอด = Game Over! วางเครื่องกรองอากาศ [4] เพื่อลดมลภาวะ', '#ff5a5f');
         sfx('playPollutionWarn');
-      } else if (this.tutorialStep === 8 && this.buildings.filter(b => b.config.type === 'air_filter').length > (this.tutorialFilterCount || 0)) {
+      } else if (this.tutorialStep === 9 && this.buildings.filter(b => b.config.type === 'air_filter').length > (this.tutorialFilterCount || 0)) {
         next();
         this.activeTool = null;
         say('✅ เครื่องกรองกำลังลดมลภาวะ! ต่อไป วิธีแพ้ที่ 2: การร้องเรียน (Strike)', '#06d6a0');
         sfx('playUpgrade');
       }
-      // Step 9 is read-only: the player confirms with the coach-bar button (skipTutorialStep)
+      // Step 10 is read-only: the player confirms with the coach-bar button (skipTutorialStep)
     }
 
     skipTutorialStep() {
@@ -460,15 +463,17 @@
         this.connections = this.connections.filter(x => x !== this.tutorialTargetWire);
       } else if (this.tutorialStep === 6 && h1 && h2) {
         link3(h1, h2);
-      } else if (this.tutorialStep === 7) {
+      } else if (this.tutorialStep === 7 && pump && h2) {
+        this.connectNodes('water', pump, h2);
+      } else if (this.tutorialStep === 8) {
         const broken = this.buildings.find(b => b.isBroken);
         if (broken) broken.repair();
-      } else if (this.tutorialStep === 8) {
+      } else if (this.tutorialStep === 9) {
         const spot = h0 && this.findTutorialSpot(h0);
         if (spot) this.createBuilding('air_filter', spot.x, spot.y);
         else this.tutorialFilterCount = -1;
-      } else if (this.tutorialStep === 9) {
-        this.tutorialStep = 10;
+      } else if (this.tutorialStep === 10) {
+        this.tutorialStep = 11;
         this.pollution = 0;
         this.addFloatingText('🎉 ฝึกสอนครบทุกขั้นตอน! ดูตัวอย่างการแพ้ 2 แบบ', CONFIG.CANVAS_WIDTH / 2, 150, '#06d6a0');
         if (global.POWATER.soundManager) global.POWATER.soundManager.playWin();
@@ -1503,6 +1508,11 @@
 
     connectNodes(type, nodeA, nodeB) {
       if (!nodeA || !nodeB || nodeA.id === nodeB.id) return false;
+      const h3 = this.tutorialHouse3;
+      if (this.isTutorialMode && this.tutorialStep === 6 && h3 && (nodeA === h3 || nodeB === h3) && (nodeA.config || nodeB.config)) {
+        this.addFloatingText('ขั้นนี้ให้พ่วงจากบ้านหลังที่ 2 ก่อน (ลองดูว่าน้ำไหลไม่พอ)', h3.getCenter().x, h3.getCenter().y - 50, '#ffb703');
+        return false;
+      }
 
       if ((nodeA.config && nodeA.config.type === 'air_filter') || (nodeB.config && nodeB.config.type === 'air_filter')) {
         this.addFloatingText('เครื่องกรองมลภาวะทำงานอัตโนมัติ ไม่ต้องต่อสาย!', (nodeA.getCenter().x + nodeB.getCenter().x) / 2, (nodeA.getCenter().y + nodeB.getCenter().y) / 2 - 20, '#2ec4b6');

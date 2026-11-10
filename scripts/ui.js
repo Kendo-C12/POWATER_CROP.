@@ -441,20 +441,21 @@
       g.endFill();
 
       const msgs = {
-        1: '🎓 1/9: ลากสายไฟ (สีเหลือง) จาก โรงปั่นไฟ ไปยัง บ้าน — วงในสีเขียว = ส่งเต็มเร็ว, สีเหลือง = สายยาวส่งช้าลง, สีแดง = ยาวเกิน',
-        2: '🎓 2/9: ลากท่อน้ำดี (สีฟ้า) จาก ปั๊มน้ำริมแม่น้ำ ไปยัง บ้าน — กด Tab เพื่อสลับชนิดสาย',
-        3: '🎓 3/9: ลากท่อน้ำเสีย (สีม่วง) จาก บ้าน ไปยัง ถังบำบัดริมแม่น้ำ รับโบนัส +$50',
-        4: '🎓 4/9: บ้านพ่วงต่อกันได้! ลากจาก บ้านเดิม ไป บ้านใหม่ ให้ครบ ไฟ/น้ำ/น้ำเสีย (สายยาวเกินวงในสีเขียว = ส่งช้าลง)',
-        5: '🎓 5/9: ลบสาย 1 เส้น: คลิกที่สายตามลูกศรสีแดง (หรือคลิกขวาที่สาย) — อาคารรื้อถอนไม่ได้',
-        6: '🐢 6/9: พ่วงบ้านหลังที่ 3 ต่อจากหลังที่ 2 — ยิ่งพ่วงยาวยิ่งไหลช้า: ไอคอนบนบ้านเป็นสีจางกะพริบ = ไฟ/น้ำ/น้ำเสียไหลไม่พอ บ้านจะร้องเรียน',
-        7: '🎓 7/9: ปั๊มน้ำเสีย (ประแจแดง)! คลิกที่ปั๊ม หรือกด REPAIR [R] แล้วคลิกปั๊มเพื่อซ่อม',
-        8: '☢️ 8/9 วิธีแพ้ที่ 1 — มลภาวะ: ค่า ☢️ ด้านบนเต็มขีดจำกัด = Game Over! (โรงไฟฟ้าและน้ำเสียเพิ่มมลภาวะ) วางเครื่องกรองอากาศ [4] เพื่อลด',
-        9: '⚠️ 9/9 วิธีแพ้ที่ 2 — ร้องเรียน: บ้านขาดไฟ/น้ำ/ท่อน้ำเสีย หรือพ่วงยาวจนเติมไม่ทัน จะร้องเรียน 1 Strike — ครบ 3 Strike = Game Over'
+        1: '🎓 1/10: ลากสายไฟ (สีเหลือง) จาก โรงปั่นไฟ ไปยัง บ้าน — วงในสีเขียว = ส่งเต็มเร็ว, สีเหลือง = สายยาวส่งช้าลง, สีแดง = ยาวเกิน',
+        2: '🎓 2/10: ลากท่อน้ำดี (สีฟ้า) จาก ปั๊มน้ำริมแม่น้ำ ไปยัง บ้าน — กด Tab เพื่อสลับชนิดสาย',
+        3: '🎓 3/10: ลากท่อน้ำเสีย (สีม่วง) จาก บ้าน ไปยัง ถังบำบัดริมแม่น้ำ รับโบนัส +$50',
+        4: '🎓 4/10: บ้านพ่วงต่อกันได้! ลากจาก บ้านเดิม ไป บ้านใหม่ ให้ครบ ไฟ/น้ำ/น้ำเสีย (สายยาวเกินวงในสีเขียว = ส่งช้าลง)',
+        5: '🎓 5/10: ลบสาย 1 เส้น: คลิกที่สายตามลูกศรสีแดง (หรือคลิกขวาที่สาย) — อาคารรื้อถอนไม่ได้',
+        6: '🐢 6/10: พ่วงบ้านหลังที่ 3 ต่อจากหลังที่ 2 — ยิ่งพ่วงยาวยิ่งไหลช้า: ไอคอนบนบ้านเป็นสีจางกะพริบ = ไฟ/น้ำ/น้ำเสียไหลไม่พอ บ้านจะร้องเรียน',
+        7: '💧 7/10: แก้น้ำไหลไม่พอ: ลากท่อน้ำจากปั๊มน้ำ (ต้นน้ำ) ไปที่บ้านหลังที่ 3 โดยตรง — บ้านต่อได้ 2 ทาง ทางที่สั้นกว่าชนะ',
+        8: '🎓 8/10: ปั๊มน้ำเสีย (ประแจแดง)! คลิกที่ปั๊ม หรือกด REPAIR [R] แล้วคลิกปั๊มเพื่อซ่อม',
+        9: '☢️ 9/10 วิธีแพ้ที่ 1 — มลภาวะ: ค่า ☢️ ด้านบนเต็มขีดจำกัด = Game Over! (โรงไฟฟ้าและน้ำเสียเพิ่มมลภาวะ) วางเครื่องกรองอากาศ [4] เพื่อลด',
+        10: '⚠️ 10/10 วิธีแพ้ที่ 2 — ร้องเรียน: บ้านขาดไฟ/น้ำ/ท่อน้ำเสีย หรือพ่วงยาวจนเติมไม่ทัน จะร้องเรียน 1 Strike — ครบ 3 Strike = Game Over'
       };
       const stepMsg = (msgs[step] || '🎉 ฝึกสอนสำเร็จครบ 100%! คลิก [▶] เหนือปุ่มเพื่อดูวิดีโอฟีเจอร์ หรือเริ่มด่าน Bangkok ได้เลย!');
 
       // Point at the HUD pill the lose-condition steps talk about
-      const hl = step === 8 ? [660, 6, 172, 32] : (step === 9 ? [1056, 6, 214, 32] : null);
+      const hl = step === 9 ? [660, 6, 172, 32] : (step === 10 ? [1056, 6, 214, 32] : null);
       if (hl) {
         g.lineStyle(3, 0xff5a5f, 0.6 + 0.4 * Math.sin(Date.now() / 150));
         g.drawRoundedRect(hl[0] - 3, hl[1] - 2, hl[2] + 6, hl[3] + 4, 9);
@@ -468,7 +469,7 @@
       this.tutorialUIContainer.addChild(txt);
 
       // Auto-complete current step button (steps 1..9; step 9 is the "got it" confirm)
-      if (step >= 1 && step <= 9) {
+      if (step >= 1 && step <= 10) {
         const autoBtn = { id: 'tut_auto_step', x: barX + barW - 275, y: barY + 6, w: 125, h: 32 };
         this.tutorialButtons.push(autoBtn);
         const isHov = (mouseX >= autoBtn.x && mouseX <= autoBtn.x + autoBtn.w && mouseY >= autoBtn.y && mouseY <= autoBtn.y + autoBtn.h);
@@ -477,7 +478,7 @@
         g.drawRoundedRect(autoBtn.x, autoBtn.y, autoBtn.w, autoBtn.h, 6);
         g.endFill();
 
-        const autoTxt = this.makeText(step === 9 ? '✅ เข้าใจแล้ว' : '⏭️ ทำขั้นตอนนี้ให้', {
+        const autoTxt = this.makeText(step === 10 ? '✅ เข้าใจแล้ว' : '⏭️ ทำขั้นตอนนี้ให้', {
           fontFamily: font, fontSize: 11, fontWeight: 'bold', fill: isHov ? 0x120d24 : 0xffd166
         }, 'tutorial');
         autoTxt.anchor.set(0.5);
@@ -749,7 +750,7 @@
       const s = gm.tutorialStep;
       const h = s === 4 ? gm.tutorialHouse2 : s === 6 ? gm.tutorialHouse3 : null;
       if (h) return !h.hasPower ? 'power' : !h.hasWater ? 'water' : 'sewage'; // chaining: next missing utility
-      return { 1: 'power', 2: 'water', 3: 'sewage', 5: 'delete', 7: 'repair', 8: 'air_filter' }[s] || null;
+      return { 1: 'power', 2: 'water', 3: 'sewage', 5: 'delete', 7: 'water', 8: 'repair', 9: 'air_filter' }[s] || null;
     }
 
     // --- MODALS ---
@@ -773,6 +774,7 @@
         ['chain', 'บ้านใหม่อยู่ไกลอาคาร: ลากสายพ่วงจากบ้านเดิมไปบ้านใหม่'],
         ['delete_wire', 'ลบสาย: คลิกที่สาย (หรือคลิกขวา) — อาคารรื้อถอนไม่ได้'],
         ['chain_slow', 'พ่วงยาวเกินไป ไอคอนจางกะพริบ = ไฟ/น้ำ/น้ำเสียไหลไม่พอ บ้านจะร้องเรียน'],
+        ['chain_fix', 'แก้: ลากท่อจากต้นน้ำ (ปั๊มน้ำ) ไปที่บ้านปลายสายโดยตรง ต่อได้ 2 ทาง = ไหลเต็ม'],
         ['repair', 'อาคารเสีย (ประแจแดง): คลิกที่อาคาร หรือกด REPAIR [R] แล้วคลิกเพื่อซ่อม'],
         ['air_filter', 'วิธีแพ้ที่ 1 — มลพิษเต็มหลอด: วางเครื่องกรองอากาศ [4] เพื่อลด'],
         ['lose_complaint', 'วิธีแพ้ที่ 2 — ร้องเรียน: บ้านขาดไฟ/น้ำ/น้ำเสียนานเกินไป ครบ 3 Strike = แพ้']
@@ -1305,9 +1307,9 @@
 
         drawCursor(curEnd.x, curEnd.y, t >= 0.1 && t <= 0.58);
       }
-      else if (vKey === 'chain' || vKey === 'delete_wire' || vKey === 'chain_slow') {
+      else if (vKey === 'chain' || vKey === 'delete_wire' || vKey === 'chain_slow' || vKey === 'chain_fix') {
         const y = vy + 105;
-        const xs = vKey === 'chain_slow' ? [vx + 70, vx + 200, vx + 330, vx + 460] : [vx + 90, vx + 260, vx + 430];
+        const xs = (vKey === 'chain_slow' || vKey === 'chain_fix') ? [vx + 70, vx + 200, vx + 330, vx + 460] : [vx + 90, vx + 260, vx + 430];
         addSprite('Power.png', xs[0], y, 46, 46);
         xs.slice(1).forEach(x => addSprite('House.png', x, y, 70, 46));
         const wire = (a, b, alpha = 1) => { g.lineStyle(5, 0xffd166, alpha); g.moveTo(a, y); g.lineTo(b, y); };
@@ -1327,6 +1329,23 @@
           else addLabel('🗑️ ลบสายไฟแล้ว', mid, y - 22, 0x90e0ef, 12);
           drawCursor(t < 0.3 ? mid - 60 + t * 200 : mid, y, t >= 0.4 && t < 0.5);
           addLabel('คลิกที่สาย (หรือคลิกขวา) เพื่อลบ', vx + vw / 2, vy + 24, 0xadb5bd, 12);
+        } else if (vKey === 'chain_fix') {
+          for (let i = 0; i < 3; i++) wire(xs[i] + 30, xs[i + 1] - 34);
+          // drag a pipe from the source over the top, straight to the last house
+          const p = Math.max(0, Math.min(1, (t - 0.2) / 0.4));
+          const top = y - 62;
+          const path = (k) => k < 0.2 ? [xs[0], y - 26 - (k / 0.2) * (36)] : k < 0.8 ? [xs[0] + (xs[3] - xs[0]) * ((k - 0.2) / 0.6), top] : [xs[3], top + ((k - 0.8) / 0.2) * 36];
+          g.lineStyle(5, 0x00b4d8, t >= 0.6 ? 1 : 0.75);
+          g.moveTo(xs[0], y - 26);
+          for (let k = 0.05; k <= (t >= 0.6 ? 1 : p) + 1e-9; k += 0.05) { const q = path(k); g.lineTo(q[0], q[1]); }
+          if (t < 0.6) { const q = path(p); drawCursor(q[0], q[1], t >= 0.2); }
+          const ok = t >= 0.6;
+          [['badge_power.png', -14], ['badge_water.png', 14]].forEach(([img, dx]) => {
+            const sp = addSprite(img, xs[3] + dx, y - 38, 22, 22);
+            if (sp) sp.alpha = ok ? 1 : 0.35 + 0.35 * Math.abs(Math.sin(t * 20));
+          });
+          addLabel(ok ? '✅ น้ำไหลเต็มแล้ว' : '🐢 น้ำไหลไม่พอ', xs[3], y + 42, ok ? 0x06d6a0 : 0xffb703, 11);
+          addLabel('ลากจากต้นน้ำมาที่บ้านโดยตรง (ต่อได้ 2 ทาง)', vx + vw / 2, vy + 24, 0x00b4d8, 12);
         } else {
           for (let i = 0; i < 3; i++) {
             wire(xs[i] + 30, xs[i + 1] - 34);

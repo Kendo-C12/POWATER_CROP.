@@ -228,14 +228,14 @@ async function runTest() {
     const g = window.POWATER.game;
     g.startTutorial();
     const seen = [];
-    for (let i = 0; i < 9; i++) { seen.push(g.tutorialStep); g.skipTutorialStep(); g.update(0.05); }
+    for (let i = 0; i < 10; i++) { seen.push(g.tutorialStep); g.skipTutorialStep(); g.update(0.05); }
     const ui = window.POWATER.uiManager;
     const r = { seen, final: g.tutorialStep, chained: !!(g.tutorialHouse3 && g.tutorialHouse3.hasPower && g.tutorialHouse3.hasDrainage), video: ui.activeModal === 'feature_video' && ui.modalData.videoKey };
     ui.closeModal();
     return r;
   });
   console.log('5-7. HUD hover / Tab / Tutorial:', { hoverElapsed, afterTab, tutSteps });
-  if (hoverElapsed < 1.0 || afterTab !== 'water' || tutSteps.final !== 10 || tutSteps.seen.join() !== '1,2,3,4,5,6,7,8,9' || !tutSteps.chained || tutSteps.video !== 'lose_pollution') {
+  if (hoverElapsed < 1.0 || afterTab !== 'water' || tutSteps.final !== 11 || tutSteps.seen.join() !== '1,2,3,4,5,6,7,8,9,10' || !tutSteps.chained || tutSteps.video !== 'lose_pollution') {
     throw new Error('HUD-hover simulation, Tab wire switch, or tutorial check failed!');
   }
   await page.evaluate(() => window.POWATER.game.startLevel(0));
@@ -466,7 +466,7 @@ async function runTest() {
     u.showTutorialDemo(0);
     const keys = [u.modalData.videoKey];
     u.tutorialDemoGo(-1); const stayFirst = u.modalData.demoStep === 0; // back on the first step does nothing
-    for (let i = 0; i < 8; i++) { u.tutorialDemoGo(1); keys.push(u.modalData.videoKey); }
+    for (let i = 0; i < 9; i++) { u.tutorialDemoGo(1); keys.push(u.modalData.videoKey); }
     u.tutorialDemoGo(-1); const back = u.modalData.demoStep; u.tutorialDemoGo(1);
     u.tutorialDemoGo(1); // last step -> start playing
     const r = { keys, stayFirst, back, modal: u.activeModal, step: g.tutorialStep, houses: g.houses.length };
@@ -474,7 +474,7 @@ async function runTest() {
     return r;
   });
   console.log('8k. Tutorial bot example (step videos):', JSON.stringify(demo));
-  if (demo.keys.length !== 9 || new Set(demo.keys).size !== 9 || !demo.stayFirst || demo.back !== 7 || demo.modal || demo.step !== 1 || demo.houses !== 1) throw new Error('Tutorial example videos check failed!');
+  if (demo.keys.length !== 10 || new Set(demo.keys).size !== 10 || !demo.stayFirst || demo.back !== 8 || demo.modal || demo.step !== 1 || demo.houses !== 1) throw new Error('Tutorial example videos check failed!');
   await page.evaluate(() => window.POWATER.game.startLevel(0));
 
   // 9. City map image drives water; city cutscene (story intro for Bangkok) precedes the briefing
