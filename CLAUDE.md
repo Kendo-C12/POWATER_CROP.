@@ -1,8 +1,8 @@
-# POWATER CORP. (`v1.0.8.7`) — GDevelop 5 Project Documentation (`CLAUDE.md`)
+# POWATER CORP. (`v1.0.8.8`) — GDevelop 5 Project Documentation (`CLAUDE.md`)
 
 > **Team Green Gang**: Sukrit Limpakanon, Aristt Mahakitsiri, Gantinan Satjariyakul  
 > **Engine**: GDevelop 5 (`POWATER CROPS..json`) + Real PNG Sprite Assets + PixiJS Procedural River/Conduit Rendering  
-> **Version Naming**: `1.x.y.z` (`x` = Major Version, `y` = Small Addition Within Major Version, `z` = Bug Fixes) — Current: **`v1.0.8.7`**
+> **Version Naming**: `1.x.y.z` (`x` = Major Version, `y` = Small Addition Within Major Version, `z` = Bug Fixes) — Current: **`v1.0.8.8`**
 
 ---
 
@@ -136,6 +136,8 @@ All buildings, houses, rivers, HUD bars, toolbar docks, buttons, and status badg
 
 ## 7. Changelog
 
+- **`v1.0.8.8` (2026-11-10)**:
+  - Earthquake screen shake and snapped wires only on the first quake of a level; later quakes just break the buildings (banner still shown).
 - **`v1.0.8.7` (2026-11-10)**:
   - City disasters now every 4–5 new houses (was 1–2).
 - **`v1.0.8.6` (2026-11-10)**:
