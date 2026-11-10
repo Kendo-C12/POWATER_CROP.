@@ -132,7 +132,7 @@
       "durationSeconds": 8.0
     },
     "flood": {
-      "maxDurationSecondsBeforeGameOver": 10.0
+      "maxDurationSecondsBeforeGameOver": 1.5
     }
   }
 }

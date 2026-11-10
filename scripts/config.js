@@ -549,7 +549,7 @@
       HIGH_TIDE: { durationSeconds: 8.0, riversideBreakChance: 0.50 },
       EARTHQUAKE: {},
       BLACKOUT: { durationSeconds: 8.0 },
-      FLOOD: { maxDurationSecondsBeforeGameOver: 10.0 }
+      FLOOD: { maxDurationSecondsBeforeGameOver: 1.5 }
     },
     DAY_DURATION_IN_GAME_SECONDS: 15.0,
     WEEKLY_BASE_GRANT: 40,

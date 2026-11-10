@@ -1062,7 +1062,7 @@
     triggerAmsterdamFlood() {
       if (this.isFloodActive) return;
       this.isFloodActive = true;
-      this.floodMaxDuration = (CONFIG.DISASTERS && CONFIG.DISASTERS.FLOOD && CONFIG.DISASTERS.FLOOD.maxDurationSecondsBeforeGameOver) || 10;
+      this.floodMaxDuration = (CONFIG.DISASTERS && CONFIG.DISASTERS.FLOOD && CONFIG.DISASTERS.FLOOD.maxDurationSecondsBeforeGameOver) || 1.5;
       this.floodTimer = 0.0;
       this.addFloatingText(
         `🌊 น้ำท่วม! ไฟ น้ำ และน้ำเสียไหลช้าลงเล็กน้อย ${Math.round(this.floodMaxDuration)} วินาที`,

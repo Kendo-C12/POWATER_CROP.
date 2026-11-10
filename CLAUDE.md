@@ -1,8 +1,8 @@
-# POWATER CORP. (`v1.0.8.9`) — GDevelop 5 Project Documentation (`CLAUDE.md`)
+# POWATER CORP. (`v1.0.9.0`) — GDevelop 5 Project Documentation (`CLAUDE.md`)
 
 > **Team Green Gang**: Sukrit Limpakanon, Aristt Mahakitsiri, Gantinan Satjariyakul  
 > **Engine**: GDevelop 5 (`POWATER CROPS..json`) + Real PNG Sprite Assets + PixiJS Procedural River/Conduit Rendering  
-> **Version Naming**: `1.x.y.z` (`x` = Major Version, `y` = Small Addition Within Major Version, `z` = Bug Fixes) — Current: **`v1.0.8.9`**
+> **Version Naming**: `1.x.y.z` (`x` = Major Version, `y` = Small Addition Within Major Version, `z` = Bug Fixes) — Current: **`v1.0.9.0`**
 
 ---
 
@@ -37,7 +37,7 @@
 - **Pollution advice**: the first time pollution reaches **33%** of the limit (`globalRules.pollutionAdviceRatio`), a `☢️ มลพิษสูงแล้ว!` message appears and the Eco Filter demo video auto-plays (it shows the pollution bar climbing past the 33% mark, placing filters via `FILTER [4]`, and the bar falling).
 - **After winning**: `CONTINUE` / ✕ on the victory screen keeps the level running (`levelCleared` stops the win from re-firing).
 
-- **City disasters by house count (`engine.scheduleNextDisaster`)**: from the start of the level, each city's disasters strike every **4–5 new houses** (`disasters.everyHouses: [4, 5]`), never the same gap twice in a row (so 4, 5, 4, 5...). Bangkok = High Tide, Tokyo = Earthquake, Rome = Blackout, Amsterdam = random Earthquake / High Tide / Flood. Effects are short (tide & blackout `8s`, flood `10s`). Every earthquake shows a numbered banner (`🌋 แผ่นดินไหวครั้งที่ N!`, 4s), breaks the generators/pumps/filters **and snaps up to 2 random wires**, so later quakes still do damage when buildings are already broken. A flood (10s) shows power, water and sewage as slower (blinking badges) but never causes complaints or stops flow; winning is blocked until it recedes. The old day-based tide/blackout/flood and minute-based quake rolls were removed (levels end before they could fire).
+- **City disasters by house count (`engine.scheduleNextDisaster`)**: from the start of the level, each city's disasters strike every **4–5 new houses** (`disasters.everyHouses: [4, 5]`), never the same gap twice in a row (so 4, 5, 4, 5...). Bangkok = High Tide, Tokyo = Earthquake, Rome = Blackout, Amsterdam = random Earthquake / High Tide / Flood. Effects are short (tide & blackout `8s`, flood `10s`). Every earthquake shows a numbered banner (`🌋 แผ่นดินไหวครั้งที่ N!`, 4s), breaks the generators/pumps/filters **and snaps up to 2 random wires**, so later quakes still do damage when buildings are already broken. A flood (1.5s) shows power, water and sewage as slower (blinking badges) but never causes complaints or stops flow; winning is blocked until it recedes. The old day-based tide/blackout/flood and minute-based quake rolls were removed (levels end before they could fire).
 
 ### 💀 Lose Conditions
 1. **Citizen Complaints**: Reaching the level's maximum complaint limit (`3` strikes in Bangkok, Tokyo, and Rome; **`1` strike = Instant Game Over** in Amsterdam).
@@ -136,6 +136,8 @@ All buildings, houses, rivers, HUD bars, toolbar docks, buttons, and status badg
 
 ## 7. Changelog
 
+- **`v1.0.9.0` (2026-11-10)**:
+  - Flood lasts 1.5s (was 10s).
 - **`v1.0.8.9` (2026-11-10)**:
   - Flood slowdown is visual only (no unhappiness, flow never stops). Checked at 1× and 4×: 0 complaints through a full flood in Amsterdam.
 - **`v1.0.8.8` (2026-11-10)**:
