@@ -421,7 +421,7 @@ async function runTest() {
   if (after.modal !== 'victory' || !after.runs || !after.noRefire || after.video !== 'air_filter' || !after.once) throw new Error('Continue-after-win / pollution advice check failed!');
   await page.evaluate(() => window.POWATER.game.startLevel(0));
 
-  // 8i. City disasters every 1-2 new houses from the start, never the same gap twice in a row
+  // 8i. City disasters every 4-5 new houses from the start, never the same gap twice in a row
   const dis = await page.evaluate(() => {
     const g = window.POWATER.game;
     const out = {};
@@ -438,7 +438,7 @@ async function runTest() {
     return out;
   });
   console.log('8i. Disaster schedule:', JSON.stringify(dis));
-  const disOk = Object.values(dis).every(d => d.hits.length >= 4 && d.gaps.every(x => x >= 1 && x <= 2) && d.gaps.every((x, i) => !i || x !== d.gaps[i - 1]));
+  const disOk = Object.values(dis).every(d => d.hits.length >= 2 && d.gaps.every(x => x >= 4 && x <= 5) && d.gaps.every((x, i) => !i || x !== d.gaps[i - 1]));
   if (!disOk) throw new Error('Disaster schedule check failed!');
   await page.evaluate(() => window.POWATER.game.startLevel(0));
 

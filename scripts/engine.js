@@ -979,12 +979,12 @@
       this.activeDisasterText = alerts.join(' | ');
     }
 
-    // City disasters (tide / quake / blackout / flood) strike every 1-2 new houses (DISASTERS.EVERY_HOUSES); the next
-    // gap always differs from the last one, so with [1, 2] they alternate 1, 2, 1, 2...
+    // City disasters (tide / quake / blackout / flood) strike every 4-5 new houses (DISASTERS.EVERY_HOUSES); the next
+    // gap always differs from the last one, so with [4, 5] they alternate 4, 5, 4, 5...
     scheduleNextDisaster() {
       const lvl = this.currentLevel || {};
       this.cityDisasters = [lvl.hasHighTide && 'tide', lvl.hasEarthquake && 'quake', lvl.hasBlackout && 'blackout', lvl.hasFlood && 'flood'].filter(Boolean);
-      const gaps = ((CONFIG.DISASTERS && CONFIG.DISASTERS.EVERY_HOUSES) || [1, 2]).filter(g => g !== this.lastDisasterGap);
+      const gaps = ((CONFIG.DISASTERS && CONFIG.DISASTERS.EVERY_HOUSES) || [4, 5]).filter(g => g !== this.lastDisasterGap);
       const gap = gaps[Math.floor(Math.random() * gaps.length)];
       this.lastDisasterGap = gap;
       this.nextDisasterAt = (this.cityDisasters.length && !this.isTutorialMode) ? this.houses.length + gap : Infinity;
