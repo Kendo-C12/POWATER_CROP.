@@ -14,12 +14,12 @@
     MAX_COMPLAINTS: 3, // Default: 3 complaints = Game Over (Amsterdam overrides to 1)
     STRIKE_TIMER_SECONDS: 27, // 27 seconds unsupplied = complaint
     GRACE_PERIOD_SECONDS: 120, // 2-minute Protecting Time / Grace Period
-    POLLUTION_START_DELAY_SECONDS: 180, // Pollution starts after 3 minutes (180s)
+    POLLUTION_START_HOUSES: 5, // pollution starts once the city has this many houses
     POLLUTION_WARN_THRESHOLD: 0.8,
 
     // Win Condition (POWATER CORP.pdf: บ้าน > 15 หลังมีน้ำและไฟใช้ตลอดเวลาเป็นเวลา 5-7 นาที)
     WIN_REQUIRED_HOUSES: 15, // > 15 houses (15+ complete houses)
-    WIN_HOLD_DURATION_SECONDS: 300, // 5 minutes (300s); pauses on Repair/Disaster, resets on Complaint
+    WIN_HOLD_DURATION_SECONDS: 80, // 1:20; counts only once pollution has started, pauses on Repair/Disaster, resets on Complaint
 
     // Economy (POWATER CORP.pdf: ทำให้บ้าน complete - 50 ทันที, [จำนวน บ้านที่ complete]*40/ต่อสัปดาห์)
     HOUSE_COMPLETE_BONUS: 50, // Instant +50 when a house becomes complete for the first time
@@ -246,7 +246,7 @@
         title: '🎬 ตัวอย่างการแพ้ 1/2: มลภาวะเกินขีดจำกัด',
         subtitle: 'โรงปั่นไฟและน้ำเสียปล่อยมลภาวะทุกวินาที ถ้าหลอด ☢️ เต็ม = Game Over ทันที',
         steps: [
-          '1. หลังผ่านไป 3 นาที มลภาวะเริ่มนับ: โรงปั่นไฟ +0.3/วิ, น้ำเสียที่ไม่มีท่อระบาย +0.15/วิ/หลัง',
+          '1. เมื่อมีบ้านครบ 5 หลัง มลภาวะเริ่มนับ: โรงปั่นไฟ +0.3/วิ, น้ำเสียที่ไม่มีท่อระบาย +0.15/วิ/หลัง',
           '2. ถ้าปล่อยไว้ หลอด ☢️ ด้านบนจะเต็มจนถึงขีดจำกัดของด่าน',
           '3. ป้องกัน: วางเครื่องกรองอากาศ [4] (-0.2/วิ) ต่อท่อน้ำเสียทุกบ้าน และอัปเกรดลดมลภาวะ'
         ],
@@ -301,7 +301,7 @@
         title: '🎬 วิดีโอสาธิต: เครื่องกรองมลภาวะ (Eco & River Filter)',
         subtitle: 'เทคโนโลยีสะอาด: ลดมลภาวะในเมืองและแม่น้ำอัตโนมัติ -0.2 หน่วย/วินาที',
         steps: [
-          '1. หลังผ่านไป 3 นาที ระบบมลภาวะจะเริ่มทำงานจากโรงปั่นไฟและน้ำเสีย',
+          '1. เมื่อมีบ้านครบ 5 หลัง ระบบมลภาวะจะเริ่มทำงานจากโรงปั่นไฟและน้ำเสีย',
           '2. คลิกปุ่ม FILTER [4] แล้วคลิกวางเครื่องกรองมลภาวะบนพื้นที่ว่าง ($40)',
           '3. เครื่องกรองจะทำงานอัตโนมัติทันทีโดยไม่ต้องต่อสาย ช่วยลดมลพิษ -0.2/วินาที!'
         ],
@@ -353,10 +353,10 @@
       },
       guide: {
         id: 'guide',
-        title: '🎬 วิดีโอสาธิต: เงื่อนไขการชนะ 5 นาที (Win Timer) & โหมดฝึกสอน',
-        subtitle: 'ดูแลบ้าน > 15 หลังให้มีน้ำและไฟครบ 5 นาที (Pause เมื่อต้องซ่อม, Reset เมื่อถูกร้องเรียน)',
+        title: '🎬 วิดีโอสาธิต: เงื่อนไขการชนะ 1:20 นาที (Win Timer) & โหมดฝึกสอน',
+        subtitle: 'ดูแลบ้าน > 15 หลังให้มีน้ำและไฟครบ 1:20 นาที (Pause เมื่อต้องซ่อม, Reset เมื่อถูกร้องเรียน)',
         steps: [
-          '1. เมื่อมีบ้านที่ได้รับน้ำและไฟมากกว่า 15 หลัง เวลาสะสมชัยชนะ (🏆 WIN: 05:00) จะเริ่มเดิน',
+          '1. เมื่อมีบ้านที่ได้รับน้ำและไฟมากกว่า 15 หลัง เวลาสะสมชัยชนะ (🏆 WIN: 01:20) จะเริ่มเดิน (หลังมลภาวะเริ่มนับแล้ว)',
           '2. หากอุปกรณ์เสียหรือเกิดภัยพิบัติ เวลาจะหยุดรอ (PAUSED) แต่หากถูกร้องเรียน เวลาจะรีเซ็ตเป็น 00:00!',
           '3. คุณสามารถกดเริ่ม "โหมดฝึกสอนด่วน (Fast Scene Tutorial)" ได้จากหน้าต่างนี้ทุกเมื่อ!'
         ],
@@ -372,7 +372,7 @@
         name: '1. Bangkok, Thailand',
         thaiName: 'ด่าน 1: กรุงเทพมหานคร (Tutorial & High Tide)',
         cityChallenge: 'กรุงเทพมหานครเผชิญกับปัญหาน้ำท่วมและระดับน้ำที่เปลี่ยนแปลง',
-        briefing: 'ภารกิจของคุณ Amigo: บริหารจัดการระบบน้ำและพลังงานของกรุงเทพมหานคร เชื่อมต่อเครือข่าย Node ให้ประชาชนเข้าถึงสาธารณูปโภคอย่างทั่วถึง\nความท้าทายธรรมชาติ: ทุกๆ 15 วันในเกมจะเกิดน้ำขึ้น (High Tide) ส่งผลให้อุปกรณ์ริมแม่น้ำเจ้าพระยาชำรุดและต้องการการซ่อมแซมบ่อยขึ้น!\nเป้าหมายชนะ: ดูแลบ้าน > 15 หลังให้มีน้ำและไฟใช้ต่อเนื่อง 5 นาที!',
+        briefing: 'ภารกิจของคุณ Amigo: บริหารจัดการระบบน้ำและพลังงานของกรุงเทพมหานคร เชื่อมต่อเครือข่าย Node ให้ประชาชนเข้าถึงสาธารณูปโภคอย่างทั่วถึง\nความท้าทายธรรมชาติ: ทุกๆ 15 วันในเกมจะเกิดน้ำขึ้น (High Tide) ส่งผลให้อุปกรณ์ริมแม่น้ำเจ้าพระยาชำรุดและต้องการการซ่อมแซมบ่อยขึ้น!\nเป้าหมายชนะ: ดูแลบ้าน > 15 หลังให้มีน้ำและไฟใช้ต่อเนื่อง 1:20 นาที!',
         conditionPlus: 'ไม่มีเงื่อนไขลบ (ด่านเริ่มต้นและฝึกสอน Tutorial)',
         conditionMinus: 'Extreme Weather: น้ำขึ้นทุกๆ 15 วัน ทำให้อุปกรณ์ริมแม่น้ำเสียและต้องกดซ่อมบ่อยขึ้น',
         amigoQuote: 'ผมจะเชื่อมไฟ น้ำ และท่อน้ำเสียให้ครบทุกบ้าน บ้านที่สมบูรณ์ให้โบนัสทันที +$50 และรายได้รายสัปดาห์ +$40 แต่ต้องระวังน้ำขึ้นทุก 15 วัน!',
@@ -606,7 +606,7 @@
       if (typeof gr.dayCycleDurationSeconds === 'number') CONFIG.DAY_DURATION_SECONDS = gr.dayCycleDurationSeconds;
       if (typeof gr.nightCycleDurationSeconds === 'number') CONFIG.NIGHT_DURATION_SECONDS = gr.nightCycleDurationSeconds;
       if (typeof gr.protectingTimeSeconds === 'number') CONFIG.GRACE_PERIOD_SECONDS = gr.protectingTimeSeconds;
-      if (typeof gr.pollutionStartDelaySeconds === 'number') CONFIG.POLLUTION_START_DELAY_SECONDS = gr.pollutionStartDelaySeconds;
+      if (typeof gr.pollutionStartHouses === 'number') CONFIG.POLLUTION_START_HOUSES = gr.pollutionStartHouses;
       if (typeof gr.complaintStrikeTimerSeconds === 'number') CONFIG.STRIKE_TIMER_SECONDS = gr.complaintStrikeTimerSeconds;
       if (typeof gr.defaultMaxComplaints === 'number') CONFIG.MAX_COMPLAINTS = gr.defaultMaxComplaints;
       if (typeof gr.winRequiredHouses === 'number') CONFIG.WIN_REQUIRED_HOUSES = gr.winRequiredHouses;

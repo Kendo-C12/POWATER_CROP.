@@ -297,9 +297,22 @@ async function runTest() {
     return { idle, wired, all, speeds, eta1: Math.round(eta1), eta4: Math.round(eta4) };
   });
   console.log('8b. All-connected spawn boost / speed / ETA:', boost);
-  if (!boost.all || boost.wired < boost.idle * 3 || boost.speeds.join() !== '2,4,1' || boost.eta1 < 300 || Math.abs(boost.eta4 * 4 - boost.eta1) > 4) {
+  if (!boost.all || boost.wired < boost.idle * 3 || boost.speeds.join() !== '2,4,1' || boost.eta1 < 80 || Math.abs(boost.eta4 * 4 - boost.eta1) > 4) {
     throw new Error('Spawn speedup / 4x speed / win ETA check failed!');
   }
+  await page.evaluate(() => window.POWATER.game.startLevel(0));
+
+  // 8c. Pollution starts at 5 houses; the 1:20 win hold only counts after that
+  const pol = await page.evaluate(() => {
+    const g = window.POWATER.game;
+    g.startLevel(0);
+    const before = { n: g.houses.length, active: g.pollutionActive() };
+    while (g.houses.length < 5 && g.spawnHouse()) {}
+    const after = { n: g.houses.length, active: g.pollutionActive() };
+    return { before, after, hold: g.winTargetDuration };
+  });
+  console.log('8c. Pollution start / win hold:', pol);
+  if (pol.before.active || pol.before.n >= 5 || !pol.after.active || pol.hold !== 80) throw new Error('Pollution start at 5 houses / 80s hold check failed!');
   await page.evaluate(() => window.POWATER.game.startLevel(0));
 
   // 9. City map image drives water; city cutscene (story intro for Bangkok) precedes the briefing

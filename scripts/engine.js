@@ -1263,9 +1263,13 @@
       });
     }
 
+    // Pollution (and the win hold timer) start once the city reaches POLLUTION_START_HOUSES; stays on after that
+    pollutionActive() {
+      return this.isTutorialMode || this.pollutionStartedNotified || this.houses.length >= (CONFIG.POLLUTION_START_HOUSES || 5);
+    }
+
     updatePollution(dt) {
-      const delay = CONFIG.POLLUTION_START_DELAY_SECONDS || 180;
-      if (this.levelElapsedTime < delay && !this.isTutorialMode) {
+      if (!this.pollutionActive()) {
         this.currentPollutionRate = 0.0;
         this.pollution = 0.0;
         return;
@@ -1273,7 +1277,7 @@
 
       if (!this.pollutionStartedNotified) {
         this.pollutionStartedNotified = true;
-        this.addFloatingText('⚠️ ครบ 3 นาที: ระบบคำนวณมลภาวะเริ่มทำงานแล้ว!', CONFIG.CANVAS_WIDTH / 2, 80, '#ffd166');
+        this.addFloatingText(`⚠️ มีบ้านครบ ${CONFIG.POLLUTION_START_HOUSES || 5} หลัง: มลภาวะเริ่มนับแล้ว! (เวลาชนะเริ่มนับได้)`, CONFIG.CANVAS_WIDTH / 2, 80, '#ffd166');
         if (global.POWATER.soundManager) global.POWATER.soundManager.playPollutionWarn();
       }
 
@@ -1365,7 +1369,7 @@
 
       if (hasBrokenEquipment || hasActiveDisaster) {
         this.winTimerState = 'PAUSED';
-      } else if (suppliedHouses >= this.winRequiredHouses) {
+      } else if (suppliedHouses >= this.winRequiredHouses && this.pollutionActive()) {
         this.winTimerState = 'RUNNING';
         this.winHoldTimer += dt;
         if (this.winHoldTimer >= this.winTargetDuration) {

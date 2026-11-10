@@ -10,7 +10,7 @@
   "maxPollution": 7.0,
   "maxComplaints": 3,
   "winRequiredHouses": 15,
-  "winHoldDurationSeconds": 300.0,
+  "winHoldDurationSeconds": 80.0,
   "maxHousesCap": 40,
   "cleanEnergyDiscount": 0.25,
   "buildCostDiscount": 0.0,

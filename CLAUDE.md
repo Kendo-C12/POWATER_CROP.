@@ -1,8 +1,8 @@
-# POWATER CORP. (`v1.0.6.5`) — GDevelop 5 Project Documentation (`CLAUDE.md`)
+# POWATER CORP. (`v1.0.6.6`) — GDevelop 5 Project Documentation (`CLAUDE.md`)
 
 > **Team Green Gang**: Sukrit Limpakanon, Aristt Mahakitsiri, Gantinan Satjariyakul  
 > **Engine**: GDevelop 5 (`POWATER CROPS..json`) + Real PNG Sprite Assets + PixiJS Procedural River/Conduit Rendering  
-> **Version Naming**: `1.x.y.z` (`x` = Major Version, `y` = Small Addition Within Major Version, `z` = Bug Fixes) — Current: **`v1.0.6.5`**
+> **Version Naming**: `1.x.y.z` (`x` = Major Version, `y` = Small Addition Within Major Version, `z` = Bug Fixes) — Current: **`v1.0.6.6`**
 
 ---
 
@@ -24,7 +24,8 @@
 ## 2. Core Game Mechanics (`POWATER CORP.pdf` — Upgrade from `b1.5` Demo to `v1.0.0.0`)
 
 ### 🏆 Win Conditions
-- **House Requirement**: Maintain **more than 15 completed houses (`>= 15` houses)** continuously supplied with water and electricity for **5–7 minutes (`300s`)**.
+- **House Requirement**: Maintain **more than 15 completed houses (`>= 15` houses)** continuously supplied with water and electricity for **1:20 (`80s`, `winHoldDurationSeconds`)**.
+- **Pollution start**: pollution starts once the city has **5 houses** (`globalRules.pollutionStartHouses`; HUD shows `☢️ เริ่มเมื่อบ้าน n/5`), and the win hold timer only counts after pollution has started (`engine.pollutionActive`).
 - **Pause Rule**: If any pump/facility breaks down (**Needs Repair**) or an **Extreme Weather Disaster** is active, the **Win Timer pauses** (`PAUSED`).
 - **Reset Rule**: If a citizen files a **Complaint**, the **Win Timer resets to `00:00`** immediately.
 
@@ -122,6 +123,9 @@ All buildings, houses, rivers, HUD bars, toolbar docks, buttons, and status badg
 
 ## 7. Changelog
 
+- **`v1.0.6.6` (2026-11-10)**:
+  - Win hold shortened from 5:00 to **1:20** in all 4 cities.
+  - Pollution now starts when the city reaches **5 houses** (was: after 3 minutes); the win hold only counts once pollution is active.
 - **`v1.0.6.5` (2026-11-10)**:
   - Houses spawn spread out (best of 10 legal candidates by distance to the nearest node); mean nearest-neighbour distance in Bangkok rose from ~116px to ~153px.
   - Capacity analysis (houses that fit, tier-3 bounds, reachable land only; random spawner fill / best packing): spacing `133px` — Bangkok ~23, Tokyo ~6, Rome ~25–31, Amsterdam ~15–19; spacing `100px` — Bangkok ~37–49, Tokyo ~10–14, Rome ~39–59, Amsterdam ~27–34. Tokyo's reachable land is small because the bay is wider than a wire.

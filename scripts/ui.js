@@ -163,7 +163,7 @@
       this.txtServed.position.set(322, 14);
       this.textContainer.addChild(this.txtServed);
 
-      this.txtWinTimer = this.makeText('🏆 WIN: 00:00/05:00 (>15)', { fontFamily: font, fontSize: 11, fontWeight: 'bold', fill: 0x90e0ef }, null);
+      this.txtWinTimer = this.makeText('🏆 WIN: 00:00/01:20 (>15)', { fontFamily: font, fontSize: 11, fontWeight: 'bold', fill: 0x90e0ef }, null);
       this.txtWinTimer.position.set(472, 14);
       this.textContainer.addChild(this.txtWinTimer);
 
@@ -283,10 +283,8 @@
       if (this.txtPollution) {
         const p = this.game.pollution.toFixed(1);
         const maxP = this.game.currentLevel ? this.game.currentLevel.maxPollution.toFixed(1) : '6.0';
-        const startIn = (CONFIG.POLLUTION_START_DELAY_SECONDS || 180) - (this.game.levelElapsedTime || 0);
-        if (startIn > 0 && !this.game.isTutorialMode) {
-          const m = Math.floor(startIn / 60), sec = String(Math.floor(startIn % 60)).padStart(2, '0');
-          this.txtPollution.text = `☢️ เริ่มใน ${m}:${sec}`;
+        if (!this.game.pollutionActive()) {
+          this.txtPollution.text = `☢️ เริ่มเมื่อบ้าน ${this.game.houses.length}/${CONFIG.POLLUTION_START_HOUSES || 5}`;
         } else {
           this.txtPollution.text = `☢️ ${p}/${maxP}`;
         }
@@ -1283,7 +1281,7 @@
             ? '⚡ อัปเกรดไฟ +20% | ☢️ ลดมลพิษ -5% | 💧 ปั๊มน้ำ +20%'
             : (vKey === 'sdgs'
               ? '🗺️ ขยายแมพทุก +10 หลัง (ตันที่ 40 หลัง) & ☀️/🌙 Day/Night 1 นาที'
-              : '🏆 ดูแลบ้าน > 15 หลังครบ 5 นาทีเพื่อชนะด่าน!'),
+              : '🏆 ดูแลบ้าน > 15 หลังครบ 1:20 นาทีเพื่อชนะด่าน!'),
           vx + vw / 2, vy + 30, 0x06d6a0, 12
         );
       }
@@ -1614,7 +1612,7 @@
       const msg = this.makeText(
         'ครบ 2 นาทีแรกของการเตรียมโครงข่ายเมืองแล้ว!\n\n' +
         '• นับจากนี้ บ้านที่ขาดน้ำประปา ไฟฟ้า หรือท่อระบายน้ำเกิน 27 วินาที จะยื่นเรื่องร้องเรียน!\n' +
-        '• หากถูกร้องเรียน เวลาสะสมเพื่อชนะ (Win Timer 5 นาที) จะถูกรีเซ็ตกลับเป็น 0:00 ทันที!\n' +
+        '• หากถูกร้องเรียน เวลาสะสมเพื่อชนะ (Win Timer 1:20 นาที) จะถูกรีเซ็ตกลับเป็น 0:00 ทันที!\n' +
         '• ในด่าน Tokyo/Amsterdam โอกาสเกิดแผ่นดินไหว (Earthquake) จะเริ่มทำงานทุกๆ 1 นาที!\n' +
         '• หมั่นตรวจสอบและซ่อมแซมเครื่องปั๊มน้ำ/โรงไฟฟ้าที่ขึ้นไอคอนประแจสีแดง!',
         { fontFamily: font, fontSize: 13, fill: 0xe9ecef, wordWrap: true, wordWrapWidth: mw - 50, lineHeight: 22 }
@@ -1651,7 +1649,7 @@
       const msg = this.makeText(
         `สาเหตุ: ${reason}\n\n` +
         `• สถิติบ้านที่ดูแลสำเร็จสูงสุด: ${this.game.housesServedPeak || 0} หลัง\n` +
-        `• เวลาสะสม Win Timer ล่าสุด: ${this.formatMMSS(this.game.winHoldTimer || 0)} / 05:00\n` +
+        `• เวลาสะสม Win Timer ล่าสุด: ${this.formatMMSS(this.game.winHoldTimer || 0)} / ${this.formatMMSS(this.game.winTargetDuration || 80)}\n` +
         `• วันที่บริหารเมืองได้: ${(this.game.totalDaysPassed || 0) + 1} วัน\n` +
         `• ระดับมลภาวะสุดท้าย: ${(this.game.pollution || 0).toFixed(2)}\n\n` +
         `เคล็ดลับ: คลิกปุ่ม [▶] เหนือไอคอนด้านล่างเพื่อดูวิดีโอสาธิตการใช้ฟีเจอร์ได้ทุกเมื่อ!`,
@@ -1688,7 +1686,7 @@
       const curLvl = this.game.currentLevel ? (this.game.currentLevel.name || 'Bangkok') : 'City';
       const msg = this.makeText(
         `ยอดเยี่ยมมาก คุณ Amigo! คุณบริหาร ${curLvl} ผ่านเงื่อนไขการชนะครบสมบูรณ์!\n\n` +
-        `• ดูแลบ้านมากกว่า 15 หลังให้มีน้ำและไฟใช้ตลอดเวลาครบ 5 นาทีเต็ม!\n` +
+        `• ดูแลบ้านมากกว่า 15 หลังให้มีน้ำและไฟใช้ตลอดเวลาครบ 1:20 นาที (เริ่มนับหลังมลภาวะเริ่ม)!\n` +
         `• ควบคุมมลภาวะต่ำกว่าเกณฑ์และรับมือภัยพิบัติได้อย่างยอดเยี่ยม\n` +
         `• ตอบสนองเป้าหมาย SDGs 6, 7 และ 15 (Life on Land) รักษาสมดุลมหานครกับธรรมชาติอย่างยั่งยืน!`,
         { fontFamily: font, fontSize: 13, fill: 0xe9ecef, wordWrap: true, wordWrapWidth: mw - 50, lineHeight: 22 }
