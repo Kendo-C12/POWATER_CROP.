@@ -1,8 +1,8 @@
-# POWATER CORP. (`v1.0.9.1`) — GDevelop 5 Project Documentation (`CLAUDE.md`)
+# POWATER CORP. (`v1.0.9.2`) — GDevelop 5 Project Documentation (`CLAUDE.md`)
 
 > **Team Green Gang**: Sukrit Limpakanon, Aristt Mahakitsiri, Gantinan Satjariyakul  
 > **Engine**: GDevelop 5 (`POWATER CROPS..json`) + Real PNG Sprite Assets + PixiJS Procedural River/Conduit Rendering  
-> **Version Naming**: `1.x.y.z` (`x` = Major Version, `y` = Small Addition Within Major Version, `z` = Bug Fixes) — Current: **`v1.0.9.1`**
+> **Version Naming**: `1.x.y.z` (`x` = Major Version, `y` = Small Addition Within Major Version, `z` = Bug Fixes) — Current: **`v1.0.9.2`**
 
 ---
 
@@ -136,6 +136,8 @@ All buildings, houses, rivers, HUD bars, toolbar docks, buttons, and status badg
 
 ## 7. Changelog
 
+- **`v1.0.9.2` (2026-11-10)**:
+  - Fixed: earthquake screen shake could keep going until the player clicked (its timer only ran while the game wasn't paused, e.g. under an auto-opened video). It now stops after 2 real seconds.
 - **`v1.0.9.1` (2026-11-10)**:
   - High Tide lasts 2s (was 8s).
 - **`v1.0.9.0` (2026-11-10)**:

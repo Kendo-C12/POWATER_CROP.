@@ -487,6 +487,14 @@
       if (this.currentRuntimeScene && this.currentRuntimeScene.getLayer) {
         const baseLayer = this.currentRuntimeScene.getLayer('');
         if (baseLayer && typeof baseLayer.setCameraX === 'function') {
+          // Shake counts down in real time (2s), so a paused game or an open window can't leave it shaking
+          const nowMs = performance.now();
+          if (this.game.screenShakeTimer > 0) {
+            this.game.screenShakeTimer = Math.max(0, this.game.screenShakeTimer - (this._shakeLastMs ? (nowMs - this._shakeLastMs) / 1000 : 0));
+            this._shakeLastMs = nowMs;
+          } else {
+            this._shakeLastMs = 0;
+          }
           if (this.game.screenShakeTimer > 0) {
             const jx = (Math.random() - 0.5) * 14;
             const jy = (Math.random() - 0.5) * 14;

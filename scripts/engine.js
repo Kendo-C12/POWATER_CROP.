@@ -895,9 +895,6 @@
     }
 
     updateRepairAndDisasters(dt) {
-      if (this.screenShakeTimer > 0) {
-        this.screenShakeTimer = Math.max(0, this.screenShakeTimer - dt);
-      }
 
       // 1. Periodic Repair Breakdown (POWATER CORP.pdf: 30% chance every 2 minutes)
       const repairInterval = CONFIG.REPAIR_CHECK_INTERVAL_SECONDS || 120;
