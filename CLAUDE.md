@@ -1,8 +1,8 @@
-# POWATER CORP. (`v1.0.8.4`) — GDevelop 5 Project Documentation (`CLAUDE.md`)
+# POWATER CORP. (`v1.0.8.5`) — GDevelop 5 Project Documentation (`CLAUDE.md`)
 
 > **Team Green Gang**: Sukrit Limpakanon, Aristt Mahakitsiri, Gantinan Satjariyakul  
 > **Engine**: GDevelop 5 (`POWATER CROPS..json`) + Real PNG Sprite Assets + PixiJS Procedural River/Conduit Rendering  
-> **Version Naming**: `1.x.y.z` (`x` = Major Version, `y` = Small Addition Within Major Version, `z` = Bug Fixes) — Current: **`v1.0.8.4`**
+> **Version Naming**: `1.x.y.z` (`x` = Major Version, `y` = Small Addition Within Major Version, `z` = Bug Fixes) — Current: **`v1.0.8.5`**
 
 ---
 
@@ -136,6 +136,8 @@ All buildings, houses, rivers, HUD bars, toolbar docks, buttons, and status badg
 
 ## 7. Changelog
 
+- **`v1.0.8.5` (2026-11-10)**:
+  - Tutorial now 11 steps: after deleting a wire (step 5) the wire is no longer restored automatically; new step 6 asks the player to reconnect it until houses 1 and 2 are complete again. New bot-example video `rewire`.
 - **`v1.0.8.4` (2026-11-10)**:
   - Tutorial now 10 steps: step 6 forces house 3 to be chained from house 2 (building→house-3 wires refused) so its water runs short; new step 7 fixes it by dragging a pipe straight from the pump (the house is fed 2 ways, the shorter path wins). Repair / Eco Filter / complaints moved to 8–10. New bot-example video `chain_fix`. Tutorial ignores hard mode so the long pipe is allowed.
 - **`v1.0.8.3` (2026-11-10)**:

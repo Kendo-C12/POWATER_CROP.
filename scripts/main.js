@@ -627,7 +627,7 @@
       }
 
       // 7. Interactive Fast Tutorial Visual Guide (Manhattan Guide Line & Target Highlight)
-      if (this.game.isTutorialMode && this.game.tutorialStep >= 1 && this.game.tutorialStep <= 8) {
+      if (this.game.isTutorialMode && this.game.tutorialStep >= 1 && this.game.tutorialStep <= 9) {
         const step = this.game.tutorialStep;
         const house = this.game.houses[0];
         let srcNode = null;
@@ -646,15 +646,15 @@
           srcNode = house;
           dstNode = this.game.buildings.find(b => b.config && b.config.type === 'waste_filter');
           guideColor = 0xc77dff;
-        } else if (step === 4 || step === 6) {
-          srcNode = step === 4 ? house : this.game.tutorialHouse2;
-          dstNode = step === 4 ? this.game.tutorialHouse2 : this.game.tutorialHouse3;
+        } else if (step === 4 || step === 6 || step === 7) {
+          srcNode = step === 7 ? this.game.tutorialHouse2 : house;
+          dstNode = step === 7 ? this.game.tutorialHouse3 : this.game.tutorialHouse2;
           guideColor = { power: 0xffd166, water: 0x00b4d8, sewage: 0xc77dff }[this.game.activeTool] || 0xffd166;
-        } else if (step === 7) {
+        } else if (step === 8) {
           srcNode = this.game.buildings.find(b => b.config && b.config.type === 'water_pump');
           dstNode = this.game.tutorialHouse3;
           guideColor = 0x00b4d8;
-        } else if (step === 8) {
+        } else if (step === 9) {
           srcNode = this.game.buildings.find(b => b.isBroken) || this.game.buildings.find(b => b.config && b.config.type === 'water_pump');
           guideColor = 0xef476f;
         }
@@ -706,7 +706,7 @@
             gfxO.lineStyle(3, 0xe63946, 0.6 + 0.3 * Math.sin(this.pulseTime * 6));
             gfxO.drawCircle(tx, ty, 14 + Math.sin(this.pulseTime * 6) * 3);
           }
-        } else if (srcNode && step === 8) {
+        } else if (srcNode && step === 9) {
           const c1 = srcNode.getCenter();
           const rPulse = 48 + Math.sin(this.pulseTime * 6) * 6;
           gfxO.lineStyle(3.5, 0xef476f, 0.95);
