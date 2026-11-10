@@ -61,6 +61,20 @@ assets = [
     ('btn_upgrade.png', 'assets/btn_upgrade.png'),
     ('btn_sdgs.png', 'assets/btn_sdgs.png'),
     ('btn_guide.png', 'assets/btn_guide.png'),
+    ('btn_delete.png', 'assets/btn_delete.png'),
+    ('house_spot.png', 'assets/house_spot.png'),
+    ('hud_slot_city.png', 'assets/hud_slot_city.png'),
+    ('hud_slot_city_main.png', 'assets/hud_slot_city_main.png'),
+    ('hud_slot_city_tutorial.png', 'assets/hud_slot_city_tutorial.png'),
+    ('hud_slot_city_tokyo.png', 'assets/hud_slot_city_tokyo.png'),
+    ('hud_slot_city_rome.png', 'assets/hud_slot_city_rome.png'),
+    ('hud_slot_city_amsterdam.png', 'assets/hud_slot_city_amsterdam.png'),
+    ('hud_slot_money.png', 'assets/hud_slot_money.png'),
+    ('hud_slot_houses.png', 'assets/hud_slot_houses.png'),
+    ('hud_slot_goal.png', 'assets/hud_slot_goal.png'),
+    ('hud_slot_pollution.png', 'assets/hud_slot_pollution.png'),
+    ('hud_slot_time.png', 'assets/hud_slot_time.png'),
+    ('hud_slot_strikes.png', 'assets/hud_slot_strikes.png'),
     ('icon_video_help.png', 'assets/icon_video_help.png'),
     ('Bangkok.jpg', 'assets/Bangkok.jpg'),
     ('Tokyo.jpg', 'assets/Tokyo.jpg'),
@@ -375,10 +389,22 @@ def build_layout_objects(river_image='river.png', river_w=280, river_h=720):
         ('badge_drain', 'badge_drain.png', 48, 48),
         ('badge_repair', 'badge_repair.png', 128, 128),
         ('badge_candle', 'badge_candle.png', 128, 128),
-        ('btn_video_help', 'icon_video_help.png', 144, 96)
+        ('btn_video_help', 'icon_video_help.png', 144, 96),
+        ('btn_delete', 'btn_delete.png', 256, 192),
+        ('hud_slot_city', 'hud_slot_city.png', 370, 64),
+        ('hud_slot_money', 'hud_slot_money.png', 224, 64),
+        ('hud_slot_houses', 'hud_slot_houses.png', 296, 64),
+        ('hud_slot_goal', 'hud_slot_goal.png', 380, 64),
+        ('hud_slot_pollution', 'hud_slot_pollution.png', 344, 64),
+        ('hud_slot_time', 'hud_slot_time.png', 432, 64),
+        ('hud_slot_strikes', 'hud_slot_strikes.png', 428, 64),
     ]
     for bname, bimg, bw, bh in base_buildings:
         objs.append(make_sprite_object(bname, bimg, bw, bh))
+    # Editor-only marker for the fixed house spawn spots (hidden in game; 'order' = spawn sequence)
+    spot = make_sprite_object('house_spot', 'house_spot.png', 200, 200)
+    spot['variables'] = [{'name': 'order', 'type': 'number', 'value': 0}]
+    objs.append(spot)
     return objs
 
 
@@ -408,6 +434,17 @@ def make_base_instances():
         { 'name': 'btn_speed', 'x': 830, 'y': 658, 'width': 64, 'height': 48, 'zOrder': 10, 'persistentUuid': 'inst-btn-speed', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
         { 'name': 'btn_upgrade', 'x': 904, 'y': 658, 'width': 64, 'height': 48, 'zOrder': 10, 'persistentUuid': 'inst-btn-upgrade', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
         { 'name': 'btn_guide', 'x': 978, 'y': 658, 'width': 64, 'height': 48, 'zOrder': 10, 'persistentUuid': 'inst-btn-guide', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
+        { 'name': 'btn_delete', 'x': 460, 'y': 658, 'width': 64, 'height': 48, 'zOrder': 10, 'persistentUuid': 'inst-btn-delete', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
+        # Top-bar boxes, logo and day icon (the HUD draws live values over these spots in game)
+        { 'name': 'hud_slot_city', 'x': 8, 'y': 6, 'width': 185, 'height': 32, 'zOrder': 9, 'persistentUuid': 'inst-hud_slot_city', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
+        { 'name': 'hud_slot_money', 'x': 198, 'y': 6, 'width': 112, 'height': 32, 'zOrder': 9, 'persistentUuid': 'inst-hud_slot_money', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
+        { 'name': 'hud_slot_houses', 'x': 314, 'y': 6, 'width': 148, 'height': 32, 'zOrder': 9, 'persistentUuid': 'inst-hud_slot_houses', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
+        { 'name': 'hud_slot_goal', 'x': 466, 'y': 6, 'width': 190, 'height': 32, 'zOrder': 9, 'persistentUuid': 'inst-hud_slot_goal', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
+        { 'name': 'hud_slot_pollution', 'x': 660, 'y': 6, 'width': 172, 'height': 32, 'zOrder': 9, 'persistentUuid': 'inst-hud_slot_pollution', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
+        { 'name': 'hud_slot_time', 'x': 836, 'y': 6, 'width': 216, 'height': 32, 'zOrder': 9, 'persistentUuid': 'inst-hud_slot_time', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
+        { 'name': 'hud_slot_strikes', 'x': 1056, 'y': 6, 'width': 214, 'height': 32, 'zOrder': 9, 'persistentUuid': 'inst-hud_slot_strikes', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
+        { 'name': 'logo_powater', 'x': 14, 'y': 10, 'width': 24, 'height': 24, 'zOrder': 10, 'persistentUuid': 'inst-hud-logo', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
+        { 'name': 'icon_day', 'x': 842, 'y': 11, 'width': 22, 'height': 22, 'zOrder': 10, 'persistentUuid': 'inst-hud-day', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
         # 10 Clickable Feature Video Demo Icons ([▶]) directly above each feature button
         { 'name': 'btn_video_help', 'x': 252, 'y': 626, 'width': 36, 'height': 24, 'zOrder': 10, 'persistentUuid': 'inst-vid-power', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
         { 'name': 'btn_video_help', 'x': 326, 'y': 626, 'width': 36, 'height': 24, 'zOrder': 10, 'persistentUuid': 'inst-vid-water', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
@@ -593,6 +630,20 @@ tutorial_houses = [
 layout_tutorial = create_layout('Tutorial', '0. Fast Scene Tutorial', 'Bangkok.jpg', 1522, 1076, tutorial_river, tutorial_buildings, tutorial_houses)
 
 # Set all 5 layouts in project (Main, Tutorial, Tokyo, Rome, Amsterdam)
+# Each scene's city box shows its own city name
+for lay in [layout_main, layout_tutorial, layout_tokyo, layout_rome, layout_amsterdam]:
+    img = f"hud_slot_city_{lay['name'].lower()}.png"
+    for o in lay['objects']:
+        if o['name'] == 'hud_slot_city':
+            o['animations'][0]['directions'][0]['sprites'][0]['image'] = img
+
+# Fixed house spots (config/<stage>.json -> houseSpawnPoints) placed as editor markers in each scene
+for lay, stage in [(layout_main, 'bangkok'), (layout_tutorial, 'tutorial'), (layout_tokyo, 'tokyo'), (layout_rome, 'rome'), (layout_amsterdam, 'amsterdam')]:
+    for i, (cx, cy) in enumerate(merged_config['stages'].get(stage, {}).get('houseSpawnPoints', [])):
+        lay['instances'].append({ 'name': 'house_spot', 'x': cx - 50, 'y': cy - 50, 'width': 100, 'height': 100, 'zOrder': 2,
+            'persistentUuid': f'inst-spot-{stage}-{i + 1}', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False,
+            'numberProperties': [], 'stringProperties': [], 'initialVariables': [{'name': 'order', 'type': 'number', 'value': i + 1}] })
+
 project['layouts'] = [layout_main, layout_tutorial, layout_tokyo, layout_rome, layout_amsterdam]
 
 # Write back to POWATER CROPS..json

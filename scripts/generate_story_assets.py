@@ -167,11 +167,54 @@ def generate_logo(path=None, size=256):
     print('Generated', path, img.size)
 
 
+# Top-bar boxes as placed in every scene (x, width) — same spots the HUD draws them at runtime
+HUD_SLOTS = [
+    ('hud_slot_city', 8, 185, 'BANGKOK v1.0', (0, 180, 216)),
+    ('hud_slot_money', 198, 112, '$150', (255, 209, 102)),
+    ('hud_slot_houses', 314, 148, 'บ้าน 0/3 (Up:0)', (6, 214, 160)),
+    ('hud_slot_goal', 466, 190, 'เป้าหมาย 0/15 หลัง', (144, 224, 239)),
+    ('hud_slot_pollution', 660, 172, 'มลพิษ เริ่มเมื่อบ้าน 3/5', (255, 183, 3)),
+    ('hud_slot_time', 836, 216, 'DAY (60s) | MON D1', (255, 209, 102)),
+    ('hud_slot_strikes', 1056, 214, 'STRIKES: ☐ ☐ ☐', (255, 90, 95)),
+]
+
+
+def generate_scene_ui():
+    """PNG versions of everything the game draws on screen, so each GDevelop scene shows the full level layout."""
+    K = 4  # supersample, saved at 2x for crisp editor zoom
+    font = lambda size: ImageFont.truetype('C:/Windows/Fonts/leelawdb.ttf', size)
+    city_boxes = [('hud_slot_city_' + k, 8, 185, f'{v} v1.0', (0, 180, 216)) for k, v in
+                  [('main', 'BANGKOK'), ('tutorial', 'TUTORIAL'), ('tokyo', 'TOKYO'), ('rome', 'ROME'), ('amsterdam', 'AMSTERDAM')]]
+    for name, _x, w, label, col in HUD_SLOTS + city_boxes:
+        h = 32
+        img = Image.new('RGBA', (w * K, h * K), (0, 0, 0, 0))
+        d = ImageDraw.Draw(img)
+        d.rounded_rectangle([0, 0, w * K - 1, h * K - 1], radius=6 * K, fill=(26, 19, 52, 225), outline=(72, 202, 228, 90), width=K)
+        f = font(11 * K)
+        tw = d.textlength(label, font=f)
+        d.text(((w * K - tw) / 2, 7 * K), label, font=f, fill=col + (255,))
+        img.resize((w * 2, h * 2), Image.LANCZOS).save(os.path.join(ASSETS, name + '.png'))
+    # House spot marker: faded house + dashed ring = "a house will spawn here"
+    house = Image.open(os.path.join(ASSETS, 'House.png')).convert('RGBA').resize((84 * K, 56 * K), Image.LANCZOS)
+    house.putalpha(house.getchannel('A').point(lambda a: a * 45 // 100))
+    spot = Image.new('RGBA', (100 * K, 100 * K), (0, 0, 0, 0))
+    d = ImageDraw.Draw(spot)
+    for i in range(24):  # dashed ring
+        a0 = i * 15
+        d.arc([4 * K, 4 * K, 96 * K, 96 * K], a0, a0 + 9, fill=(6, 214, 160, 230), width=3 * K)
+    spot.alpha_composite(house, (8 * K, 22 * K))
+    spot.resize((200, 200), Image.LANCZOS).save(os.path.join(ASSETS, 'house_spot.png'))
+    print('Generated', len(HUD_SLOTS), 'hud_slot_*.png + house_spot.png')
+
+
 if __name__ == '__main__':
     import sys
     if 'logo' in sys.argv:
         generate_logo(*(sys.argv[2:3]))
+    elif 'ui' in sys.argv:
+        generate_scene_ui()
     else:
         generate_bangkok()
         generate_amigo()
         generate_logo()
+        generate_scene_ui()

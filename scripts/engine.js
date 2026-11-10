@@ -290,6 +290,7 @@
       this.completedHousesCount = 0;
       this.sdg15Unlocked = false;
 
+      this.readSceneHouseSpots(this.currentLevel);
       this.setupStartingCity();
       this.currentLevel.maxPollution = this.computeMaxPollution();
       this.lastDisasterGap = 0;
@@ -311,6 +312,7 @@
       this.money = 300;
       this.activeTool = 'power';
 
+      this.readSceneHouseSpots(CONFIG.TUTORIAL_LEVEL);
       // The tutorial uses its own fixed house spots (config/tutorial.json -> houseSpawnPoints):
       // [0] starts wired-able to every building, [1] only via house 1, [2] only via house 2 (series slowdown)
       while (this.houses.length > 0) {
@@ -324,6 +326,18 @@
       this.spawnHouse(null, p0.x, p0.y);
       this.addFloatingText('🎓 เริ่มโหมดฝึกสอนด่วน (Fast Scene Tutorial)! ทำตามลูกศรแนะนำได้เลย', CONFIG.CANVAS_WIDTH / 2, 115, '#06d6a0');
       if (global.POWATER.uiManager) global.POWATER.uiManager.showHudIntro(); // explain the top bar first
+    }
+
+    // Fixed house spots placed in the GDevelop scene ('house_spot' markers, 'order' = spawn sequence) override
+    // config/<city>.json -> houseSpawnPoints, so moving a marker in the editor moves that house
+    readSceneHouseSpots(level) {
+      const sc = this.runtimeScene;
+      if (!level || !sc || !sc.getObjects || !sc.getName || sc.getName() !== level.sceneName) return; // only this level's own scene
+      const spots = (sc.getObjects('house_spot') || []).map(o => {
+        const v = o.getVariables && o.getVariables();
+        return { order: v && v.has('order') ? v.get('order').getAsNumber() : 0, x: Math.round(o.getX() + o.getWidth() / 2), y: Math.round(o.getY() + o.getHeight() / 2) };
+      });
+      if (spots.length) level.houseSpawnPoints = spots.sort((a, b) => a.order - b.order).map(s => [s.x, s.y]);
     }
 
     // i-th fixed tutorial house spot, or a free spot near the previous tutorial house

@@ -91,7 +91,7 @@
         { id: 'power', objectName: 'btn_power', title: '⚡ POWER', sub: '[1] WIRE', videoKey: 'power', type: 'tool', toolId: 'power', x: 238, y: tbY, w: tbW, h: tbH, color: 0xffb703 },
         { id: 'water', objectName: 'btn_water', title: '💧 WATER', sub: '[2] PIPE', videoKey: 'water', type: 'tool', toolId: 'water', x: 312, y: tbY, w: tbW, h: tbH, color: 0x00b4d8 },
         { id: 'sewage', objectName: 'btn_drain', title: '🧪 DRAIN', sub: '[3] SEWAGE', videoKey: 'sewage', type: 'tool', toolId: 'sewage', x: 386, y: tbY, w: tbW, h: tbH, color: 0x9d4edd },
-        { id: 'delete', title: '🗑️ DELETE', sub: '[X] WIRE', type: 'tool', toolId: 'delete', x: 460, y: tbY, w: tbW, h: tbH, color: 0xadb5bd },
+        { id: 'delete', objectName: 'btn_delete', title: '🗑️ DELETE', sub: '[X] WIRE', type: 'tool', toolId: 'delete', x: 460, y: tbY, w: tbW, h: tbH, color: 0xadb5bd },
         { id: 'air_filter', objectName: 'btn_filter', title: '🍃 FILTER', sub: '[4] $40', videoKey: 'air_filter', type: 'build', buildId: 'build_air_filter', x: 534, y: tbY, w: tbW, h: tbH, color: 0x06d6a0 },
         { id: 'repair', objectName: 'btn_repair', title: '🔧 REPAIR', sub: '[R] FIX', videoKey: 'repair', type: 'action', action: 'repairTool', x: 608, y: tbY, w: tbW, h: tbH, color: 0xff5a5f },
         { id: 'special', objectName: 'btn_special', title: '🧪 TEST', sub: '[I] LAB', videoKey: 'special', type: 'action', action: 'openSpecialItems', x: 682, y: tbY, w: tbW, h: tbH, color: 0x06d6a0 },
@@ -329,6 +329,9 @@
             }
           }
         }
+        // Editor-only layout sprites (top-bar boxes, logo, day icon, house spots): the HUD/engine draw the live versions
+        ['hud_slot_city', 'hud_slot_money', 'hud_slot_houses', 'hud_slot_goal', 'hud_slot_pollution', 'hud_slot_time', 'hud_slot_strikes',
+          'logo_powater', 'icon_day', 'house_spot'].forEach(n => (this.game.runtimeScene.getObjects(n) || []).forEach(o => o.hide && o.hide(true)));
         const vidObjs = this.game.runtimeScene.getObjects('btn_video_help');
         if (vidObjs && vidObjs.length > 0) {
           for (let j = 0; j < vidObjs.length; j++) {
@@ -1469,7 +1472,7 @@
       this.modalGfx.beginFill(hard ? (isHardHover ? 0xc1121f : 0x9d0208) : (isHardHover ? 0x2b2350 : 0x1d1738), 1.0);
       this.modalGfx.drawRoundedRect(hardBtn.x, hardBtn.y, hardBtn.w, hardBtn.h, 8);
       this.modalGfx.endFill();
-      const hardTxt = this.makeText(hard ? '🔥 โหมดยาก: เปิด — ไม่มีสายยาว 2.5 เท่า (ลากได้สูงสุด 315px)' : '🔥 โหมดยาก: ปิด (คลิกเพื่อเปิด — เอาสายยาว 2.5 เท่าออก)', {
+      const hardTxt = this.makeText(hard ? '🔥 โหมดยาก: เปิด — สายไฟสั้นลง' : '🔥 โหมดยาก: ปิด — สายไฟสั้นลง', {
         fontFamily: font, fontSize: 12, fontWeight: 'bold', fill: hard ? 0xffffff : 0xadb5bd
       });
       hardTxt.anchor.set(0.5);

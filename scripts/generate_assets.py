@@ -478,18 +478,17 @@ if __name__ == '__main__':
     generate_river_png('river_amsterdam.png', 280, 720, 490, amsterdam_path, 90, amsterdam_palette)
 
     # 3. All 12 Toolbar Buttons in 4x HD (256x192) with Anti-Aliased Vector Typography
-    all_buttons = [
+    all_buttons = [  # labels match the live toolbar (scripts/ui.js)
         ('btn_power.png', 'POWER', '[1] WIRE', (255, 183, 3)),
         ('btn_water.png', 'WATER', '[2] PIPE', (0, 180, 216)),
         ('btn_drain.png', 'DRAIN', '[3] SEWAGE', (157, 78, 221)),
-        ('btn_solar.png', 'SOLAR', '[4] $60', (255, 209, 102)),
-        ('btn_filter.png', 'FILTER', '[5] $40', (6, 214, 160)),
+        ('btn_delete.png', 'DELETE', '[X] WIRE', (173, 181, 189)),
+        ('btn_filter.png', 'FILTER', '[4] $40', (6, 214, 160)),
         ('btn_repair.png', 'REPAIR', '[R] FIX', (255, 90, 95)),
-        ('btn_special.png', 'ITEMS', '[I] SHOP', (6, 214, 160)),
+        ('btn_special.png', 'TEST', '[I] LAB', (6, 214, 160)),
         ('btn_pause.png', 'PAUSE', '[SPACE]', (173, 181, 189)),
-        ('btn_speed.png', 'SPEED', '1X / 2X', (173, 181, 189)),
-        ('btn_upgrade.png', 'UPGRADE', '[U] TECH', (255, 209, 102)),
-        ('btn_sdgs.png', 'SDGS', 'ROADMAP', (0, 180, 216)),
+        ('btn_speed.png', 'SPEED', '1X 2X 4X', (173, 181, 189)),
+        ('btn_upgrade.png', 'TECH', '[U] UPGRD', (255, 209, 102)),
         ('btn_guide.png', 'LEVELS', 'BRIEFING', (72, 202, 228))
     ]
     for fname, title, sub, col in all_buttons:
@@ -499,6 +498,6 @@ if __name__ == '__main__':
     generate_badge_repair()
     generate_badge_candle()
     generate_day_night_icons()
-    generate_logo_powater()
+    # logo_powater.png now comes from scripts/generate_story_assets.py (team logo)
     generate_toolbar_dock()
     generate_video_help_icon()

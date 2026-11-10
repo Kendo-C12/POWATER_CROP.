@@ -383,6 +383,118 @@
         "name": "amigo.png",
         "smoothed": true,
         "userAdded": true
+      },
+      {
+        "file": "assets/btn_delete.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "btn_delete.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "file": "assets/house_spot.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "house_spot.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "file": "assets/hud_slot_city.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "hud_slot_city.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "file": "assets/hud_slot_money.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "hud_slot_money.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "file": "assets/hud_slot_houses.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "hud_slot_houses.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "file": "assets/hud_slot_goal.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "hud_slot_goal.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "file": "assets/hud_slot_pollution.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "hud_slot_pollution.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "file": "assets/hud_slot_time.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "hud_slot_time.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "file": "assets/hud_slot_strikes.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "hud_slot_strikes.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "file": "assets/hud_slot_city_main.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "hud_slot_city_main.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "file": "assets/hud_slot_city_tutorial.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "hud_slot_city_tutorial.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "file": "assets/hud_slot_city_tokyo.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "hud_slot_city_tokyo.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "file": "assets/hud_slot_city_rome.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "hud_slot_city_rome.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "file": "assets/hud_slot_city_amsterdam.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "hud_slot_city_amsterdam.png",
+        "smoothed": true,
+        "userAdded": true
       }
     ]
   },
@@ -630,6 +742,166 @@
           "initialVariables": []
         },
         {
+          "name": "btn_delete",
+          "x": 460,
+          "y": 658,
+          "width": 64,
+          "height": 48,
+          "zOrder": 10,
+          "persistentUuid": "inst-btn-delete",
+          "angle": 0,
+          "customSize": true,
+          "layer": "",
+          "locked": false,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "name": "hud_slot_city",
+          "x": 8,
+          "y": 6,
+          "width": 185,
+          "height": 32,
+          "zOrder": 9,
+          "persistentUuid": "inst-hud_slot_city",
+          "angle": 0,
+          "customSize": true,
+          "layer": "",
+          "locked": false,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "name": "hud_slot_money",
+          "x": 198,
+          "y": 6,
+          "width": 112,
+          "height": 32,
+          "zOrder": 9,
+          "persistentUuid": "inst-hud_slot_money",
+          "angle": 0,
+          "customSize": true,
+          "layer": "",
+          "locked": false,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "name": "hud_slot_houses",
+          "x": 314,
+          "y": 6,
+          "width": 148,
+          "height": 32,
+          "zOrder": 9,
+          "persistentUuid": "inst-hud_slot_houses",
+          "angle": 0,
+          "customSize": true,
+          "layer": "",
+          "locked": false,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "name": "hud_slot_goal",
+          "x": 466,
+          "y": 6,
+          "width": 190,
+          "height": 32,
+          "zOrder": 9,
+          "persistentUuid": "inst-hud_slot_goal",
+          "angle": 0,
+          "customSize": true,
+          "layer": "",
+          "locked": false,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "name": "hud_slot_pollution",
+          "x": 660,
+          "y": 6,
+          "width": 172,
+          "height": 32,
+          "zOrder": 9,
+          "persistentUuid": "inst-hud_slot_pollution",
+          "angle": 0,
+          "customSize": true,
+          "layer": "",
+          "locked": false,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "name": "hud_slot_time",
+          "x": 836,
+          "y": 6,
+          "width": 216,
+          "height": 32,
+          "zOrder": 9,
+          "persistentUuid": "inst-hud_slot_time",
+          "angle": 0,
+          "customSize": true,
+          "layer": "",
+          "locked": false,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "name": "hud_slot_strikes",
+          "x": 1056,
+          "y": 6,
+          "width": 214,
+          "height": 32,
+          "zOrder": 9,
+          "persistentUuid": "inst-hud_slot_strikes",
+          "angle": 0,
+          "customSize": true,
+          "layer": "",
+          "locked": false,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "name": "logo_powater",
+          "x": 14,
+          "y": 10,
+          "width": 24,
+          "height": 24,
+          "zOrder": 10,
+          "persistentUuid": "inst-hud-logo",
+          "angle": 0,
+          "customSize": true,
+          "layer": "",
+          "locked": false,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "name": "icon_day",
+          "x": 842,
+          "y": 11,
+          "width": 22,
+          "height": 22,
+          "zOrder": 10,
+          "persistentUuid": "inst-hud-day",
+          "angle": 0,
+          "customSize": true,
+          "layer": "",
+          "locked": false,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
           "name": "btn_video_help",
           "x": 252,
           "y": 626,
@@ -820,6 +1092,336 @@
           "numberProperties": [],
           "stringProperties": [],
           "initialVariables": []
+        },
+        {
+          "name": "house_spot",
+          "x": 795,
+          "y": 230,
+          "width": 100,
+          "height": 100,
+          "zOrder": 2,
+          "persistentUuid": "inst-spot-bangkok-1",
+          "angle": 0,
+          "customSize": true,
+          "layer": "",
+          "locked": false,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": [
+            {
+              "name": "order",
+              "type": "number",
+              "value": 1
+            }
+          ]
+        },
+        {
+          "name": "house_spot",
+          "x": 535,
+          "y": 80,
+          "width": 100,
+          "height": 100,
+          "zOrder": 2,
+          "persistentUuid": "inst-spot-bangkok-2",
+          "angle": 0,
+          "customSize": true,
+          "layer": "",
+          "locked": false,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": [
+            {
+              "name": "order",
+              "type": "number",
+              "value": 2
+            }
+          ]
+        },
+        {
+          "name": "house_spot",
+          "x": 485,
+          "y": 380,
+          "width": 100,
+          "height": 100,
+          "zOrder": 2,
+          "persistentUuid": "inst-spot-bangkok-3",
+          "angle": 0,
+          "customSize": true,
+          "layer": "",
+          "locked": false,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": [
+            {
+              "name": "order",
+              "type": "number",
+              "value": 3
+            }
+          ]
+        },
+        {
+          "name": "house_spot",
+          "x": 785,
+          "y": 60,
+          "width": 100,
+          "height": 100,
+          "zOrder": 2,
+          "persistentUuid": "inst-spot-bangkok-4",
+          "angle": 0,
+          "customSize": true,
+          "layer": "",
+          "locked": false,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": [
+            {
+              "name": "order",
+              "type": "number",
+              "value": 4
+            }
+          ]
+        },
+        {
+          "name": "house_spot",
+          "x": 945,
+          "y": 230,
+          "width": 100,
+          "height": 100,
+          "zOrder": 2,
+          "persistentUuid": "inst-spot-bangkok-5",
+          "angle": 0,
+          "customSize": true,
+          "layer": "",
+          "locked": false,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": [
+            {
+              "name": "order",
+              "type": "number",
+              "value": 5
+            }
+          ]
+        },
+        {
+          "name": "house_spot",
+          "x": 515,
+          "y": 520,
+          "width": 100,
+          "height": 100,
+          "zOrder": 2,
+          "persistentUuid": "inst-spot-bangkok-6",
+          "angle": 0,
+          "customSize": true,
+          "layer": "",
+          "locked": false,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": [
+            {
+              "name": "order",
+              "type": "number",
+              "value": 6
+            }
+          ]
+        },
+        {
+          "name": "house_spot",
+          "x": 365,
+          "y": 320,
+          "width": 100,
+          "height": 100,
+          "zOrder": 2,
+          "persistentUuid": "inst-spot-bangkok-7",
+          "angle": 0,
+          "customSize": true,
+          "layer": "",
+          "locked": false,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": [
+            {
+              "name": "order",
+              "type": "number",
+              "value": 7
+            }
+          ]
+        },
+        {
+          "name": "house_spot",
+          "x": 285,
+          "y": 190,
+          "width": 100,
+          "height": 100,
+          "zOrder": 2,
+          "persistentUuid": "inst-spot-bangkok-8",
+          "angle": 0,
+          "customSize": true,
+          "layer": "",
+          "locked": false,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": [
+            {
+              "name": "order",
+              "type": "number",
+              "value": 8
+            }
+          ]
+        },
+        {
+          "name": "house_spot",
+          "x": 905,
+          "y": 430,
+          "width": 100,
+          "height": 100,
+          "zOrder": 2,
+          "persistentUuid": "inst-spot-bangkok-9",
+          "angle": 0,
+          "customSize": true,
+          "layer": "",
+          "locked": false,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": [
+            {
+              "name": "order",
+              "type": "number",
+              "value": 9
+            }
+          ]
+        },
+        {
+          "name": "house_spot",
+          "x": 935,
+          "y": 80,
+          "width": 100,
+          "height": 100,
+          "zOrder": 2,
+          "persistentUuid": "inst-spot-bangkok-10",
+          "angle": 0,
+          "customSize": true,
+          "layer": "",
+          "locked": false,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": [
+            {
+              "name": "order",
+              "type": "number",
+              "value": 10
+            }
+          ]
+        },
+        {
+          "name": "house_spot",
+          "x": 375,
+          "y": 480,
+          "width": 100,
+          "height": 100,
+          "zOrder": 2,
+          "persistentUuid": "inst-spot-bangkok-11",
+          "angle": 0,
+          "customSize": true,
+          "layer": "",
+          "locked": false,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": [
+            {
+              "name": "order",
+              "type": "number",
+              "value": 11
+            }
+          ]
+        },
+        {
+          "name": "house_spot",
+          "x": 305,
+          "y": 50,
+          "width": 100,
+          "height": 100,
+          "zOrder": 2,
+          "persistentUuid": "inst-spot-bangkok-12",
+          "angle": 0,
+          "customSize": true,
+          "layer": "",
+          "locked": false,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": [
+            {
+              "name": "order",
+              "type": "number",
+              "value": 12
+            }
+          ]
+        },
+        {
+          "name": "house_spot",
+          "x": 215,
+          "y": 320,
+          "width": 100,
+          "height": 100,
+          "zOrder": 2,
+          "persistentUuid": "inst-spot-bangkok-13",
+          "angle": 0,
+          "customSize": true,
+          "layer": "",
+          "locked": false,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": [
+            {
+              "name": "order",
+              "type": "number",
+              "value": 13
+            }
+          ]
+        },
+        {
+          "name": "house_spot",
+          "x": 1075,
+          "y": 160,
+          "width": 100,
+          "height": 100,
+          "zOrder": 2,
+          "persistentUuid": "inst-spot-bangkok-14",
+          "angle": 0,
+          "customSize": true,
+          "layer": "",
+          "locked": false,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": [
+            {
+              "name": "order",
+              "type": "number",
+              "value": 14
+            }
+          ]
+        },
+        {
+          "name": "house_spot",
+          "x": 225,
+          "y": 470,
+          "width": 100,
+          "height": 100,
+          "zOrder": 2,
+          "persistentUuid": "inst-spot-bangkok-15",
+          "angle": 0,
+          "customSize": true,
+          "layer": "",
+          "locked": false,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": [
+            {
+              "name": "order",
+              "type": "number",
+              "value": 15
+            }
+          ]
         }
       ],
       "objects": [
@@ -2318,6 +2920,444 @@
                         "name": "centre",
                         "x": 72.0,
                         "y": 48.0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "adaptCollisionMaskAutomatically": true,
+          "assetStoreId": "",
+          "name": "btn_delete",
+          "persistentUuid": "uuid-btn_delete",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 0.025,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "btn_delete.png",
+                      "points": [
+                        {
+                          "name": "Point",
+                          "x": 128.0,
+                          "y": -10.0
+                        }
+                      ],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0.0,
+                        "y": 0.0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 128.0,
+                        "y": 96.0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "adaptCollisionMaskAutomatically": true,
+          "assetStoreId": "",
+          "name": "hud_slot_city",
+          "persistentUuid": "uuid-hud_slot_city",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 0.025,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "hud_slot_city_main.png",
+                      "points": [
+                        {
+                          "name": "Point",
+                          "x": 185.0,
+                          "y": -10.0
+                        }
+                      ],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0.0,
+                        "y": 0.0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 185.0,
+                        "y": 32.0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "adaptCollisionMaskAutomatically": true,
+          "assetStoreId": "",
+          "name": "hud_slot_money",
+          "persistentUuid": "uuid-hud_slot_money",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 0.025,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "hud_slot_money.png",
+                      "points": [
+                        {
+                          "name": "Point",
+                          "x": 112.0,
+                          "y": -10.0
+                        }
+                      ],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0.0,
+                        "y": 0.0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 112.0,
+                        "y": 32.0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "adaptCollisionMaskAutomatically": true,
+          "assetStoreId": "",
+          "name": "hud_slot_houses",
+          "persistentUuid": "uuid-hud_slot_houses",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 0.025,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "hud_slot_houses.png",
+                      "points": [
+                        {
+                          "name": "Point",
+                          "x": 148.0,
+                          "y": -10.0
+                        }
+                      ],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0.0,
+                        "y": 0.0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 148.0,
+                        "y": 32.0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "adaptCollisionMaskAutomatically": true,
+          "assetStoreId": "",
+          "name": "hud_slot_goal",
+          "persistentUuid": "uuid-hud_slot_goal",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 0.025,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "hud_slot_goal.png",
+                      "points": [
+                        {
+                          "name": "Point",
+                          "x": 190.0,
+                          "y": -10.0
+                        }
+                      ],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0.0,
+                        "y": 0.0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 190.0,
+                        "y": 32.0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "adaptCollisionMaskAutomatically": true,
+          "assetStoreId": "",
+          "name": "hud_slot_pollution",
+          "persistentUuid": "uuid-hud_slot_pollution",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 0.025,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "hud_slot_pollution.png",
+                      "points": [
+                        {
+                          "name": "Point",
+                          "x": 172.0,
+                          "y": -10.0
+                        }
+                      ],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0.0,
+                        "y": 0.0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 172.0,
+                        "y": 32.0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "adaptCollisionMaskAutomatically": true,
+          "assetStoreId": "",
+          "name": "hud_slot_time",
+          "persistentUuid": "uuid-hud_slot_time",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 0.025,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "hud_slot_time.png",
+                      "points": [
+                        {
+                          "name": "Point",
+                          "x": 216.0,
+                          "y": -10.0
+                        }
+                      ],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0.0,
+                        "y": 0.0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 216.0,
+                        "y": 32.0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "adaptCollisionMaskAutomatically": true,
+          "assetStoreId": "",
+          "name": "hud_slot_strikes",
+          "persistentUuid": "uuid-hud_slot_strikes",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 0.025,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "hud_slot_strikes.png",
+                      "points": [
+                        {
+                          "name": "Point",
+                          "x": 214.0,
+                          "y": -10.0
+                        }
+                      ],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0.0,
+                        "y": 0.0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 214.0,
+                        "y": 32.0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "adaptCollisionMaskAutomatically": true,
+          "assetStoreId": "",
+          "name": "house_spot",
+          "persistentUuid": "uuid-house_spot",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [
+            {
+              "name": "order",
+              "type": "number",
+              "value": 0
+            }
+          ],
+          "effects": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 0.025,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "house_spot.png",
+                      "points": [
+                        {
+                          "name": "Point",
+                          "x": 100.0,
+                          "y": -10.0
+                        }
+                      ],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0.0,
+                        "y": 0.0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 100.0,
+                        "y": 100.0
                       },
                       "customCollisionMask": []
                     }
@@ -5462,6 +6502,7 @@
                 "      this.completedHousesCount = 0;",
                 "      this.sdg15Unlocked = false;",
                 "",
+                "      this.readSceneHouseSpots(this.currentLevel);",
                 "      this.setupStartingCity();",
                 "      this.currentLevel.maxPollution = this.computeMaxPollution();",
                 "      this.lastDisasterGap = 0;",
@@ -5483,6 +6524,7 @@
                 "      this.money = 300;",
                 "      this.activeTool = 'power';",
                 "",
+                "      this.readSceneHouseSpots(CONFIG.TUTORIAL_LEVEL);",
                 "      // The tutorial uses its own fixed house spots (config/tutorial.json -> houseSpawnPoints):",
                 "      // [0] starts wired-able to every building, [1] only via house 1, [2] only via house 2 (series slowdown)",
                 "      while (this.houses.length > 0) {",
@@ -5496,6 +6538,18 @@
                 "      this.spawnHouse(null, p0.x, p0.y);",
                 "      this.addFloatingText('🎓 เริ่มโหมดฝึกสอนด่วน (Fast Scene Tutorial)! ทำตามลูกศรแนะนำได้เลย', CONFIG.CANVAS_WIDTH / 2, 115, '#06d6a0');",
                 "      if (global.POWATER.uiManager) global.POWATER.uiManager.showHudIntro(); // explain the top bar first",
+                "    }",
+                "",
+                "    // Fixed house spots placed in the GDevelop scene ('house_spot' markers, 'order' = spawn sequence) override",
+                "    // config/<city>.json -> houseSpawnPoints, so moving a marker in the editor moves that house",
+                "    readSceneHouseSpots(level) {",
+                "      const sc = this.runtimeScene;",
+                "      if (!level || !sc || !sc.getObjects || !sc.getName || sc.getName() !== level.sceneName) return; // only this level's own scene",
+                "      const spots = (sc.getObjects('house_spot') || []).map(o => {",
+                "        const v = o.getVariables && o.getVariables();",
+                "        return { order: v && v.has('order') ? v.get('order').getAsNumber() : 0, x: Math.round(o.getX() + o.getWidth() / 2), y: Math.round(o.getY() + o.getHeight() / 2) };",
+                "      });",
+                "      if (spots.length) level.houseSpawnPoints = spots.sort((a, b) => a.order - b.order).map(s => [s.x, s.y]);",
                 "    }",
                 "",
                 "    // i-th fixed tutorial house spot, or a free spot near the previous tutorial house",
@@ -6968,7 +8022,7 @@
                 "        { id: 'power', objectName: 'btn_power', title: '⚡ POWER', sub: '[1] WIRE', videoKey: 'power', type: 'tool', toolId: 'power', x: 238, y: tbY, w: tbW, h: tbH, color: 0xffb703 },",
                 "        { id: 'water', objectName: 'btn_water', title: '💧 WATER', sub: '[2] PIPE', videoKey: 'water', type: 'tool', toolId: 'water', x: 312, y: tbY, w: tbW, h: tbH, color: 0x00b4d8 },",
                 "        { id: 'sewage', objectName: 'btn_drain', title: '🧪 DRAIN', sub: '[3] SEWAGE', videoKey: 'sewage', type: 'tool', toolId: 'sewage', x: 386, y: tbY, w: tbW, h: tbH, color: 0x9d4edd },",
-                "        { id: 'delete', title: '🗑️ DELETE', sub: '[X] WIRE', type: 'tool', toolId: 'delete', x: 460, y: tbY, w: tbW, h: tbH, color: 0xadb5bd },",
+                "        { id: 'delete', objectName: 'btn_delete', title: '🗑️ DELETE', sub: '[X] WIRE', type: 'tool', toolId: 'delete', x: 460, y: tbY, w: tbW, h: tbH, color: 0xadb5bd },",
                 "        { id: 'air_filter', objectName: 'btn_filter', title: '🍃 FILTER', sub: '[4] $40', videoKey: 'air_filter', type: 'build', buildId: 'build_air_filter', x: 534, y: tbY, w: tbW, h: tbH, color: 0x06d6a0 },",
                 "        { id: 'repair', objectName: 'btn_repair', title: '🔧 REPAIR', sub: '[R] FIX', videoKey: 'repair', type: 'action', action: 'repairTool', x: 608, y: tbY, w: tbW, h: tbH, color: 0xff5a5f },",
                 "        { id: 'special', objectName: 'btn_special', title: '🧪 TEST', sub: '[I] LAB', videoKey: 'special', type: 'action', action: 'openSpecialItems', x: 682, y: tbY, w: tbW, h: tbH, color: 0x06d6a0 },",
@@ -7206,6 +8260,9 @@
                 "            }",
                 "          }",
                 "        }",
+                "        // Editor-only layout sprites (top-bar boxes, logo, day icon, house spots): the HUD/engine draw the live versions",
+                "        ['hud_slot_city', 'hud_slot_money', 'hud_slot_houses', 'hud_slot_goal', 'hud_slot_pollution', 'hud_slot_time', 'hud_slot_strikes',",
+                "          'logo_powater', 'icon_day', 'house_spot'].forEach(n => (this.game.runtimeScene.getObjects(n) || []).forEach(o => o.hide && o.hide(true)));",
                 "        const vidObjs = this.game.runtimeScene.getObjects('btn_video_help');",
                 "        if (vidObjs && vidObjs.length > 0) {",
                 "          for (let j = 0; j < vidObjs.length; j++) {",
@@ -8346,7 +9403,7 @@
                 "      this.modalGfx.beginFill(hard ? (isHardHover ? 0xc1121f : 0x9d0208) : (isHardHover ? 0x2b2350 : 0x1d1738), 1.0);",
                 "      this.modalGfx.drawRoundedRect(hardBtn.x, hardBtn.y, hardBtn.w, hardBtn.h, 8);",
                 "      this.modalGfx.endFill();",
-                "      const hardTxt = this.makeText(hard ? '🔥 โหมดยาก: เปิด — ไม่มีสายยาว 2.5 เท่า (ลากได้สูงสุด 315px)' : '🔥 โหมดยาก: ปิด (คลิกเพื่อเปิด — เอาสายยาว 2.5 เท่าออก)', {",
+                "      const hardTxt = this.makeText(hard ? '🔥 โหมดยาก: เปิด — สายไฟสั้นลง' : '🔥 โหมดยาก: ปิด — สายไฟสั้นลง', {",
                 "        fontFamily: font, fontSize: 12, fontWeight: 'bold', fill: hard ? 0xffffff : 0xadb5bd",
                 "      });",
                 "      hardTxt.anchor.set(0.5);",
@@ -9741,6 +10798,48 @@
         },
         {
           "name": "amigo.png"
+        },
+        {
+          "name": "btn_delete.png"
+        },
+        {
+          "name": "house_spot.png"
+        },
+        {
+          "name": "hud_slot_city.png"
+        },
+        {
+          "name": "hud_slot_money.png"
+        },
+        {
+          "name": "hud_slot_houses.png"
+        },
+        {
+          "name": "hud_slot_goal.png"
+        },
+        {
+          "name": "hud_slot_pollution.png"
+        },
+        {
+          "name": "hud_slot_time.png"
+        },
+        {
+          "name": "hud_slot_strikes.png"
+        },
+        {
+          "name": "hud_slot_city_main.png"
+        },
+        {
+          "name": "hud_slot_city_tutorial.png"
+        },
+        {
+          "name": "hud_slot_city_tokyo.png"
+        },
+        {
+          "name": "hud_slot_city_rome.png"
+        },
+        {
+          "name": "hud_slot_city_amsterdam.png"
         }
       ]
     },
@@ -9981,6 +11080,166 @@
           "initialVariables": []
         },
         {
+          "name": "btn_delete",
+          "x": 460,
+          "y": 658,
+          "width": 64,
+          "height": 48,
+          "zOrder": 10,
+          "persistentUuid": "inst-btn-delete",
+          "angle": 0,
+          "customSize": true,
+          "layer": "",
+          "locked": false,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "name": "hud_slot_city",
+          "x": 8,
+          "y": 6,
+          "width": 185,
+          "height": 32,
+          "zOrder": 9,
+          "persistentUuid": "inst-hud_slot_city",
+          "angle": 0,
+          "customSize": true,
+          "layer": "",
+          "locked": false,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "name": "hud_slot_money",
+          "x": 198,
+          "y": 6,
+          "width": 112,
+          "height": 32,
+          "zOrder": 9,
+          "persistentUuid": "inst-hud_slot_money",
+          "angle": 0,
+          "customSize": true,
+          "layer": "",
+          "locked": false,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "name": "hud_slot_houses",
+          "x": 314,
+          "y": 6,
+          "width": 148,
+          "height": 32,
+          "zOrder": 9,
+          "persistentUuid": "inst-hud_slot_houses",
+          "angle": 0,
+          "customSize": true,
+          "layer": "",
+          "locked": false,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "name": "hud_slot_goal",
+          "x": 466,
+          "y": 6,
+          "width": 190,
+          "height": 32,
+          "zOrder": 9,
+          "persistentUuid": "inst-hud_slot_goal",
+          "angle": 0,
+          "customSize": true,
+          "layer": "",
+          "locked": false,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "name": "hud_slot_pollution",
+          "x": 660,
+          "y": 6,
+          "width": 172,
+          "height": 32,
+          "zOrder": 9,
+          "persistentUuid": "inst-hud_slot_pollution",
+          "angle": 0,
+          "customSize": true,
+          "layer": "",
+          "locked": false,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "name": "hud_slot_time",
+          "x": 836,
+          "y": 6,
+          "width": 216,
+          "height": 32,
+          "zOrder": 9,
+          "persistentUuid": "inst-hud_slot_time",
+          "angle": 0,
+          "customSize": true,
+          "layer": "",
+          "locked": false,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "name": "hud_slot_strikes",
+          "x": 1056,
+          "y": 6,
+          "width": 214,
+          "height": 32,
+          "zOrder": 9,
+          "persistentUuid": "inst-hud_slot_strikes",
+          "angle": 0,
+          "customSize": true,
+          "layer": "",
+          "locked": false,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "name": "logo_powater",
+          "x": 14,
+          "y": 10,
+          "width": 24,
+          "height": 24,
+          "zOrder": 10,
+          "persistentUuid": "inst-hud-logo",
+          "angle": 0,
+          "customSize": true,
+          "layer": "",
+          "locked": false,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "name": "icon_day",
+          "x": 842,
+          "y": 11,
+          "width": 22,
+          "height": 22,
+          "zOrder": 10,
+          "persistentUuid": "inst-hud-day",
+          "angle": 0,
+          "customSize": true,
+          "layer": "",
+          "locked": false,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
           "name": "btn_video_help",
           "x": 252,
           "y": 626,
@@ -10171,6 +11430,72 @@
           "numberProperties": [],
           "stringProperties": [],
           "initialVariables": []
+        },
+        {
+          "name": "house_spot",
+          "x": 790,
+          "y": 230,
+          "width": 100,
+          "height": 100,
+          "zOrder": 2,
+          "persistentUuid": "inst-spot-tutorial-1",
+          "angle": 0,
+          "customSize": true,
+          "layer": "",
+          "locked": false,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": [
+            {
+              "name": "order",
+              "type": "number",
+              "value": 1
+            }
+          ]
+        },
+        {
+          "name": "house_spot",
+          "x": 990,
+          "y": 240,
+          "width": 100,
+          "height": 100,
+          "zOrder": 2,
+          "persistentUuid": "inst-spot-tutorial-2",
+          "angle": 0,
+          "customSize": true,
+          "layer": "",
+          "locked": false,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": [
+            {
+              "name": "order",
+              "type": "number",
+              "value": 2
+            }
+          ]
+        },
+        {
+          "name": "house_spot",
+          "x": 1080,
+          "y": 120,
+          "width": 100,
+          "height": 100,
+          "zOrder": 2,
+          "persistentUuid": "inst-spot-tutorial-3",
+          "angle": 0,
+          "customSize": true,
+          "layer": "",
+          "locked": false,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": [
+            {
+              "name": "order",
+              "type": "number",
+              "value": 3
+            }
+          ]
         }
       ],
       "objects": [
@@ -11669,6 +12994,444 @@
                         "name": "centre",
                         "x": 72.0,
                         "y": 48.0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "adaptCollisionMaskAutomatically": true,
+          "assetStoreId": "",
+          "name": "btn_delete",
+          "persistentUuid": "uuid-btn_delete",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 0.025,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "btn_delete.png",
+                      "points": [
+                        {
+                          "name": "Point",
+                          "x": 128.0,
+                          "y": -10.0
+                        }
+                      ],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0.0,
+                        "y": 0.0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 128.0,
+                        "y": 96.0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "adaptCollisionMaskAutomatically": true,
+          "assetStoreId": "",
+          "name": "hud_slot_city",
+          "persistentUuid": "uuid-hud_slot_city",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 0.025,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "hud_slot_city_tutorial.png",
+                      "points": [
+                        {
+                          "name": "Point",
+                          "x": 185.0,
+                          "y": -10.0
+                        }
+                      ],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0.0,
+                        "y": 0.0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 185.0,
+                        "y": 32.0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "adaptCollisionMaskAutomatically": true,
+          "assetStoreId": "",
+          "name": "hud_slot_money",
+          "persistentUuid": "uuid-hud_slot_money",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 0.025,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "hud_slot_money.png",
+                      "points": [
+                        {
+                          "name": "Point",
+                          "x": 112.0,
+                          "y": -10.0
+                        }
+                      ],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0.0,
+                        "y": 0.0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 112.0,
+                        "y": 32.0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "adaptCollisionMaskAutomatically": true,
+          "assetStoreId": "",
+          "name": "hud_slot_houses",
+          "persistentUuid": "uuid-hud_slot_houses",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 0.025,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "hud_slot_houses.png",
+                      "points": [
+                        {
+                          "name": "Point",
+                          "x": 148.0,
+                          "y": -10.0
+                        }
+                      ],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0.0,
+                        "y": 0.0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 148.0,
+                        "y": 32.0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "adaptCollisionMaskAutomatically": true,
+          "assetStoreId": "",
+          "name": "hud_slot_goal",
+          "persistentUuid": "uuid-hud_slot_goal",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 0.025,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "hud_slot_goal.png",
+                      "points": [
+                        {
+                          "name": "Point",
+                          "x": 190.0,
+                          "y": -10.0
+                        }
+                      ],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0.0,
+                        "y": 0.0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 190.0,
+                        "y": 32.0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "adaptCollisionMaskAutomatically": true,
+          "assetStoreId": "",
+          "name": "hud_slot_pollution",
+          "persistentUuid": "uuid-hud_slot_pollution",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 0.025,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "hud_slot_pollution.png",
+                      "points": [
+                        {
+                          "name": "Point",
+                          "x": 172.0,
+                          "y": -10.0
+                        }
+                      ],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0.0,
+                        "y": 0.0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 172.0,
+                        "y": 32.0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "adaptCollisionMaskAutomatically": true,
+          "assetStoreId": "",
+          "name": "hud_slot_time",
+          "persistentUuid": "uuid-hud_slot_time",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 0.025,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "hud_slot_time.png",
+                      "points": [
+                        {
+                          "name": "Point",
+                          "x": 216.0,
+                          "y": -10.0
+                        }
+                      ],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0.0,
+                        "y": 0.0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 216.0,
+                        "y": 32.0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "adaptCollisionMaskAutomatically": true,
+          "assetStoreId": "",
+          "name": "hud_slot_strikes",
+          "persistentUuid": "uuid-hud_slot_strikes",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 0.025,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "hud_slot_strikes.png",
+                      "points": [
+                        {
+                          "name": "Point",
+                          "x": 214.0,
+                          "y": -10.0
+                        }
+                      ],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0.0,
+                        "y": 0.0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 214.0,
+                        "y": 32.0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "adaptCollisionMaskAutomatically": true,
+          "assetStoreId": "",
+          "name": "house_spot",
+          "persistentUuid": "uuid-house_spot",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [
+            {
+              "name": "order",
+              "type": "number",
+              "value": 0
+            }
+          ],
+          "effects": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 0.025,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "house_spot.png",
+                      "points": [
+                        {
+                          "name": "Point",
+                          "x": 100.0,
+                          "y": -10.0
+                        }
+                      ],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0.0,
+                        "y": 0.0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 100.0,
+                        "y": 100.0
                       },
                       "customCollisionMask": []
                     }
@@ -14813,6 +16576,7 @@
                 "      this.completedHousesCount = 0;",
                 "      this.sdg15Unlocked = false;",
                 "",
+                "      this.readSceneHouseSpots(this.currentLevel);",
                 "      this.setupStartingCity();",
                 "      this.currentLevel.maxPollution = this.computeMaxPollution();",
                 "      this.lastDisasterGap = 0;",
@@ -14834,6 +16598,7 @@
                 "      this.money = 300;",
                 "      this.activeTool = 'power';",
                 "",
+                "      this.readSceneHouseSpots(CONFIG.TUTORIAL_LEVEL);",
                 "      // The tutorial uses its own fixed house spots (config/tutorial.json -> houseSpawnPoints):",
                 "      // [0] starts wired-able to every building, [1] only via house 1, [2] only via house 2 (series slowdown)",
                 "      while (this.houses.length > 0) {",
@@ -14847,6 +16612,18 @@
                 "      this.spawnHouse(null, p0.x, p0.y);",
                 "      this.addFloatingText('🎓 เริ่มโหมดฝึกสอนด่วน (Fast Scene Tutorial)! ทำตามลูกศรแนะนำได้เลย', CONFIG.CANVAS_WIDTH / 2, 115, '#06d6a0');",
                 "      if (global.POWATER.uiManager) global.POWATER.uiManager.showHudIntro(); // explain the top bar first",
+                "    }",
+                "",
+                "    // Fixed house spots placed in the GDevelop scene ('house_spot' markers, 'order' = spawn sequence) override",
+                "    // config/<city>.json -> houseSpawnPoints, so moving a marker in the editor moves that house",
+                "    readSceneHouseSpots(level) {",
+                "      const sc = this.runtimeScene;",
+                "      if (!level || !sc || !sc.getObjects || !sc.getName || sc.getName() !== level.sceneName) return; // only this level's own scene",
+                "      const spots = (sc.getObjects('house_spot') || []).map(o => {",
+                "        const v = o.getVariables && o.getVariables();",
+                "        return { order: v && v.has('order') ? v.get('order').getAsNumber() : 0, x: Math.round(o.getX() + o.getWidth() / 2), y: Math.round(o.getY() + o.getHeight() / 2) };",
+                "      });",
+                "      if (spots.length) level.houseSpawnPoints = spots.sort((a, b) => a.order - b.order).map(s => [s.x, s.y]);",
                 "    }",
                 "",
                 "    // i-th fixed tutorial house spot, or a free spot near the previous tutorial house",
@@ -16319,7 +18096,7 @@
                 "        { id: 'power', objectName: 'btn_power', title: '⚡ POWER', sub: '[1] WIRE', videoKey: 'power', type: 'tool', toolId: 'power', x: 238, y: tbY, w: tbW, h: tbH, color: 0xffb703 },",
                 "        { id: 'water', objectName: 'btn_water', title: '💧 WATER', sub: '[2] PIPE', videoKey: 'water', type: 'tool', toolId: 'water', x: 312, y: tbY, w: tbW, h: tbH, color: 0x00b4d8 },",
                 "        { id: 'sewage', objectName: 'btn_drain', title: '🧪 DRAIN', sub: '[3] SEWAGE', videoKey: 'sewage', type: 'tool', toolId: 'sewage', x: 386, y: tbY, w: tbW, h: tbH, color: 0x9d4edd },",
-                "        { id: 'delete', title: '🗑️ DELETE', sub: '[X] WIRE', type: 'tool', toolId: 'delete', x: 460, y: tbY, w: tbW, h: tbH, color: 0xadb5bd },",
+                "        { id: 'delete', objectName: 'btn_delete', title: '🗑️ DELETE', sub: '[X] WIRE', type: 'tool', toolId: 'delete', x: 460, y: tbY, w: tbW, h: tbH, color: 0xadb5bd },",
                 "        { id: 'air_filter', objectName: 'btn_filter', title: '🍃 FILTER', sub: '[4] $40', videoKey: 'air_filter', type: 'build', buildId: 'build_air_filter', x: 534, y: tbY, w: tbW, h: tbH, color: 0x06d6a0 },",
                 "        { id: 'repair', objectName: 'btn_repair', title: '🔧 REPAIR', sub: '[R] FIX', videoKey: 'repair', type: 'action', action: 'repairTool', x: 608, y: tbY, w: tbW, h: tbH, color: 0xff5a5f },",
                 "        { id: 'special', objectName: 'btn_special', title: '🧪 TEST', sub: '[I] LAB', videoKey: 'special', type: 'action', action: 'openSpecialItems', x: 682, y: tbY, w: tbW, h: tbH, color: 0x06d6a0 },",
@@ -16557,6 +18334,9 @@
                 "            }",
                 "          }",
                 "        }",
+                "        // Editor-only layout sprites (top-bar boxes, logo, day icon, house spots): the HUD/engine draw the live versions",
+                "        ['hud_slot_city', 'hud_slot_money', 'hud_slot_houses', 'hud_slot_goal', 'hud_slot_pollution', 'hud_slot_time', 'hud_slot_strikes',",
+                "          'logo_powater', 'icon_day', 'house_spot'].forEach(n => (this.game.runtimeScene.getObjects(n) || []).forEach(o => o.hide && o.hide(true)));",
                 "        const vidObjs = this.game.runtimeScene.getObjects('btn_video_help');",
                 "        if (vidObjs && vidObjs.length > 0) {",
                 "          for (let j = 0; j < vidObjs.length; j++) {",
@@ -17697,7 +19477,7 @@
                 "      this.modalGfx.beginFill(hard ? (isHardHover ? 0xc1121f : 0x9d0208) : (isHardHover ? 0x2b2350 : 0x1d1738), 1.0);",
                 "      this.modalGfx.drawRoundedRect(hardBtn.x, hardBtn.y, hardBtn.w, hardBtn.h, 8);",
                 "      this.modalGfx.endFill();",
-                "      const hardTxt = this.makeText(hard ? '🔥 โหมดยาก: เปิด — ไม่มีสายยาว 2.5 เท่า (ลากได้สูงสุด 315px)' : '🔥 โหมดยาก: ปิด (คลิกเพื่อเปิด — เอาสายยาว 2.5 เท่าออก)', {",
+                "      const hardTxt = this.makeText(hard ? '🔥 โหมดยาก: เปิด — สายไฟสั้นลง' : '🔥 โหมดยาก: ปิด — สายไฟสั้นลง', {",
                 "        fontFamily: font, fontSize: 12, fontWeight: 'bold', fill: hard ? 0xffffff : 0xadb5bd",
                 "      });",
                 "      hardTxt.anchor.set(0.5);",
@@ -19092,6 +20872,48 @@
         },
         {
           "name": "amigo.png"
+        },
+        {
+          "name": "btn_delete.png"
+        },
+        {
+          "name": "house_spot.png"
+        },
+        {
+          "name": "hud_slot_city.png"
+        },
+        {
+          "name": "hud_slot_money.png"
+        },
+        {
+          "name": "hud_slot_houses.png"
+        },
+        {
+          "name": "hud_slot_goal.png"
+        },
+        {
+          "name": "hud_slot_pollution.png"
+        },
+        {
+          "name": "hud_slot_time.png"
+        },
+        {
+          "name": "hud_slot_strikes.png"
+        },
+        {
+          "name": "hud_slot_city_main.png"
+        },
+        {
+          "name": "hud_slot_city_tutorial.png"
+        },
+        {
+          "name": "hud_slot_city_tokyo.png"
+        },
+        {
+          "name": "hud_slot_city_rome.png"
+        },
+        {
+          "name": "hud_slot_city_amsterdam.png"
         }
       ]
     },
@@ -19323,6 +21145,166 @@
           "height": 48,
           "zOrder": 10,
           "persistentUuid": "inst-btn-guide",
+          "angle": 0,
+          "customSize": true,
+          "layer": "",
+          "locked": false,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "name": "btn_delete",
+          "x": 460,
+          "y": 658,
+          "width": 64,
+          "height": 48,
+          "zOrder": 10,
+          "persistentUuid": "inst-btn-delete",
+          "angle": 0,
+          "customSize": true,
+          "layer": "",
+          "locked": false,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "name": "hud_slot_city",
+          "x": 8,
+          "y": 6,
+          "width": 185,
+          "height": 32,
+          "zOrder": 9,
+          "persistentUuid": "inst-hud_slot_city",
+          "angle": 0,
+          "customSize": true,
+          "layer": "",
+          "locked": false,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "name": "hud_slot_money",
+          "x": 198,
+          "y": 6,
+          "width": 112,
+          "height": 32,
+          "zOrder": 9,
+          "persistentUuid": "inst-hud_slot_money",
+          "angle": 0,
+          "customSize": true,
+          "layer": "",
+          "locked": false,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "name": "hud_slot_houses",
+          "x": 314,
+          "y": 6,
+          "width": 148,
+          "height": 32,
+          "zOrder": 9,
+          "persistentUuid": "inst-hud_slot_houses",
+          "angle": 0,
+          "customSize": true,
+          "layer": "",
+          "locked": false,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "name": "hud_slot_goal",
+          "x": 466,
+          "y": 6,
+          "width": 190,
+          "height": 32,
+          "zOrder": 9,
+          "persistentUuid": "inst-hud_slot_goal",
+          "angle": 0,
+          "customSize": true,
+          "layer": "",
+          "locked": false,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "name": "hud_slot_pollution",
+          "x": 660,
+          "y": 6,
+          "width": 172,
+          "height": 32,
+          "zOrder": 9,
+          "persistentUuid": "inst-hud_slot_pollution",
+          "angle": 0,
+          "customSize": true,
+          "layer": "",
+          "locked": false,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "name": "hud_slot_time",
+          "x": 836,
+          "y": 6,
+          "width": 216,
+          "height": 32,
+          "zOrder": 9,
+          "persistentUuid": "inst-hud_slot_time",
+          "angle": 0,
+          "customSize": true,
+          "layer": "",
+          "locked": false,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "name": "hud_slot_strikes",
+          "x": 1056,
+          "y": 6,
+          "width": 214,
+          "height": 32,
+          "zOrder": 9,
+          "persistentUuid": "inst-hud_slot_strikes",
+          "angle": 0,
+          "customSize": true,
+          "layer": "",
+          "locked": false,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "name": "logo_powater",
+          "x": 14,
+          "y": 10,
+          "width": 24,
+          "height": 24,
+          "zOrder": 10,
+          "persistentUuid": "inst-hud-logo",
+          "angle": 0,
+          "customSize": true,
+          "layer": "",
+          "locked": false,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "name": "icon_day",
+          "x": 842,
+          "y": 11,
+          "width": 22,
+          "height": 22,
+          "zOrder": 10,
+          "persistentUuid": "inst-hud-day",
           "angle": 0,
           "customSize": true,
           "layer": "",
@@ -19570,6 +21552,336 @@
           "numberProperties": [],
           "stringProperties": [],
           "initialVariables": []
+        },
+        {
+          "name": "house_spot",
+          "x": 982,
+          "y": 404,
+          "width": 100,
+          "height": 100,
+          "zOrder": 2,
+          "persistentUuid": "inst-spot-tokyo-1",
+          "angle": 0,
+          "customSize": true,
+          "layer": "",
+          "locked": false,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": [
+            {
+              "name": "order",
+              "type": "number",
+              "value": 1
+            }
+          ]
+        },
+        {
+          "name": "house_spot",
+          "x": 364,
+          "y": 92,
+          "width": 100,
+          "height": 100,
+          "zOrder": 2,
+          "persistentUuid": "inst-spot-tokyo-2",
+          "angle": 0,
+          "customSize": true,
+          "layer": "",
+          "locked": false,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": [
+            {
+              "name": "order",
+              "type": "number",
+              "value": 2
+            }
+          ]
+        },
+        {
+          "name": "house_spot",
+          "x": 976,
+          "y": 542,
+          "width": 100,
+          "height": 100,
+          "zOrder": 2,
+          "persistentUuid": "inst-spot-tokyo-3",
+          "angle": 0,
+          "customSize": true,
+          "layer": "",
+          "locked": false,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": [
+            {
+              "name": "order",
+              "type": "number",
+              "value": 3
+            }
+          ]
+        },
+        {
+          "name": "house_spot",
+          "x": 826,
+          "y": 530,
+          "width": 100,
+          "height": 100,
+          "zOrder": 2,
+          "persistentUuid": "inst-spot-tokyo-4",
+          "angle": 0,
+          "customSize": true,
+          "layer": "",
+          "locked": false,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": [
+            {
+              "name": "order",
+              "type": "number",
+              "value": 4
+            }
+          ]
+        },
+        {
+          "name": "house_spot",
+          "x": 232,
+          "y": 146,
+          "width": 100,
+          "height": 100,
+          "zOrder": 2,
+          "persistentUuid": "inst-spot-tokyo-5",
+          "angle": 0,
+          "customSize": true,
+          "layer": "",
+          "locked": false,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": [
+            {
+              "name": "order",
+              "type": "number",
+              "value": 5
+            }
+          ]
+        },
+        {
+          "name": "house_spot",
+          "x": 1054,
+          "y": 218,
+          "width": 100,
+          "height": 100,
+          "zOrder": 2,
+          "persistentUuid": "inst-spot-tokyo-6",
+          "angle": 0,
+          "customSize": true,
+          "layer": "",
+          "locked": false,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": [
+            {
+              "name": "order",
+              "type": "number",
+              "value": 6
+            }
+          ]
+        },
+        {
+          "name": "house_spot",
+          "x": 172,
+          "y": 422,
+          "width": 100,
+          "height": 100,
+          "zOrder": 2,
+          "persistentUuid": "inst-spot-tokyo-7",
+          "angle": 0,
+          "customSize": true,
+          "layer": "",
+          "locked": false,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": [
+            {
+              "name": "order",
+              "type": "number",
+              "value": 7
+            }
+          ]
+        },
+        {
+          "name": "house_spot",
+          "x": 1144,
+          "y": 326,
+          "width": 100,
+          "height": 100,
+          "zOrder": 2,
+          "persistentUuid": "inst-spot-tokyo-8",
+          "angle": 0,
+          "customSize": true,
+          "layer": "",
+          "locked": false,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": [
+            {
+              "name": "order",
+              "type": "number",
+              "value": 8
+            }
+          ]
+        },
+        {
+          "name": "house_spot",
+          "x": 1114,
+          "y": 524,
+          "width": 100,
+          "height": 100,
+          "zOrder": 2,
+          "persistentUuid": "inst-spot-tokyo-9",
+          "angle": 0,
+          "customSize": true,
+          "layer": "",
+          "locked": false,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": [
+            {
+              "name": "order",
+              "type": "number",
+              "value": 9
+            }
+          ]
+        },
+        {
+          "name": "house_spot",
+          "x": 100,
+          "y": 176,
+          "width": 100,
+          "height": 100,
+          "zOrder": 2,
+          "persistentUuid": "inst-spot-tokyo-10",
+          "angle": 0,
+          "customSize": true,
+          "layer": "",
+          "locked": false,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": [
+            {
+              "name": "order",
+              "type": "number",
+              "value": 10
+            }
+          ]
+        },
+        {
+          "name": "house_spot",
+          "x": 64,
+          "y": 338,
+          "width": 100,
+          "height": 100,
+          "zOrder": 2,
+          "persistentUuid": "inst-spot-tokyo-11",
+          "angle": 0,
+          "customSize": true,
+          "layer": "",
+          "locked": false,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": [
+            {
+              "name": "order",
+              "type": "number",
+              "value": 11
+            }
+          ]
+        },
+        {
+          "name": "house_spot",
+          "x": 232,
+          "y": 290,
+          "width": 100,
+          "height": 100,
+          "zOrder": 2,
+          "persistentUuid": "inst-spot-tokyo-12",
+          "angle": 0,
+          "customSize": true,
+          "layer": "",
+          "locked": false,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": [
+            {
+              "name": "order",
+              "type": "number",
+              "value": 12
+            }
+          ]
+        },
+        {
+          "name": "house_spot",
+          "x": 1156,
+          "y": 128,
+          "width": 100,
+          "height": 100,
+          "zOrder": 2,
+          "persistentUuid": "inst-spot-tokyo-13",
+          "angle": 0,
+          "customSize": true,
+          "layer": "",
+          "locked": false,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": [
+            {
+              "name": "order",
+              "type": "number",
+              "value": 13
+            }
+          ]
+        },
+        {
+          "name": "house_spot",
+          "x": 52,
+          "y": 488,
+          "width": 100,
+          "height": 100,
+          "zOrder": 2,
+          "persistentUuid": "inst-spot-tokyo-14",
+          "angle": 0,
+          "customSize": true,
+          "layer": "",
+          "locked": false,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": [
+            {
+              "name": "order",
+              "type": "number",
+              "value": 14
+            }
+          ]
+        },
+        {
+          "name": "house_spot",
+          "x": 142,
+          "y": 50,
+          "width": 100,
+          "height": 100,
+          "zOrder": 2,
+          "persistentUuid": "inst-spot-tokyo-15",
+          "angle": 0,
+          "customSize": true,
+          "layer": "",
+          "locked": false,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": [
+            {
+              "name": "order",
+              "type": "number",
+              "value": 15
+            }
+          ]
         }
       ],
       "objects": [
@@ -21068,6 +23380,444 @@
                         "name": "centre",
                         "x": 72.0,
                         "y": 48.0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "adaptCollisionMaskAutomatically": true,
+          "assetStoreId": "",
+          "name": "btn_delete",
+          "persistentUuid": "uuid-btn_delete",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 0.025,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "btn_delete.png",
+                      "points": [
+                        {
+                          "name": "Point",
+                          "x": 128.0,
+                          "y": -10.0
+                        }
+                      ],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0.0,
+                        "y": 0.0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 128.0,
+                        "y": 96.0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "adaptCollisionMaskAutomatically": true,
+          "assetStoreId": "",
+          "name": "hud_slot_city",
+          "persistentUuid": "uuid-hud_slot_city",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 0.025,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "hud_slot_city_tokyo.png",
+                      "points": [
+                        {
+                          "name": "Point",
+                          "x": 185.0,
+                          "y": -10.0
+                        }
+                      ],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0.0,
+                        "y": 0.0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 185.0,
+                        "y": 32.0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "adaptCollisionMaskAutomatically": true,
+          "assetStoreId": "",
+          "name": "hud_slot_money",
+          "persistentUuid": "uuid-hud_slot_money",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 0.025,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "hud_slot_money.png",
+                      "points": [
+                        {
+                          "name": "Point",
+                          "x": 112.0,
+                          "y": -10.0
+                        }
+                      ],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0.0,
+                        "y": 0.0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 112.0,
+                        "y": 32.0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "adaptCollisionMaskAutomatically": true,
+          "assetStoreId": "",
+          "name": "hud_slot_houses",
+          "persistentUuid": "uuid-hud_slot_houses",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 0.025,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "hud_slot_houses.png",
+                      "points": [
+                        {
+                          "name": "Point",
+                          "x": 148.0,
+                          "y": -10.0
+                        }
+                      ],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0.0,
+                        "y": 0.0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 148.0,
+                        "y": 32.0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "adaptCollisionMaskAutomatically": true,
+          "assetStoreId": "",
+          "name": "hud_slot_goal",
+          "persistentUuid": "uuid-hud_slot_goal",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 0.025,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "hud_slot_goal.png",
+                      "points": [
+                        {
+                          "name": "Point",
+                          "x": 190.0,
+                          "y": -10.0
+                        }
+                      ],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0.0,
+                        "y": 0.0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 190.0,
+                        "y": 32.0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "adaptCollisionMaskAutomatically": true,
+          "assetStoreId": "",
+          "name": "hud_slot_pollution",
+          "persistentUuid": "uuid-hud_slot_pollution",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 0.025,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "hud_slot_pollution.png",
+                      "points": [
+                        {
+                          "name": "Point",
+                          "x": 172.0,
+                          "y": -10.0
+                        }
+                      ],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0.0,
+                        "y": 0.0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 172.0,
+                        "y": 32.0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "adaptCollisionMaskAutomatically": true,
+          "assetStoreId": "",
+          "name": "hud_slot_time",
+          "persistentUuid": "uuid-hud_slot_time",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 0.025,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "hud_slot_time.png",
+                      "points": [
+                        {
+                          "name": "Point",
+                          "x": 216.0,
+                          "y": -10.0
+                        }
+                      ],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0.0,
+                        "y": 0.0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 216.0,
+                        "y": 32.0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "adaptCollisionMaskAutomatically": true,
+          "assetStoreId": "",
+          "name": "hud_slot_strikes",
+          "persistentUuid": "uuid-hud_slot_strikes",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 0.025,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "hud_slot_strikes.png",
+                      "points": [
+                        {
+                          "name": "Point",
+                          "x": 214.0,
+                          "y": -10.0
+                        }
+                      ],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0.0,
+                        "y": 0.0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 214.0,
+                        "y": 32.0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "adaptCollisionMaskAutomatically": true,
+          "assetStoreId": "",
+          "name": "house_spot",
+          "persistentUuid": "uuid-house_spot",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [
+            {
+              "name": "order",
+              "type": "number",
+              "value": 0
+            }
+          ],
+          "effects": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 0.025,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "house_spot.png",
+                      "points": [
+                        {
+                          "name": "Point",
+                          "x": 100.0,
+                          "y": -10.0
+                        }
+                      ],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0.0,
+                        "y": 0.0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 100.0,
+                        "y": 100.0
                       },
                       "customCollisionMask": []
                     }
@@ -24212,6 +26962,7 @@
                 "      this.completedHousesCount = 0;",
                 "      this.sdg15Unlocked = false;",
                 "",
+                "      this.readSceneHouseSpots(this.currentLevel);",
                 "      this.setupStartingCity();",
                 "      this.currentLevel.maxPollution = this.computeMaxPollution();",
                 "      this.lastDisasterGap = 0;",
@@ -24233,6 +26984,7 @@
                 "      this.money = 300;",
                 "      this.activeTool = 'power';",
                 "",
+                "      this.readSceneHouseSpots(CONFIG.TUTORIAL_LEVEL);",
                 "      // The tutorial uses its own fixed house spots (config/tutorial.json -> houseSpawnPoints):",
                 "      // [0] starts wired-able to every building, [1] only via house 1, [2] only via house 2 (series slowdown)",
                 "      while (this.houses.length > 0) {",
@@ -24246,6 +26998,18 @@
                 "      this.spawnHouse(null, p0.x, p0.y);",
                 "      this.addFloatingText('🎓 เริ่มโหมดฝึกสอนด่วน (Fast Scene Tutorial)! ทำตามลูกศรแนะนำได้เลย', CONFIG.CANVAS_WIDTH / 2, 115, '#06d6a0');",
                 "      if (global.POWATER.uiManager) global.POWATER.uiManager.showHudIntro(); // explain the top bar first",
+                "    }",
+                "",
+                "    // Fixed house spots placed in the GDevelop scene ('house_spot' markers, 'order' = spawn sequence) override",
+                "    // config/<city>.json -> houseSpawnPoints, so moving a marker in the editor moves that house",
+                "    readSceneHouseSpots(level) {",
+                "      const sc = this.runtimeScene;",
+                "      if (!level || !sc || !sc.getObjects || !sc.getName || sc.getName() !== level.sceneName) return; // only this level's own scene",
+                "      const spots = (sc.getObjects('house_spot') || []).map(o => {",
+                "        const v = o.getVariables && o.getVariables();",
+                "        return { order: v && v.has('order') ? v.get('order').getAsNumber() : 0, x: Math.round(o.getX() + o.getWidth() / 2), y: Math.round(o.getY() + o.getHeight() / 2) };",
+                "      });",
+                "      if (spots.length) level.houseSpawnPoints = spots.sort((a, b) => a.order - b.order).map(s => [s.x, s.y]);",
                 "    }",
                 "",
                 "    // i-th fixed tutorial house spot, or a free spot near the previous tutorial house",
@@ -25718,7 +28482,7 @@
                 "        { id: 'power', objectName: 'btn_power', title: '⚡ POWER', sub: '[1] WIRE', videoKey: 'power', type: 'tool', toolId: 'power', x: 238, y: tbY, w: tbW, h: tbH, color: 0xffb703 },",
                 "        { id: 'water', objectName: 'btn_water', title: '💧 WATER', sub: '[2] PIPE', videoKey: 'water', type: 'tool', toolId: 'water', x: 312, y: tbY, w: tbW, h: tbH, color: 0x00b4d8 },",
                 "        { id: 'sewage', objectName: 'btn_drain', title: '🧪 DRAIN', sub: '[3] SEWAGE', videoKey: 'sewage', type: 'tool', toolId: 'sewage', x: 386, y: tbY, w: tbW, h: tbH, color: 0x9d4edd },",
-                "        { id: 'delete', title: '🗑️ DELETE', sub: '[X] WIRE', type: 'tool', toolId: 'delete', x: 460, y: tbY, w: tbW, h: tbH, color: 0xadb5bd },",
+                "        { id: 'delete', objectName: 'btn_delete', title: '🗑️ DELETE', sub: '[X] WIRE', type: 'tool', toolId: 'delete', x: 460, y: tbY, w: tbW, h: tbH, color: 0xadb5bd },",
                 "        { id: 'air_filter', objectName: 'btn_filter', title: '🍃 FILTER', sub: '[4] $40', videoKey: 'air_filter', type: 'build', buildId: 'build_air_filter', x: 534, y: tbY, w: tbW, h: tbH, color: 0x06d6a0 },",
                 "        { id: 'repair', objectName: 'btn_repair', title: '🔧 REPAIR', sub: '[R] FIX', videoKey: 'repair', type: 'action', action: 'repairTool', x: 608, y: tbY, w: tbW, h: tbH, color: 0xff5a5f },",
                 "        { id: 'special', objectName: 'btn_special', title: '🧪 TEST', sub: '[I] LAB', videoKey: 'special', type: 'action', action: 'openSpecialItems', x: 682, y: tbY, w: tbW, h: tbH, color: 0x06d6a0 },",
@@ -25956,6 +28720,9 @@
                 "            }",
                 "          }",
                 "        }",
+                "        // Editor-only layout sprites (top-bar boxes, logo, day icon, house spots): the HUD/engine draw the live versions",
+                "        ['hud_slot_city', 'hud_slot_money', 'hud_slot_houses', 'hud_slot_goal', 'hud_slot_pollution', 'hud_slot_time', 'hud_slot_strikes',",
+                "          'logo_powater', 'icon_day', 'house_spot'].forEach(n => (this.game.runtimeScene.getObjects(n) || []).forEach(o => o.hide && o.hide(true)));",
                 "        const vidObjs = this.game.runtimeScene.getObjects('btn_video_help');",
                 "        if (vidObjs && vidObjs.length > 0) {",
                 "          for (let j = 0; j < vidObjs.length; j++) {",
@@ -27096,7 +29863,7 @@
                 "      this.modalGfx.beginFill(hard ? (isHardHover ? 0xc1121f : 0x9d0208) : (isHardHover ? 0x2b2350 : 0x1d1738), 1.0);",
                 "      this.modalGfx.drawRoundedRect(hardBtn.x, hardBtn.y, hardBtn.w, hardBtn.h, 8);",
                 "      this.modalGfx.endFill();",
-                "      const hardTxt = this.makeText(hard ? '🔥 โหมดยาก: เปิด — ไม่มีสายยาว 2.5 เท่า (ลากได้สูงสุด 315px)' : '🔥 โหมดยาก: ปิด (คลิกเพื่อเปิด — เอาสายยาว 2.5 เท่าออก)', {",
+                "      const hardTxt = this.makeText(hard ? '🔥 โหมดยาก: เปิด — สายไฟสั้นลง' : '🔥 โหมดยาก: ปิด — สายไฟสั้นลง', {",
                 "        fontFamily: font, fontSize: 12, fontWeight: 'bold', fill: hard ? 0xffffff : 0xadb5bd",
                 "      });",
                 "      hardTxt.anchor.set(0.5);",
@@ -28491,6 +31258,48 @@
         },
         {
           "name": "amigo.png"
+        },
+        {
+          "name": "btn_delete.png"
+        },
+        {
+          "name": "house_spot.png"
+        },
+        {
+          "name": "hud_slot_city.png"
+        },
+        {
+          "name": "hud_slot_money.png"
+        },
+        {
+          "name": "hud_slot_houses.png"
+        },
+        {
+          "name": "hud_slot_goal.png"
+        },
+        {
+          "name": "hud_slot_pollution.png"
+        },
+        {
+          "name": "hud_slot_time.png"
+        },
+        {
+          "name": "hud_slot_strikes.png"
+        },
+        {
+          "name": "hud_slot_city_main.png"
+        },
+        {
+          "name": "hud_slot_city_tutorial.png"
+        },
+        {
+          "name": "hud_slot_city_tokyo.png"
+        },
+        {
+          "name": "hud_slot_city_rome.png"
+        },
+        {
+          "name": "hud_slot_city_amsterdam.png"
         }
       ]
     },
@@ -28731,6 +31540,166 @@
           "initialVariables": []
         },
         {
+          "name": "btn_delete",
+          "x": 460,
+          "y": 658,
+          "width": 64,
+          "height": 48,
+          "zOrder": 10,
+          "persistentUuid": "inst-btn-delete",
+          "angle": 0,
+          "customSize": true,
+          "layer": "",
+          "locked": false,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "name": "hud_slot_city",
+          "x": 8,
+          "y": 6,
+          "width": 185,
+          "height": 32,
+          "zOrder": 9,
+          "persistentUuid": "inst-hud_slot_city",
+          "angle": 0,
+          "customSize": true,
+          "layer": "",
+          "locked": false,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "name": "hud_slot_money",
+          "x": 198,
+          "y": 6,
+          "width": 112,
+          "height": 32,
+          "zOrder": 9,
+          "persistentUuid": "inst-hud_slot_money",
+          "angle": 0,
+          "customSize": true,
+          "layer": "",
+          "locked": false,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "name": "hud_slot_houses",
+          "x": 314,
+          "y": 6,
+          "width": 148,
+          "height": 32,
+          "zOrder": 9,
+          "persistentUuid": "inst-hud_slot_houses",
+          "angle": 0,
+          "customSize": true,
+          "layer": "",
+          "locked": false,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "name": "hud_slot_goal",
+          "x": 466,
+          "y": 6,
+          "width": 190,
+          "height": 32,
+          "zOrder": 9,
+          "persistentUuid": "inst-hud_slot_goal",
+          "angle": 0,
+          "customSize": true,
+          "layer": "",
+          "locked": false,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "name": "hud_slot_pollution",
+          "x": 660,
+          "y": 6,
+          "width": 172,
+          "height": 32,
+          "zOrder": 9,
+          "persistentUuid": "inst-hud_slot_pollution",
+          "angle": 0,
+          "customSize": true,
+          "layer": "",
+          "locked": false,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "name": "hud_slot_time",
+          "x": 836,
+          "y": 6,
+          "width": 216,
+          "height": 32,
+          "zOrder": 9,
+          "persistentUuid": "inst-hud_slot_time",
+          "angle": 0,
+          "customSize": true,
+          "layer": "",
+          "locked": false,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "name": "hud_slot_strikes",
+          "x": 1056,
+          "y": 6,
+          "width": 214,
+          "height": 32,
+          "zOrder": 9,
+          "persistentUuid": "inst-hud_slot_strikes",
+          "angle": 0,
+          "customSize": true,
+          "layer": "",
+          "locked": false,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "name": "logo_powater",
+          "x": 14,
+          "y": 10,
+          "width": 24,
+          "height": 24,
+          "zOrder": 10,
+          "persistentUuid": "inst-hud-logo",
+          "angle": 0,
+          "customSize": true,
+          "layer": "",
+          "locked": false,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "name": "icon_day",
+          "x": 842,
+          "y": 11,
+          "width": 22,
+          "height": 22,
+          "zOrder": 10,
+          "persistentUuid": "inst-hud-day",
+          "angle": 0,
+          "customSize": true,
+          "layer": "",
+          "locked": false,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
           "name": "btn_video_help",
           "x": 252,
           "y": 626,
@@ -28921,6 +31890,336 @@
           "numberProperties": [],
           "stringProperties": [],
           "initialVariables": []
+        },
+        {
+          "name": "house_spot",
+          "x": 725,
+          "y": 260,
+          "width": 100,
+          "height": 100,
+          "zOrder": 2,
+          "persistentUuid": "inst-spot-rome-1",
+          "angle": 0,
+          "customSize": true,
+          "layer": "",
+          "locked": false,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": [
+            {
+              "name": "order",
+              "type": "number",
+              "value": 1
+            }
+          ]
+        },
+        {
+          "name": "house_spot",
+          "x": 435,
+          "y": 280,
+          "width": 100,
+          "height": 100,
+          "zOrder": 2,
+          "persistentUuid": "inst-spot-rome-2",
+          "angle": 0,
+          "customSize": true,
+          "layer": "",
+          "locked": false,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": [
+            {
+              "name": "order",
+              "type": "number",
+              "value": 2
+            }
+          ]
+        },
+        {
+          "name": "house_spot",
+          "x": 795,
+          "y": 130,
+          "width": 100,
+          "height": 100,
+          "zOrder": 2,
+          "persistentUuid": "inst-spot-rome-3",
+          "angle": 0,
+          "customSize": true,
+          "layer": "",
+          "locked": false,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": [
+            {
+              "name": "order",
+              "type": "number",
+              "value": 3
+            }
+          ]
+        },
+        {
+          "name": "house_spot",
+          "x": 645,
+          "y": 400,
+          "width": 100,
+          "height": 100,
+          "zOrder": 2,
+          "persistentUuid": "inst-spot-rome-4",
+          "angle": 0,
+          "customSize": true,
+          "layer": "",
+          "locked": false,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": [
+            {
+              "name": "order",
+              "type": "number",
+              "value": 4
+            }
+          ]
+        },
+        {
+          "name": "house_spot",
+          "x": 355,
+          "y": 170,
+          "width": 100,
+          "height": 100,
+          "zOrder": 2,
+          "persistentUuid": "inst-spot-rome-5",
+          "angle": 0,
+          "customSize": true,
+          "layer": "",
+          "locked": false,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": [
+            {
+              "name": "order",
+              "type": "number",
+              "value": 5
+            }
+          ]
+        },
+        {
+          "name": "house_spot",
+          "x": 515,
+          "y": 390,
+          "width": 100,
+          "height": 100,
+          "zOrder": 2,
+          "persistentUuid": "inst-spot-rome-6",
+          "angle": 0,
+          "customSize": true,
+          "layer": "",
+          "locked": false,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": [
+            {
+              "name": "order",
+              "type": "number",
+              "value": 6
+            }
+          ]
+        },
+        {
+          "name": "house_spot",
+          "x": 795,
+          "y": 390,
+          "width": 100,
+          "height": 100,
+          "zOrder": 2,
+          "persistentUuid": "inst-spot-rome-7",
+          "angle": 0,
+          "customSize": true,
+          "layer": "",
+          "locked": false,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": [
+            {
+              "name": "order",
+              "type": "number",
+              "value": 7
+            }
+          ]
+        },
+        {
+          "name": "house_spot",
+          "x": 875,
+          "y": 260,
+          "width": 100,
+          "height": 100,
+          "zOrder": 2,
+          "persistentUuid": "inst-spot-rome-8",
+          "angle": 0,
+          "customSize": true,
+          "layer": "",
+          "locked": false,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": [
+            {
+              "name": "order",
+              "type": "number",
+              "value": 8
+            }
+          ]
+        },
+        {
+          "name": "house_spot",
+          "x": 375,
+          "y": 420,
+          "width": 100,
+          "height": 100,
+          "zOrder": 2,
+          "persistentUuid": "inst-spot-rome-9",
+          "angle": 0,
+          "customSize": true,
+          "layer": "",
+          "locked": false,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": [
+            {
+              "name": "order",
+              "type": "number",
+              "value": 9
+            }
+          ]
+        },
+        {
+          "name": "house_spot",
+          "x": 575,
+          "y": 530,
+          "width": 100,
+          "height": 100,
+          "zOrder": 2,
+          "persistentUuid": "inst-spot-rome-10",
+          "angle": 0,
+          "customSize": true,
+          "layer": "",
+          "locked": false,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": [
+            {
+              "name": "order",
+              "type": "number",
+              "value": 10
+            }
+          ]
+        },
+        {
+          "name": "house_spot",
+          "x": 245,
+          "y": 40,
+          "width": 100,
+          "height": 100,
+          "zOrder": 2,
+          "persistentUuid": "inst-spot-rome-11",
+          "angle": 0,
+          "customSize": true,
+          "layer": "",
+          "locked": false,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": [
+            {
+              "name": "order",
+              "type": "number",
+              "value": 11
+            }
+          ]
+        },
+        {
+          "name": "house_spot",
+          "x": 925,
+          "y": 60,
+          "width": 100,
+          "height": 100,
+          "zOrder": 2,
+          "persistentUuid": "inst-spot-rome-12",
+          "angle": 0,
+          "customSize": true,
+          "layer": "",
+          "locked": false,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": [
+            {
+              "name": "order",
+              "type": "number",
+              "value": 12
+            }
+          ]
+        },
+        {
+          "name": "house_spot",
+          "x": 725,
+          "y": 530,
+          "width": 100,
+          "height": 100,
+          "zOrder": 2,
+          "persistentUuid": "inst-spot-rome-13",
+          "angle": 0,
+          "customSize": true,
+          "layer": "",
+          "locked": false,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": [
+            {
+              "name": "order",
+              "type": "number",
+              "value": 13
+            }
+          ]
+        },
+        {
+          "name": "house_spot",
+          "x": 445,
+          "y": 530,
+          "width": 100,
+          "height": 100,
+          "zOrder": 2,
+          "persistentUuid": "inst-spot-rome-14",
+          "angle": 0,
+          "customSize": true,
+          "layer": "",
+          "locked": false,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": [
+            {
+              "name": "order",
+              "type": "number",
+              "value": 14
+            }
+          ]
+        },
+        {
+          "name": "house_spot",
+          "x": 185,
+          "y": 310,
+          "width": 100,
+          "height": 100,
+          "zOrder": 2,
+          "persistentUuid": "inst-spot-rome-15",
+          "angle": 0,
+          "customSize": true,
+          "layer": "",
+          "locked": false,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": [
+            {
+              "name": "order",
+              "type": "number",
+              "value": 15
+            }
+          ]
         }
       ],
       "objects": [
@@ -30419,6 +33718,444 @@
                         "name": "centre",
                         "x": 72.0,
                         "y": 48.0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "adaptCollisionMaskAutomatically": true,
+          "assetStoreId": "",
+          "name": "btn_delete",
+          "persistentUuid": "uuid-btn_delete",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 0.025,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "btn_delete.png",
+                      "points": [
+                        {
+                          "name": "Point",
+                          "x": 128.0,
+                          "y": -10.0
+                        }
+                      ],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0.0,
+                        "y": 0.0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 128.0,
+                        "y": 96.0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "adaptCollisionMaskAutomatically": true,
+          "assetStoreId": "",
+          "name": "hud_slot_city",
+          "persistentUuid": "uuid-hud_slot_city",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 0.025,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "hud_slot_city_rome.png",
+                      "points": [
+                        {
+                          "name": "Point",
+                          "x": 185.0,
+                          "y": -10.0
+                        }
+                      ],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0.0,
+                        "y": 0.0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 185.0,
+                        "y": 32.0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "adaptCollisionMaskAutomatically": true,
+          "assetStoreId": "",
+          "name": "hud_slot_money",
+          "persistentUuid": "uuid-hud_slot_money",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 0.025,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "hud_slot_money.png",
+                      "points": [
+                        {
+                          "name": "Point",
+                          "x": 112.0,
+                          "y": -10.0
+                        }
+                      ],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0.0,
+                        "y": 0.0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 112.0,
+                        "y": 32.0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "adaptCollisionMaskAutomatically": true,
+          "assetStoreId": "",
+          "name": "hud_slot_houses",
+          "persistentUuid": "uuid-hud_slot_houses",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 0.025,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "hud_slot_houses.png",
+                      "points": [
+                        {
+                          "name": "Point",
+                          "x": 148.0,
+                          "y": -10.0
+                        }
+                      ],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0.0,
+                        "y": 0.0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 148.0,
+                        "y": 32.0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "adaptCollisionMaskAutomatically": true,
+          "assetStoreId": "",
+          "name": "hud_slot_goal",
+          "persistentUuid": "uuid-hud_slot_goal",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 0.025,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "hud_slot_goal.png",
+                      "points": [
+                        {
+                          "name": "Point",
+                          "x": 190.0,
+                          "y": -10.0
+                        }
+                      ],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0.0,
+                        "y": 0.0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 190.0,
+                        "y": 32.0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "adaptCollisionMaskAutomatically": true,
+          "assetStoreId": "",
+          "name": "hud_slot_pollution",
+          "persistentUuid": "uuid-hud_slot_pollution",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 0.025,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "hud_slot_pollution.png",
+                      "points": [
+                        {
+                          "name": "Point",
+                          "x": 172.0,
+                          "y": -10.0
+                        }
+                      ],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0.0,
+                        "y": 0.0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 172.0,
+                        "y": 32.0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "adaptCollisionMaskAutomatically": true,
+          "assetStoreId": "",
+          "name": "hud_slot_time",
+          "persistentUuid": "uuid-hud_slot_time",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 0.025,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "hud_slot_time.png",
+                      "points": [
+                        {
+                          "name": "Point",
+                          "x": 216.0,
+                          "y": -10.0
+                        }
+                      ],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0.0,
+                        "y": 0.0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 216.0,
+                        "y": 32.0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "adaptCollisionMaskAutomatically": true,
+          "assetStoreId": "",
+          "name": "hud_slot_strikes",
+          "persistentUuid": "uuid-hud_slot_strikes",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 0.025,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "hud_slot_strikes.png",
+                      "points": [
+                        {
+                          "name": "Point",
+                          "x": 214.0,
+                          "y": -10.0
+                        }
+                      ],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0.0,
+                        "y": 0.0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 214.0,
+                        "y": 32.0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "adaptCollisionMaskAutomatically": true,
+          "assetStoreId": "",
+          "name": "house_spot",
+          "persistentUuid": "uuid-house_spot",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [
+            {
+              "name": "order",
+              "type": "number",
+              "value": 0
+            }
+          ],
+          "effects": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 0.025,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "house_spot.png",
+                      "points": [
+                        {
+                          "name": "Point",
+                          "x": 100.0,
+                          "y": -10.0
+                        }
+                      ],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0.0,
+                        "y": 0.0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 100.0,
+                        "y": 100.0
                       },
                       "customCollisionMask": []
                     }
@@ -33563,6 +37300,7 @@
                 "      this.completedHousesCount = 0;",
                 "      this.sdg15Unlocked = false;",
                 "",
+                "      this.readSceneHouseSpots(this.currentLevel);",
                 "      this.setupStartingCity();",
                 "      this.currentLevel.maxPollution = this.computeMaxPollution();",
                 "      this.lastDisasterGap = 0;",
@@ -33584,6 +37322,7 @@
                 "      this.money = 300;",
                 "      this.activeTool = 'power';",
                 "",
+                "      this.readSceneHouseSpots(CONFIG.TUTORIAL_LEVEL);",
                 "      // The tutorial uses its own fixed house spots (config/tutorial.json -> houseSpawnPoints):",
                 "      // [0] starts wired-able to every building, [1] only via house 1, [2] only via house 2 (series slowdown)",
                 "      while (this.houses.length > 0) {",
@@ -33597,6 +37336,18 @@
                 "      this.spawnHouse(null, p0.x, p0.y);",
                 "      this.addFloatingText('🎓 เริ่มโหมดฝึกสอนด่วน (Fast Scene Tutorial)! ทำตามลูกศรแนะนำได้เลย', CONFIG.CANVAS_WIDTH / 2, 115, '#06d6a0');",
                 "      if (global.POWATER.uiManager) global.POWATER.uiManager.showHudIntro(); // explain the top bar first",
+                "    }",
+                "",
+                "    // Fixed house spots placed in the GDevelop scene ('house_spot' markers, 'order' = spawn sequence) override",
+                "    // config/<city>.json -> houseSpawnPoints, so moving a marker in the editor moves that house",
+                "    readSceneHouseSpots(level) {",
+                "      const sc = this.runtimeScene;",
+                "      if (!level || !sc || !sc.getObjects || !sc.getName || sc.getName() !== level.sceneName) return; // only this level's own scene",
+                "      const spots = (sc.getObjects('house_spot') || []).map(o => {",
+                "        const v = o.getVariables && o.getVariables();",
+                "        return { order: v && v.has('order') ? v.get('order').getAsNumber() : 0, x: Math.round(o.getX() + o.getWidth() / 2), y: Math.round(o.getY() + o.getHeight() / 2) };",
+                "      });",
+                "      if (spots.length) level.houseSpawnPoints = spots.sort((a, b) => a.order - b.order).map(s => [s.x, s.y]);",
                 "    }",
                 "",
                 "    // i-th fixed tutorial house spot, or a free spot near the previous tutorial house",
@@ -35069,7 +38820,7 @@
                 "        { id: 'power', objectName: 'btn_power', title: '⚡ POWER', sub: '[1] WIRE', videoKey: 'power', type: 'tool', toolId: 'power', x: 238, y: tbY, w: tbW, h: tbH, color: 0xffb703 },",
                 "        { id: 'water', objectName: 'btn_water', title: '💧 WATER', sub: '[2] PIPE', videoKey: 'water', type: 'tool', toolId: 'water', x: 312, y: tbY, w: tbW, h: tbH, color: 0x00b4d8 },",
                 "        { id: 'sewage', objectName: 'btn_drain', title: '🧪 DRAIN', sub: '[3] SEWAGE', videoKey: 'sewage', type: 'tool', toolId: 'sewage', x: 386, y: tbY, w: tbW, h: tbH, color: 0x9d4edd },",
-                "        { id: 'delete', title: '🗑️ DELETE', sub: '[X] WIRE', type: 'tool', toolId: 'delete', x: 460, y: tbY, w: tbW, h: tbH, color: 0xadb5bd },",
+                "        { id: 'delete', objectName: 'btn_delete', title: '🗑️ DELETE', sub: '[X] WIRE', type: 'tool', toolId: 'delete', x: 460, y: tbY, w: tbW, h: tbH, color: 0xadb5bd },",
                 "        { id: 'air_filter', objectName: 'btn_filter', title: '🍃 FILTER', sub: '[4] $40', videoKey: 'air_filter', type: 'build', buildId: 'build_air_filter', x: 534, y: tbY, w: tbW, h: tbH, color: 0x06d6a0 },",
                 "        { id: 'repair', objectName: 'btn_repair', title: '🔧 REPAIR', sub: '[R] FIX', videoKey: 'repair', type: 'action', action: 'repairTool', x: 608, y: tbY, w: tbW, h: tbH, color: 0xff5a5f },",
                 "        { id: 'special', objectName: 'btn_special', title: '🧪 TEST', sub: '[I] LAB', videoKey: 'special', type: 'action', action: 'openSpecialItems', x: 682, y: tbY, w: tbW, h: tbH, color: 0x06d6a0 },",
@@ -35307,6 +39058,9 @@
                 "            }",
                 "          }",
                 "        }",
+                "        // Editor-only layout sprites (top-bar boxes, logo, day icon, house spots): the HUD/engine draw the live versions",
+                "        ['hud_slot_city', 'hud_slot_money', 'hud_slot_houses', 'hud_slot_goal', 'hud_slot_pollution', 'hud_slot_time', 'hud_slot_strikes',",
+                "          'logo_powater', 'icon_day', 'house_spot'].forEach(n => (this.game.runtimeScene.getObjects(n) || []).forEach(o => o.hide && o.hide(true)));",
                 "        const vidObjs = this.game.runtimeScene.getObjects('btn_video_help');",
                 "        if (vidObjs && vidObjs.length > 0) {",
                 "          for (let j = 0; j < vidObjs.length; j++) {",
@@ -36447,7 +40201,7 @@
                 "      this.modalGfx.beginFill(hard ? (isHardHover ? 0xc1121f : 0x9d0208) : (isHardHover ? 0x2b2350 : 0x1d1738), 1.0);",
                 "      this.modalGfx.drawRoundedRect(hardBtn.x, hardBtn.y, hardBtn.w, hardBtn.h, 8);",
                 "      this.modalGfx.endFill();",
-                "      const hardTxt = this.makeText(hard ? '🔥 โหมดยาก: เปิด — ไม่มีสายยาว 2.5 เท่า (ลากได้สูงสุด 315px)' : '🔥 โหมดยาก: ปิด (คลิกเพื่อเปิด — เอาสายยาว 2.5 เท่าออก)', {",
+                "      const hardTxt = this.makeText(hard ? '🔥 โหมดยาก: เปิด — สายไฟสั้นลง' : '🔥 โหมดยาก: ปิด — สายไฟสั้นลง', {",
                 "        fontFamily: font, fontSize: 12, fontWeight: 'bold', fill: hard ? 0xffffff : 0xadb5bd",
                 "      });",
                 "      hardTxt.anchor.set(0.5);",
@@ -37842,6 +41596,48 @@
         },
         {
           "name": "amigo.png"
+        },
+        {
+          "name": "btn_delete.png"
+        },
+        {
+          "name": "house_spot.png"
+        },
+        {
+          "name": "hud_slot_city.png"
+        },
+        {
+          "name": "hud_slot_money.png"
+        },
+        {
+          "name": "hud_slot_houses.png"
+        },
+        {
+          "name": "hud_slot_goal.png"
+        },
+        {
+          "name": "hud_slot_pollution.png"
+        },
+        {
+          "name": "hud_slot_time.png"
+        },
+        {
+          "name": "hud_slot_strikes.png"
+        },
+        {
+          "name": "hud_slot_city_main.png"
+        },
+        {
+          "name": "hud_slot_city_tutorial.png"
+        },
+        {
+          "name": "hud_slot_city_tokyo.png"
+        },
+        {
+          "name": "hud_slot_city_rome.png"
+        },
+        {
+          "name": "hud_slot_city_amsterdam.png"
         }
       ]
     },
@@ -38082,6 +41878,166 @@
           "initialVariables": []
         },
         {
+          "name": "btn_delete",
+          "x": 460,
+          "y": 658,
+          "width": 64,
+          "height": 48,
+          "zOrder": 10,
+          "persistentUuid": "inst-btn-delete",
+          "angle": 0,
+          "customSize": true,
+          "layer": "",
+          "locked": false,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "name": "hud_slot_city",
+          "x": 8,
+          "y": 6,
+          "width": 185,
+          "height": 32,
+          "zOrder": 9,
+          "persistentUuid": "inst-hud_slot_city",
+          "angle": 0,
+          "customSize": true,
+          "layer": "",
+          "locked": false,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "name": "hud_slot_money",
+          "x": 198,
+          "y": 6,
+          "width": 112,
+          "height": 32,
+          "zOrder": 9,
+          "persistentUuid": "inst-hud_slot_money",
+          "angle": 0,
+          "customSize": true,
+          "layer": "",
+          "locked": false,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "name": "hud_slot_houses",
+          "x": 314,
+          "y": 6,
+          "width": 148,
+          "height": 32,
+          "zOrder": 9,
+          "persistentUuid": "inst-hud_slot_houses",
+          "angle": 0,
+          "customSize": true,
+          "layer": "",
+          "locked": false,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "name": "hud_slot_goal",
+          "x": 466,
+          "y": 6,
+          "width": 190,
+          "height": 32,
+          "zOrder": 9,
+          "persistentUuid": "inst-hud_slot_goal",
+          "angle": 0,
+          "customSize": true,
+          "layer": "",
+          "locked": false,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "name": "hud_slot_pollution",
+          "x": 660,
+          "y": 6,
+          "width": 172,
+          "height": 32,
+          "zOrder": 9,
+          "persistentUuid": "inst-hud_slot_pollution",
+          "angle": 0,
+          "customSize": true,
+          "layer": "",
+          "locked": false,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "name": "hud_slot_time",
+          "x": 836,
+          "y": 6,
+          "width": 216,
+          "height": 32,
+          "zOrder": 9,
+          "persistentUuid": "inst-hud_slot_time",
+          "angle": 0,
+          "customSize": true,
+          "layer": "",
+          "locked": false,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "name": "hud_slot_strikes",
+          "x": 1056,
+          "y": 6,
+          "width": 214,
+          "height": 32,
+          "zOrder": 9,
+          "persistentUuid": "inst-hud_slot_strikes",
+          "angle": 0,
+          "customSize": true,
+          "layer": "",
+          "locked": false,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "name": "logo_powater",
+          "x": 14,
+          "y": 10,
+          "width": 24,
+          "height": 24,
+          "zOrder": 10,
+          "persistentUuid": "inst-hud-logo",
+          "angle": 0,
+          "customSize": true,
+          "layer": "",
+          "locked": false,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "name": "icon_day",
+          "x": 842,
+          "y": 11,
+          "width": 22,
+          "height": 22,
+          "zOrder": 10,
+          "persistentUuid": "inst-hud-day",
+          "angle": 0,
+          "customSize": true,
+          "layer": "",
+          "locked": false,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
           "name": "btn_video_help",
           "x": 252,
           "y": 626,
@@ -38288,6 +42244,336 @@
           "numberProperties": [],
           "stringProperties": [],
           "initialVariables": []
+        },
+        {
+          "name": "house_spot",
+          "x": 735,
+          "y": 390,
+          "width": 100,
+          "height": 100,
+          "zOrder": 2,
+          "persistentUuid": "inst-spot-amsterdam-1",
+          "angle": 0,
+          "customSize": true,
+          "layer": "",
+          "locked": false,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": [
+            {
+              "name": "order",
+              "type": "number",
+              "value": 1
+            }
+          ]
+        },
+        {
+          "name": "house_spot",
+          "x": 355,
+          "y": 370,
+          "width": 100,
+          "height": 100,
+          "zOrder": 2,
+          "persistentUuid": "inst-spot-amsterdam-2",
+          "angle": 0,
+          "customSize": true,
+          "layer": "",
+          "locked": false,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": [
+            {
+              "name": "order",
+              "type": "number",
+              "value": 2
+            }
+          ]
+        },
+        {
+          "name": "house_spot",
+          "x": 665,
+          "y": 560,
+          "width": 100,
+          "height": 100,
+          "zOrder": 2,
+          "persistentUuid": "inst-spot-amsterdam-3",
+          "angle": 0,
+          "customSize": true,
+          "layer": "",
+          "locked": false,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": [
+            {
+              "name": "order",
+              "type": "number",
+              "value": 3
+            }
+          ]
+        },
+        {
+          "name": "house_spot",
+          "x": 535,
+          "y": 560,
+          "width": 100,
+          "height": 100,
+          "zOrder": 2,
+          "persistentUuid": "inst-spot-amsterdam-4",
+          "angle": 0,
+          "customSize": true,
+          "layer": "",
+          "locked": false,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": [
+            {
+              "name": "order",
+              "type": "number",
+              "value": 4
+            }
+          ]
+        },
+        {
+          "name": "house_spot",
+          "x": 335,
+          "y": 520,
+          "width": 100,
+          "height": 100,
+          "zOrder": 2,
+          "persistentUuid": "inst-spot-amsterdam-5",
+          "angle": 0,
+          "customSize": true,
+          "layer": "",
+          "locked": false,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": [
+            {
+              "name": "order",
+              "type": "number",
+              "value": 5
+            }
+          ]
+        },
+        {
+          "name": "house_spot",
+          "x": 795,
+          "y": 520,
+          "width": 100,
+          "height": 100,
+          "zOrder": 2,
+          "persistentUuid": "inst-spot-amsterdam-6",
+          "angle": 0,
+          "customSize": true,
+          "layer": "",
+          "locked": false,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": [
+            {
+              "name": "order",
+              "type": "number",
+              "value": 6
+            }
+          ]
+        },
+        {
+          "name": "house_spot",
+          "x": 395,
+          "y": 130,
+          "width": 100,
+          "height": 100,
+          "zOrder": 2,
+          "persistentUuid": "inst-spot-amsterdam-7",
+          "angle": 0,
+          "customSize": true,
+          "layer": "",
+          "locked": false,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": [
+            {
+              "name": "order",
+              "type": "number",
+              "value": 7
+            }
+          ]
+        },
+        {
+          "name": "house_spot",
+          "x": 225,
+          "y": 410,
+          "width": 100,
+          "height": 100,
+          "zOrder": 2,
+          "persistentUuid": "inst-spot-amsterdam-8",
+          "angle": 0,
+          "customSize": true,
+          "layer": "",
+          "locked": false,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": [
+            {
+              "name": "order",
+              "type": "number",
+              "value": 8
+            }
+          ]
+        },
+        {
+          "name": "house_spot",
+          "x": 255,
+          "y": 140,
+          "width": 100,
+          "height": 100,
+          "zOrder": 2,
+          "persistentUuid": "inst-spot-amsterdam-9",
+          "angle": 0,
+          "customSize": true,
+          "layer": "",
+          "locked": false,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": [
+            {
+              "name": "order",
+              "type": "number",
+              "value": 9
+            }
+          ]
+        },
+        {
+          "name": "house_spot",
+          "x": 845,
+          "y": 400,
+          "width": 100,
+          "height": 100,
+          "zOrder": 2,
+          "persistentUuid": "inst-spot-amsterdam-10",
+          "angle": 0,
+          "customSize": true,
+          "layer": "",
+          "locked": false,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": [
+            {
+              "name": "order",
+              "type": "number",
+              "value": 10
+            }
+          ]
+        },
+        {
+          "name": "house_spot",
+          "x": 195,
+          "y": 290,
+          "width": 100,
+          "height": 100,
+          "zOrder": 2,
+          "persistentUuid": "inst-spot-amsterdam-11",
+          "angle": 0,
+          "customSize": true,
+          "layer": "",
+          "locked": false,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": [
+            {
+              "name": "order",
+              "type": "number",
+              "value": 11
+            }
+          ]
+        },
+        {
+          "name": "house_spot",
+          "x": 205,
+          "y": 560,
+          "width": 100,
+          "height": 100,
+          "zOrder": 2,
+          "persistentUuid": "inst-spot-amsterdam-12",
+          "angle": 0,
+          "customSize": true,
+          "layer": "",
+          "locked": false,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": [
+            {
+              "name": "order",
+              "type": "number",
+              "value": 12
+            }
+          ]
+        },
+        {
+          "name": "house_spot",
+          "x": 935,
+          "y": 220,
+          "width": 100,
+          "height": 100,
+          "zOrder": 2,
+          "persistentUuid": "inst-spot-amsterdam-13",
+          "angle": 0,
+          "customSize": true,
+          "layer": "",
+          "locked": false,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": [
+            {
+              "name": "order",
+              "type": "number",
+              "value": 13
+            }
+          ]
+        },
+        {
+          "name": "house_spot",
+          "x": 925,
+          "y": 560,
+          "width": 100,
+          "height": 100,
+          "zOrder": 2,
+          "persistentUuid": "inst-spot-amsterdam-14",
+          "angle": 0,
+          "customSize": true,
+          "layer": "",
+          "locked": false,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": [
+            {
+              "name": "order",
+              "type": "number",
+              "value": 14
+            }
+          ]
+        },
+        {
+          "name": "house_spot",
+          "x": 95,
+          "y": 450,
+          "width": 100,
+          "height": 100,
+          "zOrder": 2,
+          "persistentUuid": "inst-spot-amsterdam-15",
+          "angle": 0,
+          "customSize": true,
+          "layer": "",
+          "locked": false,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": [
+            {
+              "name": "order",
+              "type": "number",
+              "value": 15
+            }
+          ]
         }
       ],
       "objects": [
@@ -39786,6 +44072,444 @@
                         "name": "centre",
                         "x": 72.0,
                         "y": 48.0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "adaptCollisionMaskAutomatically": true,
+          "assetStoreId": "",
+          "name": "btn_delete",
+          "persistentUuid": "uuid-btn_delete",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 0.025,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "btn_delete.png",
+                      "points": [
+                        {
+                          "name": "Point",
+                          "x": 128.0,
+                          "y": -10.0
+                        }
+                      ],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0.0,
+                        "y": 0.0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 128.0,
+                        "y": 96.0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "adaptCollisionMaskAutomatically": true,
+          "assetStoreId": "",
+          "name": "hud_slot_city",
+          "persistentUuid": "uuid-hud_slot_city",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 0.025,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "hud_slot_city_amsterdam.png",
+                      "points": [
+                        {
+                          "name": "Point",
+                          "x": 185.0,
+                          "y": -10.0
+                        }
+                      ],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0.0,
+                        "y": 0.0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 185.0,
+                        "y": 32.0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "adaptCollisionMaskAutomatically": true,
+          "assetStoreId": "",
+          "name": "hud_slot_money",
+          "persistentUuid": "uuid-hud_slot_money",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 0.025,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "hud_slot_money.png",
+                      "points": [
+                        {
+                          "name": "Point",
+                          "x": 112.0,
+                          "y": -10.0
+                        }
+                      ],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0.0,
+                        "y": 0.0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 112.0,
+                        "y": 32.0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "adaptCollisionMaskAutomatically": true,
+          "assetStoreId": "",
+          "name": "hud_slot_houses",
+          "persistentUuid": "uuid-hud_slot_houses",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 0.025,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "hud_slot_houses.png",
+                      "points": [
+                        {
+                          "name": "Point",
+                          "x": 148.0,
+                          "y": -10.0
+                        }
+                      ],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0.0,
+                        "y": 0.0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 148.0,
+                        "y": 32.0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "adaptCollisionMaskAutomatically": true,
+          "assetStoreId": "",
+          "name": "hud_slot_goal",
+          "persistentUuid": "uuid-hud_slot_goal",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 0.025,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "hud_slot_goal.png",
+                      "points": [
+                        {
+                          "name": "Point",
+                          "x": 190.0,
+                          "y": -10.0
+                        }
+                      ],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0.0,
+                        "y": 0.0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 190.0,
+                        "y": 32.0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "adaptCollisionMaskAutomatically": true,
+          "assetStoreId": "",
+          "name": "hud_slot_pollution",
+          "persistentUuid": "uuid-hud_slot_pollution",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 0.025,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "hud_slot_pollution.png",
+                      "points": [
+                        {
+                          "name": "Point",
+                          "x": 172.0,
+                          "y": -10.0
+                        }
+                      ],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0.0,
+                        "y": 0.0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 172.0,
+                        "y": 32.0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "adaptCollisionMaskAutomatically": true,
+          "assetStoreId": "",
+          "name": "hud_slot_time",
+          "persistentUuid": "uuid-hud_slot_time",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 0.025,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "hud_slot_time.png",
+                      "points": [
+                        {
+                          "name": "Point",
+                          "x": 216.0,
+                          "y": -10.0
+                        }
+                      ],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0.0,
+                        "y": 0.0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 216.0,
+                        "y": 32.0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "adaptCollisionMaskAutomatically": true,
+          "assetStoreId": "",
+          "name": "hud_slot_strikes",
+          "persistentUuid": "uuid-hud_slot_strikes",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 0.025,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "hud_slot_strikes.png",
+                      "points": [
+                        {
+                          "name": "Point",
+                          "x": 214.0,
+                          "y": -10.0
+                        }
+                      ],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0.0,
+                        "y": 0.0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 214.0,
+                        "y": 32.0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "adaptCollisionMaskAutomatically": true,
+          "assetStoreId": "",
+          "name": "house_spot",
+          "persistentUuid": "uuid-house_spot",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [
+            {
+              "name": "order",
+              "type": "number",
+              "value": 0
+            }
+          ],
+          "effects": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 0.025,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "house_spot.png",
+                      "points": [
+                        {
+                          "name": "Point",
+                          "x": 100.0,
+                          "y": -10.0
+                        }
+                      ],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0.0,
+                        "y": 0.0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 100.0,
+                        "y": 100.0
                       },
                       "customCollisionMask": []
                     }
@@ -42930,6 +47654,7 @@
                 "      this.completedHousesCount = 0;",
                 "      this.sdg15Unlocked = false;",
                 "",
+                "      this.readSceneHouseSpots(this.currentLevel);",
                 "      this.setupStartingCity();",
                 "      this.currentLevel.maxPollution = this.computeMaxPollution();",
                 "      this.lastDisasterGap = 0;",
@@ -42951,6 +47676,7 @@
                 "      this.money = 300;",
                 "      this.activeTool = 'power';",
                 "",
+                "      this.readSceneHouseSpots(CONFIG.TUTORIAL_LEVEL);",
                 "      // The tutorial uses its own fixed house spots (config/tutorial.json -> houseSpawnPoints):",
                 "      // [0] starts wired-able to every building, [1] only via house 1, [2] only via house 2 (series slowdown)",
                 "      while (this.houses.length > 0) {",
@@ -42964,6 +47690,18 @@
                 "      this.spawnHouse(null, p0.x, p0.y);",
                 "      this.addFloatingText('🎓 เริ่มโหมดฝึกสอนด่วน (Fast Scene Tutorial)! ทำตามลูกศรแนะนำได้เลย', CONFIG.CANVAS_WIDTH / 2, 115, '#06d6a0');",
                 "      if (global.POWATER.uiManager) global.POWATER.uiManager.showHudIntro(); // explain the top bar first",
+                "    }",
+                "",
+                "    // Fixed house spots placed in the GDevelop scene ('house_spot' markers, 'order' = spawn sequence) override",
+                "    // config/<city>.json -> houseSpawnPoints, so moving a marker in the editor moves that house",
+                "    readSceneHouseSpots(level) {",
+                "      const sc = this.runtimeScene;",
+                "      if (!level || !sc || !sc.getObjects || !sc.getName || sc.getName() !== level.sceneName) return; // only this level's own scene",
+                "      const spots = (sc.getObjects('house_spot') || []).map(o => {",
+                "        const v = o.getVariables && o.getVariables();",
+                "        return { order: v && v.has('order') ? v.get('order').getAsNumber() : 0, x: Math.round(o.getX() + o.getWidth() / 2), y: Math.round(o.getY() + o.getHeight() / 2) };",
+                "      });",
+                "      if (spots.length) level.houseSpawnPoints = spots.sort((a, b) => a.order - b.order).map(s => [s.x, s.y]);",
                 "    }",
                 "",
                 "    // i-th fixed tutorial house spot, or a free spot near the previous tutorial house",
@@ -44436,7 +49174,7 @@
                 "        { id: 'power', objectName: 'btn_power', title: '⚡ POWER', sub: '[1] WIRE', videoKey: 'power', type: 'tool', toolId: 'power', x: 238, y: tbY, w: tbW, h: tbH, color: 0xffb703 },",
                 "        { id: 'water', objectName: 'btn_water', title: '💧 WATER', sub: '[2] PIPE', videoKey: 'water', type: 'tool', toolId: 'water', x: 312, y: tbY, w: tbW, h: tbH, color: 0x00b4d8 },",
                 "        { id: 'sewage', objectName: 'btn_drain', title: '🧪 DRAIN', sub: '[3] SEWAGE', videoKey: 'sewage', type: 'tool', toolId: 'sewage', x: 386, y: tbY, w: tbW, h: tbH, color: 0x9d4edd },",
-                "        { id: 'delete', title: '🗑️ DELETE', sub: '[X] WIRE', type: 'tool', toolId: 'delete', x: 460, y: tbY, w: tbW, h: tbH, color: 0xadb5bd },",
+                "        { id: 'delete', objectName: 'btn_delete', title: '🗑️ DELETE', sub: '[X] WIRE', type: 'tool', toolId: 'delete', x: 460, y: tbY, w: tbW, h: tbH, color: 0xadb5bd },",
                 "        { id: 'air_filter', objectName: 'btn_filter', title: '🍃 FILTER', sub: '[4] $40', videoKey: 'air_filter', type: 'build', buildId: 'build_air_filter', x: 534, y: tbY, w: tbW, h: tbH, color: 0x06d6a0 },",
                 "        { id: 'repair', objectName: 'btn_repair', title: '🔧 REPAIR', sub: '[R] FIX', videoKey: 'repair', type: 'action', action: 'repairTool', x: 608, y: tbY, w: tbW, h: tbH, color: 0xff5a5f },",
                 "        { id: 'special', objectName: 'btn_special', title: '🧪 TEST', sub: '[I] LAB', videoKey: 'special', type: 'action', action: 'openSpecialItems', x: 682, y: tbY, w: tbW, h: tbH, color: 0x06d6a0 },",
@@ -44674,6 +49412,9 @@
                 "            }",
                 "          }",
                 "        }",
+                "        // Editor-only layout sprites (top-bar boxes, logo, day icon, house spots): the HUD/engine draw the live versions",
+                "        ['hud_slot_city', 'hud_slot_money', 'hud_slot_houses', 'hud_slot_goal', 'hud_slot_pollution', 'hud_slot_time', 'hud_slot_strikes',",
+                "          'logo_powater', 'icon_day', 'house_spot'].forEach(n => (this.game.runtimeScene.getObjects(n) || []).forEach(o => o.hide && o.hide(true)));",
                 "        const vidObjs = this.game.runtimeScene.getObjects('btn_video_help');",
                 "        if (vidObjs && vidObjs.length > 0) {",
                 "          for (let j = 0; j < vidObjs.length; j++) {",
@@ -45814,7 +50555,7 @@
                 "      this.modalGfx.beginFill(hard ? (isHardHover ? 0xc1121f : 0x9d0208) : (isHardHover ? 0x2b2350 : 0x1d1738), 1.0);",
                 "      this.modalGfx.drawRoundedRect(hardBtn.x, hardBtn.y, hardBtn.w, hardBtn.h, 8);",
                 "      this.modalGfx.endFill();",
-                "      const hardTxt = this.makeText(hard ? '🔥 โหมดยาก: เปิด — ไม่มีสายยาว 2.5 เท่า (ลากได้สูงสุด 315px)' : '🔥 โหมดยาก: ปิด (คลิกเพื่อเปิด — เอาสายยาว 2.5 เท่าออก)', {",
+                "      const hardTxt = this.makeText(hard ? '🔥 โหมดยาก: เปิด — สายไฟสั้นลง' : '🔥 โหมดยาก: ปิด — สายไฟสั้นลง', {",
                 "        fontFamily: font, fontSize: 12, fontWeight: 'bold', fill: hard ? 0xffffff : 0xadb5bd",
                 "      });",
                 "      hardTxt.anchor.set(0.5);",
@@ -47209,6 +51950,48 @@
         },
         {
           "name": "amigo.png"
+        },
+        {
+          "name": "btn_delete.png"
+        },
+        {
+          "name": "house_spot.png"
+        },
+        {
+          "name": "hud_slot_city.png"
+        },
+        {
+          "name": "hud_slot_money.png"
+        },
+        {
+          "name": "hud_slot_houses.png"
+        },
+        {
+          "name": "hud_slot_goal.png"
+        },
+        {
+          "name": "hud_slot_pollution.png"
+        },
+        {
+          "name": "hud_slot_time.png"
+        },
+        {
+          "name": "hud_slot_strikes.png"
+        },
+        {
+          "name": "hud_slot_city_main.png"
+        },
+        {
+          "name": "hud_slot_city_tutorial.png"
+        },
+        {
+          "name": "hud_slot_city_tokyo.png"
+        },
+        {
+          "name": "hud_slot_city_rome.png"
+        },
+        {
+          "name": "hud_slot_city_amsterdam.png"
         }
       ]
     }
@@ -47342,6 +52125,48 @@
     },
     {
       "name": "amigo.png"
+    },
+    {
+      "name": "btn_delete.png"
+    },
+    {
+      "name": "house_spot.png"
+    },
+    {
+      "name": "hud_slot_city.png"
+    },
+    {
+      "name": "hud_slot_money.png"
+    },
+    {
+      "name": "hud_slot_houses.png"
+    },
+    {
+      "name": "hud_slot_goal.png"
+    },
+    {
+      "name": "hud_slot_pollution.png"
+    },
+    {
+      "name": "hud_slot_time.png"
+    },
+    {
+      "name": "hud_slot_strikes.png"
+    },
+    {
+      "name": "hud_slot_city_main.png"
+    },
+    {
+      "name": "hud_slot_city_tutorial.png"
+    },
+    {
+      "name": "hud_slot_city_tokyo.png"
+    },
+    {
+      "name": "hud_slot_city_rome.png"
+    },
+    {
+      "name": "hud_slot_city_amsterdam.png"
     }
   ]
 }
