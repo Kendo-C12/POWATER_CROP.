@@ -247,6 +247,7 @@
       this.gracePeriodActive = true;
       this.gracePeriodWarningShown = false;
       this.pollutionStartedNotified = false;
+      this.airFilterReadyAt = 0;
 
       this.dayNightTimer = 0.0;
       this.isNight = false;
@@ -331,7 +332,7 @@
     // Free spot within wire reach of `near`; prefers spots far from buildings so chains are needed
     findTutorialSpot(near) {
       const c = near.getCenter ? near.getCenter() : { x: near.centerX, y: near.centerY };
-      const r = (CONFIG.MAX_WIRE_LENGTH || 315) - 20;
+      const r = (CONFIG.FAST_WIRE_LENGTH || 315) - 20;
       const spots = [];
       for (let i = 0; i < 16; i++) {
         const ang = (i / 16) * Math.PI * 2;
@@ -580,7 +581,7 @@
         const marginYTop = Math.max(62, 85 - this.upsizeTier * 7);
         const marginYBottom = Math.max(85, 110 - this.upsizeTier * 7);
         const marginX = Math.max(48, 75 - this.upsizeTier * 8);
-        const reach = CONFIG.MAX_WIRE_LENGTH || 315;
+        const reach = CONFIG.FAST_WIRE_LENGTH || 315; // spawn within full-speed reach
         const anchors = [...this.houses, ...this.buildings.filter(b => b.config.type !== 'air_filter')];
         // Collect several legal spots and keep the one farthest from every existing node, so houses spread out
         let best = null;
@@ -658,6 +659,13 @@
     }
 
     // Flow left after `hops` links in series (1 = full). Rome's unlimited aqueducts exempt water.
+    // Series cost of one link: 1 hop, plus extra for every FAST_WIRE_LENGTH beyond the full-speed length
+    linkHops(conn) {
+      const a = conn.fromNode.getCenter(), b = conn.toNode.getCenter();
+      const fast = CONFIG.FAST_WIRE_LENGTH || 315;
+      return 1 + Math.max(0, Math.hypot(a.x - b.x, a.y - b.y) - fast) / fast;
+    }
+
     chainFlow(hops, type) {
       if (type === 'water' && this.currentLevel && this.currentLevel.unlimitedWaterChain) return 1;
       const free = CONFIG.CHAIN_FREE_HOPS || 2;
@@ -1181,7 +1189,7 @@
             }
 
             if (nextNode) {
-              const d = depth.get(current.id) + 1;
+              const d = depth.get(current.id) + this.linkHops(conn);
               if (this.chainFlow(d, type) <= 0) return; // too far down the chain: nothing arrives
               depth.set(nextNode.id, d);
               conn.active = true;
@@ -1241,7 +1249,7 @@
             }
 
             if (nextNode) {
-              const d = depth.get(current.id) + 1;
+              const d = depth.get(current.id) + this.linkHops(conn);
               if (this.chainFlow(d, 'sewage') <= 0) return;
               depth.set(nextNode.id, d);
               conn.active = true;
@@ -1428,6 +1436,12 @@
 
       const actualCost = this.getBuildingCost(buildCfg);
 
+      const waitLeft = buildCfg.type === 'air_filter' ? (this.airFilterReadyAt || 0) - this.levelElapsedTime : 0;
+      if (waitLeft > 0) {
+        this.addFloatingText(`⏳ เครื่องกรองอากาศคูลดาวน์ อีก ${Math.ceil(waitLeft)} วินาที`, x, y - 20, '#ffd166');
+        return false;
+      }
+
       if (this.money < actualCost) {
         this.addFloatingText(`งบประมาณไม่พอ! (ต้องการ $${actualCost})`, x, y - 20, '#e63946');
         return false;
@@ -1457,6 +1471,7 @@
 
       this.money -= actualCost;
       this.createBuilding(typeKey, x, y);
+      if (buildCfg.type === 'air_filter') this.airFilterReadyAt = this.levelElapsedTime + (CONFIG.AIR_FILTER_COOLDOWN_SECONDS || 5);
 
       // Easter Egg / Mini-Achievement: SDG 15 Life on Land trigger on Eco Filter or clean plant
       if (!this.sdg15Unlocked && buildCfg.type === 'air_filter') {
@@ -1572,7 +1587,7 @@
 
       const typeLabels = { power: '⚡ เชื่อมสายไฟ', water: '💧 เชื่อมท่อน้ำดี', sewage: '🧪 เชื่อมท่อระบายน้ำ' };
       const typeColors = { power: '#ffd166', water: '#00b4d8', sewage: '#c77dff' };
-      const costSuffix = connCost > 0 ? ` (-$${connCost})` : '';
+      const costSuffix = (connCost > 0 ? ` (-$${connCost})` : '') + (len > (CONFIG.FAST_WIRE_LENGTH || 315) ? ' 🐢 สายยาว ส่งช้าลง' : '');
       this.addFloatingText((typeLabels[actualType] || 'เชื่อมต่อสำเร็จ') + costSuffix, (p1.x + p2.x) / 2, (p1.y + p2.y) / 2 - 20, typeColors[actualType] || '#06d6a0');
 
       if (global.POWATER.soundManager) {

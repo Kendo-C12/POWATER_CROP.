@@ -1,8 +1,8 @@
-# POWATER CORP. (`v1.0.6.8`) — GDevelop 5 Project Documentation (`CLAUDE.md`)
+# POWATER CORP. (`v1.0.6.9`) — GDevelop 5 Project Documentation (`CLAUDE.md`)
 
 > **Team Green Gang**: Sukrit Limpakanon, Aristt Mahakitsiri, Gantinan Satjariyakul  
 > **Engine**: GDevelop 5 (`POWATER CROPS..json`) + Real PNG Sprite Assets + PixiJS Procedural River/Conduit Rendering  
-> **Version Naming**: `1.x.y.z` (`x` = Major Version, `y` = Small Addition Within Major Version, `z` = Bug Fixes) — Current: **`v1.0.6.8`**
+> **Version Naming**: `1.x.y.z` (`x` = Major Version, `y` = Small Addition Within Major Version, `z` = Bug Fixes) — Current: **`v1.0.6.9`**
 
 ---
 
@@ -43,7 +43,9 @@
 - **Weekly Revenue**: At the end of every in-game week (7 days), the city awards **`[Completed Houses] * $40 / week`** (plus base municipal grant).
 
 ### 🔌 Wiring Rules (`v1.0.6.1`)
-- **Max wire length**: every wire/pipe spans at most **`315px` center-to-center** (`globalRules.maxWireLengthPixels`). Dragging shows the reach circle filled translucent **green** while the wire end is in range and **red** once it is too long (the preview wire turns red too).
+- **Wire length**: up to **`315px`** center-to-center runs at full speed (`globalRules.fastWireLengthPixels`); wires can reach **`790px`** (2.5×, `maxWireLengthPixels`) but every extra `315px` counts as one more series hop (`engine.linkHops`), so long wires carry less. While dragging, the reach circle is filled translucent **green** (full speed), **orange** (long, slower) or **red** (too long); the inner green ring marks `315px`.
+- **Eco Filter cooldown**: `5s` of game time between two Eco Filter placements (`globalRules.airFilterCooldownSeconds`); the `FILTER` button shows `⏳ Ns`.
+- **Between levels**: money restarts at each city's `startingBudget`; bought upgrades carry over.
 - **Series slowdown**: the first `2` links from a source run at full flow; each extra link loses **25%** (`chainFreeHops`, `chainFlowLossPerHop`), and a 6th link carries nothing. A supplied house with lost flow keeps filling its unhappy bar (blinking utility badge) and eventually complains — *lose condition #2*. Rome's unlimited aqueducts exempt water.
 - **Delete**: right-click a wire, or the `🗑️ DELETE [X]` tool (also `Delete` key). Buildings (generators, pumps, filters) **cannot be demolished**.
 - **All-connected speedup**: while every house has power, water and sewage, the house spawn timer runs **4× faster** (`globalRules.allConnectedSpawnSpeedup`, not in the tutorial), so players who keep up reach the 15-house win phase sooner.
@@ -125,6 +127,10 @@ All buildings, houses, rivers, HUD bars, toolbar docks, buttons, and status badg
 
 ## 7. Changelog
 
+- **`v1.0.6.9` (2026-11-10)**:
+  - Back to the `790px` reach with long-wire slowdown from `v1.0.6.1`, keeping the translucent reach circle (green / orange / red).
+  - Eco Filter placement cooldown `5s`.
+  - Verified (new test 8e): money resets to each city's starting budget, upgrades carry over between levels.
 - **`v1.0.6.8` (2026-11-10)**:
   - Bangkok intro cut from 22 to 10 dialogue pages by dropping whole story paragraphs (none shortened); kept paragraphs 1, 3, 5, 9 via `gameLore.storyIntroParagraphs`. `story/story.txt` is unchanged.
 - **`v1.0.6.7` (2026-11-10)**:

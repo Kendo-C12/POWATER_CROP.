@@ -265,10 +265,11 @@ async function runTest() {
     h.hasPower = h.hasWater = h.hasDrainage = true; h.flowDeficit = 0.5; h.unhappyTimer = 0;
     let complained = false;
     for (let t = 0; t < 70; t += 0.5) h.update(0.5, () => { complained = true; }, false);
-    return { R, farRefused, buildingKept, allReachable, houses: g.houses.length, flows, complained };
+    const longHops = g.linkHops({ fromNode: gen, toNode: { getCenter: () => ({ x: gc.x + 630, y: gc.y }) } });
+    return { R, longHops, farRefused, buildingKept, allReachable, houses: g.houses.length, flows, complained };
   });
   console.log('8. Wire rules:', rules);
-  if (rules.R !== 315 || !rules.farRefused || !rules.buildingKept || !rules.allReachable || rules.flows.join() !== '1,1,0.75,0.5,0.25,0' || !rules.complained) {
+  if (rules.R !== 790 || Math.abs(rules.longHops - 2) > 1e-9 || !rules.farRefused || !rules.buildingKept || !rules.allReachable || rules.flows.join() !== '1,1,0.75,0.5,0.25,0' || !rules.complained) {
     throw new Error('Wire length / spawn reachability / series slowdown check failed!');
   }
   await page.evaluate(() => window.POWATER.game.startLevel(0));
@@ -337,6 +338,31 @@ async function runTest() {
   });
   console.log('8d. Minimal-city pollution budget:', minimal);
   if (Math.abs(minimal.holdLeft - 20) > 0.5 || minimal.polluted < 60) throw new Error('maxPollution budget check failed!');
+  await page.evaluate(() => window.POWATER.game.startLevel(0));
+
+  // 8e. Eco Filter 5s cooldown; money restarts per level while upgrades carry over
+  const carry = await page.evaluate(() => {
+    const g = window.POWATER.game;
+    g.startLevel(0);
+    g.money = 1000;
+    const spots = [];
+    for (let x = 80; x < 1200 && spots.length < 2; x += 20) for (let y = 120; y < 600 && spots.length < 2; y += 20) {
+      if (!g.map.isPointInRiver(x, y) && [...g.buildings, ...g.houses, ...spots.map(p => ({ getCenter: () => p }))].every(e => Math.hypot(e.getCenter().x - x, e.getCenter().y - y) > 80)) spots.push({ x, y });
+    }
+    const first = g.placeBuilding('air_filter', spots[0].x, spots[0].y);
+    const blocked = !g.placeBuilding('air_filter', spots[1].x, spots[1].y);
+    g.levelElapsedTime += 5.1;
+    const afterWait = g.placeBuilding('air_filter', spots[1].x, spots[1].y);
+    g.money = 5000;
+    g.buyUpgrade('poll_red');
+    const up = g.upgradeLevels.poll_red;
+    g.startLevel(1);
+    return { first, blocked, afterWait, upBefore: up, upAfter: g.upgradeLevels.poll_red, money: g.money, budget: g.currentLevel.startingBudget };
+  });
+  console.log('8e. Filter cooldown / money & upgrades across levels:', carry);
+  if (!carry.first || !carry.blocked || !carry.afterWait || carry.upAfter !== carry.upBefore || carry.upBefore < 1 || carry.money !== carry.budget) {
+    throw new Error('Filter cooldown / level carry-over check failed!');
+  }
   await page.evaluate(() => window.POWATER.game.startLevel(0));
 
   // 9. City map image drives water; city cutscene (story intro for Bangkok) precedes the briefing

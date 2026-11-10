@@ -544,18 +544,24 @@
         const pulseR = 48 + Math.sin(this.pulseTime * 6) * 3;
         gfxO.lineStyle(3, 0xffd166, 0.9);
         gfxO.drawCircle(sc.x, sc.y, pulseR);
-        // Wire reach: translucent green fill while the drag end is in range, red once it is too long
-        const reachR = global.POWATER.CONFIG.MAX_WIRE_LENGTH || 315;
-        let tooLong = false;
+        // Wire reach: translucent fill = green while full speed, orange when long (slower), red once too long.
+        // The inner ring marks the full-speed length.
+        const reachR = global.POWATER.CONFIG.MAX_WIRE_LENGTH || 790;
+        const fastR = global.POWATER.CONFIG.FAST_WIRE_LENGTH || 315;
+        let len = 0;
         if (this.isDragging) {
           const hn = this.game.getNodeAt(this.currentMouseX, this.currentMouseY);
           const ep = (hn && hn.id !== activeSource.id) ? hn.getCenter() : { x: this.currentMouseX, y: this.currentMouseY };
-          tooLong = Math.hypot(ep.x - sc.x, ep.y - sc.y) > reachR;
+          len = Math.hypot(ep.x - sc.x, ep.y - sc.y);
         }
-        const reachCol = tooLong ? 0xe63946 : 0x06d6a0;
+        const reachCol = len > reachR ? 0xe63946 : (len > fastR ? 0xf4a261 : 0x06d6a0);
         gfxO.lineStyle(2.5, reachCol, 0.8);
-        gfxO.beginFill(reachCol, 0.16);
+        gfxO.beginFill(reachCol, 0.14);
         gfxO.drawCircle(sc.x, sc.y, reachR);
+        gfxO.endFill();
+        gfxO.lineStyle(2, 0x06d6a0, 0.7);
+        gfxO.beginFill(0x06d6a0, 0.08);
+        gfxO.drawCircle(sc.x, sc.y, fastR);
         gfxO.endFill();
       }
 
@@ -570,7 +576,8 @@
         const hoverNode = this.game.getNodeAt(p2.x, p2.y);
         const endPt = (hoverNode && hoverNode.id !== this.dragStartNode.id) ? hoverNode.getCenter() : p2;
         const dragLen = Math.hypot(endPt.x - p1.x, endPt.y - p1.y);
-        if (dragLen > (global.POWATER.CONFIG.MAX_WIRE_LENGTH || 315)) wireColor = 0xe63946; // too long
+        if (dragLen > (global.POWATER.CONFIG.MAX_WIRE_LENGTH || 790)) wireColor = 0xe63946; // too long
+        else if (dragLen > (global.POWATER.CONFIG.FAST_WIRE_LENGTH || 315)) wireColor = 0xf4a261; // long = slower
 
         const previewPath = (global.POWATER.ConnectionEntity && global.POWATER.ConnectionEntity.buildManhattanPoints)
           ? global.POWATER.ConnectionEntity.buildManhattanPoints(p1, p2, 0, 22)
