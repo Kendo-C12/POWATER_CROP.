@@ -274,6 +274,24 @@ async function runTest() {
   }
   await page.evaluate(() => window.POWATER.game.startLevel(0));
 
+  // 8b. Every house fully wired -> spawn timer runs faster
+  const boost = await page.evaluate(() => {
+    const g = window.POWATER.game;
+    const t = (wire) => {
+      g.connections = [];
+      if (wire) {
+        const by = (k) => g.buildings.find(b => b.config.type === k);
+        g.houses.forEach(h => { g.connectNodes('power', by('generator'), h); g.connectNodes('water', by('water_pump'), h); g.connectNodes('sewage', h, by('waste_filter')); });
+      }
+      g.update(0.05); g.spawnTimer = 0; g.update(1);
+      return g.spawnTimer;
+    };
+    return { idle: t(false), wired: t(true), all: g.houses.every(h => h.hasPower && h.hasWater && h.hasDrainage) };
+  });
+  console.log('8b. All-connected spawn boost:', boost);
+  if (!boost.all || boost.wired < boost.idle * 3) throw new Error('All-connected spawn speedup check failed!');
+  await page.evaluate(() => window.POWATER.game.startLevel(0));
+
   // 9. City map image drives water; city cutscene (story intro for Bangkok) precedes the briefing
   const story = await page.evaluate(() => {
     const g = window.POWATER.game, u = window.POWATER.uiManager, m = g.map;

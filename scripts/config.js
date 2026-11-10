@@ -28,6 +28,7 @@
     MIN_HOUSE_DISTANCE: 100,
     MAX_WIRE_LENGTH: 790, // hard wire/pipe reach (center to center) = 2.5 x the fast length
     FAST_WIRE_LENGTH: 315, // full-speed length; longer links carry less (like extra series hops)
+    ALL_CONNECTED_SPAWN_SPEEDUP: 4, // house spawn timer runs this much faster while every house is fully wired
     CHAIN_FREE_HOPS: 2, // links from a source that run at full flow
     CHAIN_FLOW_LOSS_PER_HOP: 0.25, // flow lost per extra link in series (0 flow = not supplied)
 
@@ -618,6 +619,7 @@
       if (typeof gr.minHouseDistancePixels === 'number') CONFIG.MIN_HOUSE_DISTANCE = gr.minHouseDistancePixels;
       if (typeof gr.maxWireLengthPixels === 'number') CONFIG.MAX_WIRE_LENGTH = gr.maxWireLengthPixels;
       if (typeof gr.fastWireLengthPixels === 'number') CONFIG.FAST_WIRE_LENGTH = gr.fastWireLengthPixels;
+      if (typeof gr.allConnectedSpawnSpeedup === 'number') CONFIG.ALL_CONNECTED_SPAWN_SPEEDUP = gr.allConnectedSpawnSpeedup;
       if (typeof gr.chainFreeHops === 'number') CONFIG.CHAIN_FREE_HOPS = gr.chainFreeHops;
       if (typeof gr.chainFlowLossPerHop === 'number') CONFIG.CHAIN_FLOW_LOSS_PER_HOP = gr.chainFlowLossPerHop;
       if (typeof gr.upsizeEveryNHouses === 'number') {

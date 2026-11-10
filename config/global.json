@@ -94,6 +94,7 @@
     "minHouseDistancePixels": 100,
     "maxWireLengthPixels": 790,
     "fastWireLengthPixels": 315,
+    "allConnectedSpawnSpeedup": 4,
     "chainFreeHops": 2,
     "chainFlowLossPerHop": 0.25,
     "upsizeEveryNHouses": 10,

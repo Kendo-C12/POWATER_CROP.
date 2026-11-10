@@ -699,7 +699,13 @@
 
       // 3. Procedural House Spawner (respecting level spawnInterval & 40-house cap)
       const spawnIntervalSec = ((this.currentLevel && this.currentLevel.spawnInterval) || 18000) / 1000.0;
-      this.spawnTimer += dt;
+      // Every house fully wired = nothing left to do, so the next house comes sooner
+      const allDone = !this.isTutorialMode && this.houses.length > 0 && this.houses.every(h => h.hasPower && h.hasWater && h.hasDrainage);
+      if (allDone && !this.allConnectedBoost && this.houses.length < this.maxHousesCap) {
+        this.addFloatingText('⏩ เชื่อมครบทุกบ้าน! บ้านหลังถัดไปมาเร็วขึ้น', CONFIG.CANVAS_WIDTH / 2, 130, '#06d6a0');
+      }
+      this.allConnectedBoost = allDone;
+      this.spawnTimer += dt * (allDone ? (CONFIG.ALL_CONNECTED_SPAWN_SPEEDUP || 4) : 1);
       if (this.spawnTimer >= spawnIntervalSec && this.houses.length < this.maxHousesCap) {
         this.spawnTimer = 0;
         this.spawnHouse();
