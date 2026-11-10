@@ -1,8 +1,8 @@
-# POWATER CORP. (`v1.0.6.6`) — GDevelop 5 Project Documentation (`CLAUDE.md`)
+# POWATER CORP. (`v1.0.6.7`) — GDevelop 5 Project Documentation (`CLAUDE.md`)
 
 > **Team Green Gang**: Sukrit Limpakanon, Aristt Mahakitsiri, Gantinan Satjariyakul  
 > **Engine**: GDevelop 5 (`POWATER CROPS..json`) + Real PNG Sprite Assets + PixiJS Procedural River/Conduit Rendering  
-> **Version Naming**: `1.x.y.z` (`x` = Major Version, `y` = Small Addition Within Major Version, `z` = Bug Fixes) — Current: **`v1.0.6.6`**
+> **Version Naming**: `1.x.y.z` (`x` = Major Version, `y` = Small Addition Within Major Version, `z` = Bug Fixes) — Current: **`v1.0.6.7`**
 
 ---
 
@@ -31,6 +31,8 @@
 
 - **Level ETA (`⏳ จบใน ~m:ss`)**: the HUD win pill shows the estimated real time left to win (`engine.estimateTimeToWin`: remaining house spawns + remaining hold time, divided by game speed), assuming the player keeps up.
 - **Game speed**: the `SPEED` button cycles **1X → 2X → 4X → 1X**.
+
+- **Pollution limit is calculated (`engine.computeMaxPollution`)**: at level start, `maxPollution` = the pollution a *minimal* winning city emits from pollution start until only `pollutionWinMarginSeconds` (`20s`) of the win hold are left. Minimal city = the starting coal generator, `ceil(houses / filter capacity)` waste filters, the starting air filters, every house drained, houses growing from 5 to 15 at the all-connected spawn speed. Result: Bangkok `105.5`, Tokyo `101.4`, Rome `103.5`, Amsterdam `90.2` (the `maxPollution` in `config/<city>.json` is now only a floor, used by the tutorial). Any extra generator/filter or untreated sewage pushes the city over earlier; Eco Filters and upgrades buy time.
 
 ### 💀 Lose Conditions
 1. **Citizen Complaints**: Reaching the level's maximum complaint limit (`3` strikes in Bangkok, Tokyo, and Rome; **`1` strike = Instant Game Over** in Amsterdam).
@@ -123,6 +125,8 @@ All buildings, houses, rivers, HUD bars, toolbar docks, buttons, and status badg
 
 ## 7. Changelog
 
+- **`v1.0.6.7` (2026-11-10)**:
+  - `maxPollution` is now calculated per city from the pollution rates so a minimal city loses with 20s of the win hold left (after 100–114s of pollution); was a fixed 5.5–7.
 - **`v1.0.6.6` (2026-11-10)**:
   - Win hold shortened from 5:00 to **1:20** in all 4 cities.
   - Pollution now starts when the city reaches **5 houses** (was: after 3 minutes); the win hold only counts once pollution is active.

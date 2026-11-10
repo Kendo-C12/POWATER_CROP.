@@ -15,6 +15,7 @@
     STRIKE_TIMER_SECONDS: 27, // 27 seconds unsupplied = complaint
     GRACE_PERIOD_SECONDS: 120, // 2-minute Protecting Time / Grace Period
     POLLUTION_START_HOUSES: 5, // pollution starts once the city has this many houses
+    POLLUTION_WIN_MARGIN_SECONDS: 20, // maxPollution is sized so a minimal city loses with this much win hold left
     POLLUTION_WARN_THRESHOLD: 0.8,
 
     // Win Condition (POWATER CORP.pdf: บ้าน > 15 หลังมีน้ำและไฟใช้ตลอดเวลาเป็นเวลา 5-7 นาที)
@@ -607,6 +608,7 @@
       if (typeof gr.nightCycleDurationSeconds === 'number') CONFIG.NIGHT_DURATION_SECONDS = gr.nightCycleDurationSeconds;
       if (typeof gr.protectingTimeSeconds === 'number') CONFIG.GRACE_PERIOD_SECONDS = gr.protectingTimeSeconds;
       if (typeof gr.pollutionStartHouses === 'number') CONFIG.POLLUTION_START_HOUSES = gr.pollutionStartHouses;
+      if (typeof gr.pollutionWinMarginSeconds === 'number') CONFIG.POLLUTION_WIN_MARGIN_SECONDS = gr.pollutionWinMarginSeconds;
       if (typeof gr.complaintStrikeTimerSeconds === 'number') CONFIG.STRIKE_TIMER_SECONDS = gr.complaintStrikeTimerSeconds;
       if (typeof gr.defaultMaxComplaints === 'number') CONFIG.MAX_COMPLAINTS = gr.defaultMaxComplaints;
       if (typeof gr.winRequiredHouses === 'number') CONFIG.WIN_REQUIRED_HOUSES = gr.winRequiredHouses;

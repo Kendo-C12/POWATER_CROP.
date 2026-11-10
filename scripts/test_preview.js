@@ -315,6 +315,30 @@ async function runTest() {
   if (pol.before.active || pol.before.n >= 5 || !pol.after.active || pol.hold !== 80) throw new Error('Pollution start at 5 houses / 80s hold check failed!');
   await page.evaluate(() => window.POWATER.game.startLevel(0));
 
+  // 8d. maxPollution is sized so a minimal city (all drained, 1 generator, filters as needed) loses with 20s of hold left
+  const minimal = await page.evaluate(() => {
+    const g = window.POWATER.game, C = window.POWATER.CONFIG, lvl = g.currentLevel;
+    const req = g.winRequiredHouses, s = C.POLLUTION_START_HOUSES, step = lvl.spawnInterval / 1000 / C.ALL_CONNECTED_SPAWN_SPEEDUP;
+    const cap = g.buildings.find(b => b.config.type === 'waste_filter').config.capacity;
+    const keep = g.buildings.filter(b => b.config.type !== 'waste_filter' && b.config.type !== 'water_pump');
+    const realB = g.buildings, realH = g.houses;
+    let t = 0, hitAt = null;
+    g.pollution = 0; g.pollutionStartedNotified = true;
+    while (t < 2000 && hitAt === null) {
+      const n = Math.min(req, s + Math.floor(t / step));
+      g.houses = Array.from({ length: n }, () => ({ hasWater: true, hasDrainage: true }));
+      g.buildings = keep.concat(Array.from({ length: Math.ceil(n / cap) }, () => ({ config: { type: 'waste_filter' }, active: true, isBroken: false, usedCapacity: 1 })));
+      g.updatePollution(0.05);
+      t += 0.05;
+      if (g.pollution >= lvl.maxPollution) hitAt = t;
+    }
+    g.houses = realH; g.buildings = realB; g.pollution = 0;
+    return { max: lvl.maxPollution, holdLeft: Math.round(((req - s) * step + g.winTargetDuration - hitAt) * 10) / 10, polluted: Math.round(hitAt) };
+  });
+  console.log('8d. Minimal-city pollution budget:', minimal);
+  if (Math.abs(minimal.holdLeft - 20) > 0.5 || minimal.polluted < 60) throw new Error('maxPollution budget check failed!');
+  await page.evaluate(() => window.POWATER.game.startLevel(0));
+
   // 9. City map image drives water; city cutscene (story intro for Bangkok) precedes the briefing
   const story = await page.evaluate(() => {
     const g = window.POWATER.game, u = window.POWATER.uiManager, m = g.map;

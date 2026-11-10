@@ -83,6 +83,7 @@
     "nightCycleDurationSeconds": 60.0,
     "protectingTimeSeconds": 120.0,
     "pollutionStartHouses": 5,
+    "pollutionWinMarginSeconds": 20,
     "complaintStrikeTimerSeconds": 27.0,
     "defaultMaxComplaints": 3,
     "winRequiredHouses": 15,

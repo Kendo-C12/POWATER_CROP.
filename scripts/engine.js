@@ -299,6 +299,7 @@
       this.sdg15Unlocked = false;
 
       this.setupStartingCity();
+      this.currentLevel.maxPollution = this.computeMaxPollution();
 
       if (global.POWATER.soundManager) {
         global.POWATER.soundManager.resume();
@@ -1261,6 +1262,32 @@
           });
         }
       });
+    }
+
+    // Pollution limit = everything a minimal winning city emits from pollution start until only
+    // POLLUTION_WIN_MARGIN_SECONDS of the win hold are left, so the bare minimum just survives that long.
+    // Minimal city: starting coal generator, ceil(required / filter capacity) waste filters, starting air
+    // filters, every house drained; houses grow start..required at the all-connected spawn speed.
+    computeMaxPollution() {
+      const lvl = this.currentLevel;
+      lvl.baseMaxPollution = lvl.baseMaxPollution || lvl.maxPollution; // json value = floor (tutorial)
+      const R = CONFIG.POLLUTION_RATES;
+      const k = typeof lvl.pollutionMultiplier === 'number' ? lvl.pollutionMultiplier : 1;
+      const count = (fn) => this.buildings.filter(fn).length;
+      const gens = Math.min(1, count(b => b.config.type === 'generator' && !b.config.clean));
+      const wf = this.buildings.find(b => b.config.type === 'waste_filter');
+      const cap = (wf && wf.config.capacity) || 12;
+      const req = this.winRequiredHouses;
+      const air = count(b => b.config.type === 'air_filter');
+      const s = Math.min(req, CONFIG.POLLUTION_START_HOUSES || 5);
+      const spawnStep = (lvl.spawnInterval || 18000) / 1000 / (CONFIG.ALL_CONNECTED_SPAWN_SPEEDUP || 4);
+      const tHold = Math.max(0, this.winTargetDuration - (CONFIG.POLLUTION_WIN_MARGIN_SECONDS || 20));
+      // Emission per second with n drained houses (one more waste filter every `cap` houses)
+      const rate = (n) => k * (gens * R.ELECTRIC_GENERATOR + Math.ceil(n / cap) * R.WASTEWATER_OUTLET_BASE + n * R.WASTEWATER_DISCHARGE_PER_HOUSE)
+        - air * R.AIR_FILTER_REDUCTION - R.NATURAL_DILUTION;
+      let total = rate(req) * tHold; // holding with every required house
+      for (let n = s; n < req; n++) total += rate(n) * spawnStep; // growing from s to req houses
+      return Math.round(Math.max(lvl.baseMaxPollution, total) * 10) / 10;
     }
 
     // Pollution (and the win hold timer) start once the city reaches POLLUTION_START_HOUSES; stays on after that
