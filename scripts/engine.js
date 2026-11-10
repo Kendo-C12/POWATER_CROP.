@@ -136,8 +136,20 @@
     }
 
     toggleSpeed() {
-      this.gameSpeed = (this.gameSpeed === 1.0) ? 2.0 : 1.0;
+      this.gameSpeed = { 1: 2, 2: 4 }[this.gameSpeed] || 1; // 1x -> 2x -> 4x -> 1x
       return this.gameSpeed;
+    }
+
+    // Real-time seconds until the level can be won at the current speed, assuming the player keeps up:
+    // wait for the missing houses to spawn, then hold the win timer
+    estimateTimeToWin() {
+      const req = this.winRequiredHouses || 15;
+      const interval = ((this.currentLevel && this.currentLevel.spawnInterval) || 18000) / 1000;
+      const missing = Math.max(0, req - this.houses.length);
+      const boost = this.allConnectedBoost ? (CONFIG.ALL_CONNECTED_SPAWN_SPEEDUP || 4) : 1;
+      const spawnWait = missing > 0 ? Math.max(0, missing * interval - this.spawnTimer) / boost : 0;
+      const hold = Math.max(0, (this.winTargetDuration || 300) - (this.winHoldTimer || 0));
+      return (spawnWait + hold) / (this.gameSpeed || 1);
     }
 
     selectTool(toolId) {

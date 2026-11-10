@@ -286,10 +286,19 @@ async function runTest() {
       g.update(0.05); g.spawnTimer = 0; g.update(1);
       return g.spawnTimer;
     };
-    return { idle: t(false), wired: t(true), all: g.houses.every(h => h.hasPower && h.hasWater && h.hasDrainage) };
+    const idle = t(false), wired = t(true);
+    const all = g.houses.every(h => h.hasPower && h.hasWater && h.hasDrainage);
+    const eta1 = g.estimateTimeToWin();
+    const speeds = [g.toggleSpeed(), g.toggleSpeed(), g.toggleSpeed()];
+    g.toggleSpeed(); g.toggleSpeed(); // -> 4x
+    const eta4 = g.estimateTimeToWin();
+    g.gameSpeed = 1;
+    return { idle, wired, all, speeds, eta1: Math.round(eta1), eta4: Math.round(eta4) };
   });
-  console.log('8b. All-connected spawn boost:', boost);
-  if (!boost.all || boost.wired < boost.idle * 3) throw new Error('All-connected spawn speedup check failed!');
+  console.log('8b. All-connected spawn boost / speed / ETA:', boost);
+  if (!boost.all || boost.wired < boost.idle * 3 || boost.speeds.join() !== '2,4,1' || boost.eta1 < 300 || Math.abs(boost.eta4 * 4 - boost.eta1) > 4) {
+    throw new Error('Spawn speedup / 4x speed / win ETA check failed!');
+  }
   await page.evaluate(() => window.POWATER.game.startLevel(0));
 
   // 9. City map image drives water; city cutscene (story intro for Bangkok) precedes the briefing

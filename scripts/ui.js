@@ -96,7 +96,7 @@
         { id: 'repair', objectName: 'btn_repair', title: '🔧 REPAIR', sub: '[R] FIX', videoKey: 'repair', type: 'action', action: 'repairTool', x: 608, y: tbY, w: tbW, h: tbH, color: 0xff5a5f },
         { id: 'special', objectName: 'btn_special', title: '🧪 TEST', sub: '[I] LAB', videoKey: 'special', type: 'action', action: 'openSpecialItems', x: 682, y: tbY, w: tbW, h: tbH, color: 0x06d6a0 },
         { id: 'pause', objectName: 'btn_pause', title: '⏸️ PAUSE', sub: '[SPACE]', type: 'action', action: 'togglePause', x: 756, y: tbY, w: tbW, h: tbH, color: 0xadb5bd },
-        { id: 'speed', objectName: 'btn_speed', title: '⏩ SPEED', sub: '1X / 2X', type: 'action', action: 'toggleSpeed', x: 830, y: tbY, w: tbW, h: tbH, color: 0xadb5bd },
+        { id: 'speed', objectName: 'btn_speed', title: '⏩ SPEED', sub: '1X·2X·4X', type: 'action', action: 'toggleSpeed', x: 830, y: tbY, w: tbW, h: tbH, color: 0xadb5bd },
         { id: 'upgrades', objectName: 'btn_upgrade', title: '⬆️ TECH', sub: '[U] UPGRD', videoKey: 'upgrades', type: 'action', action: 'openUpgrades', x: 904, y: tbY, w: tbW, h: tbH, color: 0xffd166 },
         { id: 'guide', objectName: 'btn_guide', title: '📖 LEVELS', sub: 'BRIEFING', videoKey: 'guide', type: 'action', action: 'openGuide', x: 978, y: tbY, w: tbW, h: tbH, color: 0x48cae4 },
         { id: 'logo', type: 'action', action: 'openGuide', x: 8, y: 6, w: 185, h: 32 }
@@ -267,15 +267,16 @@
         const curStr = this.formatMMSS(this.game.winHoldTimer || 0);
         const tgtStr = this.formatMMSS(this.game.winTargetDuration || 300);
         const st = this.game.winTimerState || 'WAITING';
+        const eta = `⏳ จบใน ~${this.formatMMSS(this.game.estimateTimeToWin())}`;
         if (st === 'PAUSED') {
-          this.txtWinTimer.text = `⏸️ WIN: ${curStr}/${tgtStr} (PAUSED)`;
+          this.txtWinTimer.text = `⏸️ WIN ${curStr}/${tgtStr} (PAUSED)`;
           this.txtWinTimer.style.fill = 0xff5a5f;
         } else if (st === 'RUNNING') {
-          this.txtWinTimer.text = `🏆 WIN: ${curStr}/${tgtStr} (HOLD!)`;
+          this.txtWinTimer.text = `🏆 WIN ${curStr}/${tgtStr} ${eta}`;
           this.txtWinTimer.style.fill = 0x06d6a0;
         } else {
           const req = this.game.winRequiredHouses || 15;
-          this.txtWinTimer.text = `🏆 WIN: ${curStr}/${tgtStr} (>${req}หลัง)`;
+          this.txtWinTimer.text = `🏆 ${this.game.houses.length}/${req}หลัง ${eta}`;
           this.txtWinTimer.style.fill = 0x90e0ef;
         }
       }
@@ -654,7 +655,7 @@
                          (btn.id === 'repair' && (this.game.activeTool === 'repair' || brokenCount > 0)) ||
                          (btn.id === 'special' && (this.game.isFloodActive || this.game.isBlackoutActive)) ||
                          (btn.id === 'pause' && this.game.isPaused) ||
-                         (btn.id === 'speed' && this.game.gameSpeed === 2.0);
+                         (btn.id === 'speed' && this.game.gameSpeed > 1);
 
         const accentCol = btn.color || 0x00b4d8;
 
@@ -682,7 +683,7 @@
         }
         if (btn._txtSub) {
           if (btn.id === 'speed') {
-            btn._txtSub.text = (this.game.gameSpeed === 2.0) ? '⚡ 2X FAST' : '1X / 2X';
+            btn._txtSub.text = (this.game.gameSpeed > 1) ? `⚡ ${this.game.gameSpeed}X FAST` : '1X·2X·4X';
           } else if (btn.id === 'repair' && brokenCount > 0) {
             btn._txtSub.text = `⚠️ FIX (${brokenCount})`;
           } else if (btn.id === 'repair') {

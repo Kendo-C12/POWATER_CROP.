@@ -1,8 +1,8 @@
-# POWATER CORP. (`v1.0.6.2`) — GDevelop 5 Project Documentation (`CLAUDE.md`)
+# POWATER CORP. (`v1.0.6.3`) — GDevelop 5 Project Documentation (`CLAUDE.md`)
 
 > **Team Green Gang**: Sukrit Limpakanon, Aristt Mahakitsiri, Gantinan Satjariyakul  
 > **Engine**: GDevelop 5 (`POWATER CROPS..json`) + Real PNG Sprite Assets + PixiJS Procedural River/Conduit Rendering  
-> **Version Naming**: `1.x.y.z` (`x` = Major Version, `y` = Small Addition Within Major Version, `z` = Bug Fixes) — Current: **`v1.0.6.2`**
+> **Version Naming**: `1.x.y.z` (`x` = Major Version, `y` = Small Addition Within Major Version, `z` = Bug Fixes) — Current: **`v1.0.6.3`**
 
 ---
 
@@ -27,6 +27,9 @@
 - **House Requirement**: Maintain **more than 15 completed houses (`>= 15` houses)** continuously supplied with water and electricity for **5–7 minutes (`300s`)**.
 - **Pause Rule**: If any pump/facility breaks down (**Needs Repair**) or an **Extreme Weather Disaster** is active, the **Win Timer pauses** (`PAUSED`).
 - **Reset Rule**: If a citizen files a **Complaint**, the **Win Timer resets to `00:00`** immediately.
+
+- **Level ETA (`⏳ จบใน ~m:ss`)**: the HUD win pill shows the estimated real time left to win (`engine.estimateTimeToWin`: remaining house spawns + remaining hold time, divided by game speed), assuming the player keeps up.
+- **Game speed**: the `SPEED` button cycles **1X → 2X → 4X → 1X**.
 
 ### 💀 Lose Conditions
 1. **Citizen Complaints**: Reaching the level's maximum complaint limit (`3` strikes in Bangkok, Tokyo, and Rome; **`1` strike = Instant Game Over** in Amsterdam).
@@ -118,6 +121,9 @@ All buildings, houses, rivers, HUD bars, toolbar docks, buttons, and status badg
 
 ## 7. Changelog
 
+- **`v1.0.6.3` (2026-11-10)**:
+  - HUD win pill shows `🏆 houses/required ⏳ จบใน ~m:ss` (estimated real time until the level can be won).
+  - `SPEED` button cycles 1X → 2X → 4X → 1X.
 - **`v1.0.6.2` (2026-11-10)**:
   - Shorter levels: when every house is fully wired, the next house spawns 4× sooner (`⏩` message), in all 4 cities.
 - **`v1.0.6.1` (2026-11-10)**:
