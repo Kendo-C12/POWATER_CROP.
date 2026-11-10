@@ -1,8 +1,8 @@
-# POWATER CORP. (`v1.0.7.4`) — GDevelop 5 Project Documentation (`CLAUDE.md`)
+# POWATER CORP. (`v1.0.7.5`) — GDevelop 5 Project Documentation (`CLAUDE.md`)
 
 > **Team Green Gang**: Sukrit Limpakanon, Aristt Mahakitsiri, Gantinan Satjariyakul  
 > **Engine**: GDevelop 5 (`POWATER CROPS..json`) + Real PNG Sprite Assets + PixiJS Procedural River/Conduit Rendering  
-> **Version Naming**: `1.x.y.z` (`x` = Major Version, `y` = Small Addition Within Major Version, `z` = Bug Fixes) — Current: **`v1.0.7.4`**
+> **Version Naming**: `1.x.y.z` (`x` = Major Version, `y` = Small Addition Within Major Version, `z` = Bug Fixes) — Current: **`v1.0.7.5`**
 
 ---
 
@@ -36,6 +36,8 @@
 
 - **Pollution advice**: the first time pollution reaches **33%** of the limit (`globalRules.pollutionAdviceRatio`), a `☢️ มลพิษสูงแล้ว!` message appears and the Eco Filter demo video auto-plays (it shows the pollution bar climbing past the 33% mark, placing filters via `FILTER [4]`, and the bar falling).
 - **After winning**: `CONTINUE` / ✕ on the victory screen keeps the level running (`levelCleared` stops the win from re-firing).
+
+- **City disasters by house count (`engine.scheduleNextDisaster`)**: from the start of the level, each city's disasters strike every **1–2 new houses** (`disasters.everyHouses: [1, 2]`), never the same gap twice in a row (so 1, 2, 1, 2...). Bangkok = High Tide, Tokyo = Earthquake, Rome = Blackout, Amsterdam = random Earthquake / High Tide / Flood. Effects are short (tide & blackout `8s`, flood `10s`). The old day-based tide/blackout/flood and minute-based quake rolls were removed (levels end before they could fire).
 
 ### 💀 Lose Conditions
 1. **Citizen Complaints**: Reaching the level's maximum complaint limit (`3` strikes in Bangkok, Tokyo, and Rome; **`1` strike = Instant Game Over** in Amsterdam).
@@ -132,6 +134,10 @@ All buildings, houses, rivers, HUD bars, toolbar docks, buttons, and status badg
 
 ## 7. Changelog
 
+- **`v1.0.7.5` (2026-11-10)**:
+  - City disasters now strike every 1–2 new houses from the level start (previously day/minute based and never seen in a ~2 min level); durations shortened to 8–10s; briefings/cutscenes updated.
+  - Fixed: a stale victory screen closed after a restart marked the new level as already cleared, so it could never be won.
+  - Bot playthrough (human pace 4s/house + Eco Filters at 60%, real disasters): 16/16 wins across the 4 cities in 90–117s, 0 complaints.
 - **`v1.0.7.4` (2026-11-10)**:
   - Tutorial opens with a top-bar intro (`ui.showHudIntro`): highlights and explains money, houses, goal, pollution and strikes, then `✅ เข้าใจแล้ว เริ่ม Tutorial` starts the steps.
   - Removed the `⏳ จบใน` ETA from the HUD (and `engine.estimateTimeToWin`); the goal pill now reads `🏆 เป้าหมาย n/15 หลัง`.

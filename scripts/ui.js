@@ -926,7 +926,7 @@
     }
 
     closeModal() {
-      if (this.activeModal === 'victory' && this.game) {
+      if (this.activeModal === 'victory' && this.game && this.game.isGameWon) { // a stale victory screen after a restart must not mark the new level
         // "Continue in this level": un-freeze the simulation; levelCleared stops the win from re-firing
         this.game.isGameWon = false;
         this.game.levelCleared = true;
@@ -1723,7 +1723,7 @@
         'ครบ 2 นาทีแรกของการเตรียมโครงข่ายเมืองแล้ว!\n\n' +
         '• นับจากนี้ บ้านที่ขาดน้ำประปา ไฟฟ้า หรือท่อระบายน้ำเกิน 27 วินาที จะยื่นเรื่องร้องเรียน!\n' +
         '• ถูกร้องเรียนครบจำนวนที่กำหนด = Game Over!\n' +
-        '• ในด่าน Tokyo/Amsterdam โอกาสเกิดแผ่นดินไหว (Earthquake) จะเริ่มทำงานทุกๆ 1 นาที!\n' +
+        '• ภัยพิบัติของแต่ละเมืองเกิดทุกๆ 1-2 บ้านใหม่ ซ่อมอุปกรณ์ให้ไว!\n' +
         '• หมั่นตรวจสอบและซ่อมแซมเครื่องปั๊มน้ำ/โรงไฟฟ้าที่ขึ้นไอคอนประแจสีแดง!',
         { fontFamily: font, fontSize: 13, fill: 0xe9ecef, wordWrap: true, wordWrapWidth: mw - 50, lineHeight: 22 }
       );

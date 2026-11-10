@@ -71,10 +71,6 @@
       this.highTideTimer = 0.0;
 
       // Tokyo Earthquake state
-      this.earthquakeMinuteTimer = 0.0;
-      this.minutesWithoutQuake = 0;
-      this.guaranteedQuakeTriggered = false;
-      this.postGuaranteedQuakeBonus = 0.0;
       this.screenShakeTimer = 0.0;
 
       // Rome Blackout state
@@ -249,10 +245,6 @@
       this.activeDisasterText = '';
       this.isHighTide = false;
       this.highTideTimer = 0.0;
-      this.earthquakeMinuteTimer = 0.0;
-      this.minutesWithoutQuake = 0;
-      this.guaranteedQuakeTriggered = false;
-      this.postGuaranteedQuakeBonus = 0.0;
       this.screenShakeTimer = 0.0;
 
       this.isBlackoutActive = false;
@@ -291,6 +283,8 @@
 
       this.setupStartingCity();
       this.currentLevel.maxPollution = this.computeMaxPollution();
+      this.lastDisasterGap = 0;
+      this.scheduleNextDisaster(); // city disasters run from the very start of the level
 
       if (global.POWATER.soundManager) {
         global.POWATER.soundManager.resume();
@@ -648,6 +642,7 @@
       const house = new global.POWATER.HouseEntity(`h_${this.nextEntityId++}`, runtimeObj, x, y, side);
       house.applyUpsizeScale(scale);
       this.houses.push(house);
+      if (this.houses.length >= (this.nextDisasterAt || Infinity)) this.triggerCityDisaster();
 
       this.checkMapUpsize();
 
@@ -844,8 +839,6 @@
           if (global.POWATER.soundManager) global.POWATER.soundManager.playUpgrade();
         }
 
-        // Check Day-based Extreme Weather triggers (Every 15 days: High Tide / Blackout; Every 28 days: Flood)
-        this.onNewDayWeatherCheck();
       }
     }
 
@@ -866,32 +859,6 @@
 
       const targetAlpha = this.isNight ? 0.34 : 0.0;
       this.nightAlpha += (targetAlpha - this.nightAlpha) * Math.min(1.0, dt * 1.8);
-    }
-
-    onNewDayWeatherCheck() {
-      const lvl = this.currentLevel || {};
-      const dis = CONFIG.DISASTERS || {};
-      const tideDays = (dis.HIGH_TIDE && dis.HIGH_TIDE.everyNDays) || 15;
-      const blackoutDays = (dis.BLACKOUT && dis.BLACKOUT.everyNDays) || 15;
-      const blackoutChance = (dis.BLACKOUT && typeof dis.BLACKOUT.chance === 'number') ? dis.BLACKOUT.chance : 0.125;
-      const floodDays = (dis.FLOOD && dis.FLOOD.everyNDays) || 28;
-
-      // 1. Bangkok & Amsterdam: High Tide every N in-game days
-      if (lvl.hasHighTide && this.totalDaysPassed > 0 && this.totalDaysPassed % tideDays === 0) {
-        this.triggerHighTide();
-      }
-
-      // 2. Rome: Blackout chance every N in-game days
-      if (lvl.hasBlackout && this.totalDaysPassed > 0 && this.totalDaysPassed % blackoutDays === 0) {
-        if (Math.random() < blackoutChance || this.totalDaysPassed === blackoutDays) {
-          this.triggerRomeBlackout();
-        }
-      }
-
-      // 3. Amsterdam: Main Flood every 4 weeks (28 in-game days)
-      if (lvl.hasFlood && this.totalDaysPassed > 0 && this.totalDaysPassed % floodDays === 0) {
-        this.triggerAmsterdamFlood();
-      }
     }
 
     updateRepairAndDisasters(dt) {
@@ -937,45 +904,6 @@
         }
       }
 
-      // 3. Tokyo & Amsterdam Earthquake (every 1 minute after Protecting Time)
-      if (!this.gracePeriodActive && this.currentLevel && this.currentLevel.hasEarthquake) {
-        const eqCfg = (CONFIG.DISASTERS && CONFIG.DISASTERS.EARTHQUAKE) || {};
-        const checkInterval = eqCfg.checkEverySeconds || 60.0;
-        const baseChance = (typeof eqCfg.baseChance === 'number') ? eqCfg.baseChance : 0.125;
-        const escalateAfter = eqCfg.escalateAfterMinutes || 3;
-        const escalateBonus = (typeof eqCfg.escalateBonusPerMinute === 'number') ? eqCfg.escalateBonusPerMinute : 0.05;
-        const guaranteedMin = eqCfg.guaranteedAtMinute || 5;
-
-        this.earthquakeMinuteTimer += dt;
-        if (this.earthquakeMinuteTimer >= checkInterval) {
-          this.earthquakeMinuteTimer -= checkInterval;
-          this.minutesWithoutQuake++;
-
-          // POWATER CORP.pdf Tokyo Earthquake rule:
-          // Base 10-15% (12.5%). After 3 mins without quake, +5%/min. At 5 mins without quake, forced 100% quake!
-          // After forced quake, condition becomes +5% every minute.
-          let quakeChance = baseChance + this.postGuaranteedQuakeBonus;
-          let forceQuake = false;
-
-          if (!this.guaranteedQuakeTriggered) {
-            if (this.minutesWithoutQuake >= guaranteedMin) {
-              forceQuake = true;
-              this.guaranteedQuakeTriggered = true;
-            } else if (this.minutesWithoutQuake > escalateAfter) {
-              quakeChance += (this.minutesWithoutQuake - escalateAfter) * escalateBonus;
-            }
-          } else {
-            this.postGuaranteedQuakeBonus += escalateBonus;
-            quakeChance = baseChance + this.postGuaranteedQuakeBonus;
-          }
-
-          if (forceQuake || Math.random() < quakeChance) {
-            this.minutesWithoutQuake = 0;
-            this.triggerEarthquake();
-          }
-        }
-      }
-
       // 4. Rome Blackout countdown
       if (this.isBlackoutActive) {
         this.blackoutTimer -= dt;
@@ -1012,6 +940,23 @@
         alerts.push(`🔧 ต้องซ่อม ${brokenCount} จุด`);
       }
       this.activeDisasterText = alerts.join(' | ');
+    }
+
+    // City disasters (tide / quake / blackout / flood) strike every 1-2 new houses (DISASTERS.EVERY_HOUSES); the next
+    // gap always differs from the last one, so with [1, 2] they alternate 1, 2, 1, 2...
+    scheduleNextDisaster() {
+      const lvl = this.currentLevel || {};
+      this.cityDisasters = [lvl.hasHighTide && 'tide', lvl.hasEarthquake && 'quake', lvl.hasBlackout && 'blackout', lvl.hasFlood && 'flood'].filter(Boolean);
+      const gaps = ((CONFIG.DISASTERS && CONFIG.DISASTERS.EVERY_HOUSES) || [1, 2]).filter(g => g !== this.lastDisasterGap);
+      const gap = gaps[Math.floor(Math.random() * gaps.length)];
+      this.lastDisasterGap = gap;
+      this.nextDisasterAt = (this.cityDisasters.length && !this.isTutorialMode) ? this.houses.length + gap : Infinity;
+    }
+
+    triggerCityDisaster() {
+      const pick = this.cityDisasters[Math.floor(Math.random() * this.cityDisasters.length)];
+      ({ tide: () => this.triggerHighTide(), quake: () => this.triggerEarthquake(), blackout: () => this.triggerRomeBlackout(), flood: () => this.triggerAmsterdamFlood() })[pick]();
+      this.scheduleNextDisaster();
     }
 
     triggerHighTide() {
@@ -1059,7 +1004,7 @@
       this.isBlackoutActive = true;
       this.blackoutTimer = blkCfg.durationSeconds || 25.0;
       this.addFloatingText(
-        '⚡ ไฟดับครั้งใหญ่ในโรม! พลังงานไฟฟ้าขัดข้องชั่วคราว Win Timer หยุดเดิน',
+        '⚡ ไฟดับครั้งใหญ่ในโรม! บ้านทุกหลังไม่มีไฟชั่วคราว (ชนะไม่ได้จนกว่าไฟจะกลับมา)',
         CONFIG.CANVAS_WIDTH / 2,
         100,
         '#ffd166'
@@ -1070,6 +1015,7 @@
     triggerAmsterdamFlood() {
       if (this.isFloodActive) return;
       this.isFloodActive = true;
+      this.floodMaxDuration = (CONFIG.DISASTERS && CONFIG.DISASTERS.FLOOD && CONFIG.DISASTERS.FLOOD.maxDurationSecondsBeforeGameOver) || 10;
       this.floodTimer = 0.0;
       this.addFloatingText(
         `🌊 ภัยพิบัติหลัก: น้ำท่วมใหญ่ใน Amsterdam! ระดับน้ำจะลดลงใน ${Math.round(this.floodMaxDuration)}s`,

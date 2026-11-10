@@ -421,6 +421,27 @@ async function runTest() {
   if (after.modal !== 'victory' || !after.runs || !after.noRefire || after.video !== 'air_filter' || !after.once) throw new Error('Continue-after-win / pollution advice check failed!');
   await page.evaluate(() => window.POWATER.game.startLevel(0));
 
+  // 8i. City disasters every 1-2 new houses from the start, never the same gap twice in a row
+  const dis = await page.evaluate(() => {
+    const g = window.POWATER.game;
+    const out = {};
+    [[1, 'triggerEarthquake'], [2, 'triggerRomeBlackout'], [0, 'triggerHighTide']].forEach(([lvl, fn]) => {
+      g.startLevel(lvl);
+      const start = g.houses.length, hits = [];
+      const orig = g[fn].bind(g);
+      g[fn] = () => { hits.push(g.houses.length); orig(); };
+      for (let i = 0; i < 12; i++) g.spawnHouse();
+      g[fn] = orig;
+      const gaps = hits.map((h, i) => h - (i ? hits[i - 1] : start));
+      out[g.currentLevel.id] = { start, hits, gaps };
+    });
+    return out;
+  });
+  console.log('8i. Disaster schedule:', JSON.stringify(dis));
+  const disOk = Object.values(dis).every(d => d.hits.length >= 4 && d.gaps.every(x => x >= 1 && x <= 2) && d.gaps.every((x, i) => !i || x !== d.gaps[i - 1]));
+  if (!disOk) throw new Error('Disaster schedule check failed!');
+  await page.evaluate(() => window.POWATER.game.startLevel(0));
+
   // 9. City map image drives water; city cutscene (story intro for Bangkok) precedes the briefing
   const story = await page.evaluate(() => {
     const g = window.POWATER.game, u = window.POWATER.uiManager, m = g.map;
