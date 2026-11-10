@@ -442,6 +442,23 @@ async function runTest() {
   if (!disOk) throw new Error('Disaster schedule check failed!');
   await page.evaluate(() => window.POWATER.game.startLevel(0));
 
+  // 8j. Hard mode: no 2.5x wires (a 500px link is refused), normal mode allows it
+  const hardRes = await page.evaluate(() => {
+    const g = window.POWATER.game;
+    g.startLevel(0);
+    const gen = g.buildings.find(b => b.config.type === 'generator'), gc = gen.getCenter();
+    const far = { id: 'far500', isHouse: true, getCenter: () => ({ x: gc.x - 500, y: gc.y }) };
+    g.hardMode = true;
+    const hardRefused = !g.connectNodes('power', gen, far) && g.maxWireLength() === 315;
+    g.hardMode = false;
+    const normalOk = g.connectNodes('power', gen, far) && g.maxWireLength() === 790;
+    g.connections = [];
+    return { hardRefused, normalOk };
+  });
+  console.log('8j. Hard mode wire reach:', hardRes);
+  if (!hardRes.hardRefused || !hardRes.normalOk) throw new Error('Hard mode check failed!');
+  await page.evaluate(() => window.POWATER.game.startLevel(0));
+
   // 9. City map image drives water; city cutscene (story intro for Bangkok) precedes the briefing
   const story = await page.evaluate(() => {
     const g = window.POWATER.game, u = window.POWATER.uiManager, m = g.map;

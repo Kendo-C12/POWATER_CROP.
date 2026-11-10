@@ -546,7 +546,7 @@
         gfxO.drawCircle(sc.x, sc.y, pulseR);
         // Wire reach zones (fixed colours): green disc = full speed (1x), yellow ring = long & slower (up to 2.5x).
         // Dragging past 2.5x turns everything outside the ring red; green and yellow stay as they are.
-        const reachR = global.POWATER.CONFIG.MAX_WIRE_LENGTH || 790;
+        const reachR = this.game.maxWireLength();
         const fastR = global.POWATER.CONFIG.FAST_WIRE_LENGTH || 315;
         let len = 0;
         if (this.isDragging) {
@@ -589,7 +589,7 @@
         const hoverNode = this.game.getNodeAt(p2.x, p2.y);
         const endPt = (hoverNode && hoverNode.id !== this.dragStartNode.id) ? hoverNode.getCenter() : p2;
         const dragLen = Math.hypot(endPt.x - p1.x, endPt.y - p1.y);
-        if (dragLen > (global.POWATER.CONFIG.MAX_WIRE_LENGTH || 790)) wireColor = 0xe63946; // too long
+        if (dragLen > this.game.maxWireLength()) wireColor = 0xe63946; // too long
         else if (dragLen > (global.POWATER.CONFIG.FAST_WIRE_LENGTH || 315)) wireColor = 0xf4a261; // long = slower
 
         const previewPath = (global.POWATER.ConnectionEntity && global.POWATER.ConnectionEntity.buildManhattanPoints)

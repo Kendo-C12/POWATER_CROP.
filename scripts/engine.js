@@ -89,6 +89,8 @@
       this.floatingTexts = [];
       this.nextEntityId = 1;
 
+      this.hardMode = false; // Hard mode: no long 2.5x wires, every link must fit the 1x (full-speed) reach
+
       // Upgrades
       this.upgradeLevels = {
         elec_cap: 1,
@@ -134,6 +136,11 @@
     toggleSpeed() {
       this.gameSpeed = { 1: 2, 2: 4 }[this.gameSpeed] || 1; // 1x -> 2x -> 4x -> 1x
       return this.gameSpeed;
+    }
+
+    // Longest wire the player may drag right now (hard mode drops the 2.5x slow reach)
+    maxWireLength() {
+      return this.hardMode ? (CONFIG.FAST_WIRE_LENGTH || 315) : (CONFIG.MAX_WIRE_LENGTH || 790);
     }
 
     selectTool(toolId) {
@@ -1238,7 +1245,7 @@
 
     // Pollution limit = everything a minimal winning city emits from pollution start until
     // POLLUTION_WIN_MARGIN_SECONDS before it can win, but over at least POLLUTION_MIN_SURVIVE_SECONDS.
-    // Minimal city: starting coal generator, ceil(required / filter capacity) waste filters, starting air
+    // Minimal city: every starting coal generator, all filter sites (min ceil(required / capacity)), starting air
     // filters, every house drained; houses grow start..required at the all-connected spawn speed.
     computeMaxPollution() {
       const lvl = this.currentLevel;
@@ -1246,7 +1253,7 @@
       const R = CONFIG.POLLUTION_RATES;
       const k = typeof lvl.pollutionMultiplier === 'number' ? lvl.pollutionMultiplier : 1;
       const count = (fn) => this.buildings.filter(fn).length;
-      const gens = Math.min(1, count(b => b.config.type === 'generator' && !b.config.clean));
+      const gens = count(b => b.config.type === 'generator' && !b.config.clean); // every coal plant burns, wired or not
       const wf = this.buildings.find(b => b.config.type === 'waste_filter');
       const cap = (wf && wf.config.capacity) || 12;
       const req = this.winRequiredHouses;
@@ -1256,7 +1263,8 @@
       const tSpawn = (req - s) * spawnStep;
       const horizon = Math.max(tSpawn + (this.winTargetDuration || 0) - (CONFIG.POLLUTION_WIN_MARGIN_SECONDS || 20), CONFIG.POLLUTION_MIN_SURVIVE_SECONDS || 60);
       // Emission per second with n drained houses (one more waste filter every `cap` houses)
-      const rate = (n) => k * (gens * R.ELECTRIC_GENERATOR + Math.ceil(n / cap) * R.WASTEWATER_OUTLET_BASE + n * R.WASTEWATER_DISCHARGE_PER_HOUSE)
+      const outlets = (n) => Math.max(Math.ceil(n / cap), count(b => b.config.type === 'waste_filter')); // cities with 2 filter sites use both
+      const rate = (n) => k * (gens * R.ELECTRIC_GENERATOR + outlets(n) * R.WASTEWATER_OUTLET_BASE + n * R.WASTEWATER_DISCHARGE_PER_HOUSE)
         - air * R.AIR_FILTER_REDUCTION - R.NATURAL_DILUTION;
       let total = rate(req) * Math.max(0, horizon - tSpawn); // all required houses for the rest of the horizon
       for (let n = s; n < req; n++) total += rate(n) * Math.min(spawnStep, Math.max(0, horizon - (n - s) * spawnStep)); // growing s..req
@@ -1540,7 +1548,7 @@
 
       const p1 = nodeA.getCenter();
       const p2 = nodeB.getCenter();
-      const maxLen = CONFIG.MAX_WIRE_LENGTH || 315;
+      const maxLen = this.maxWireLength();
       const len = Math.hypot(p2.x - p1.x, p2.y - p1.y);
       if (len > maxLen) {
         this.addFloatingText(`❌ สายยาวเกินไป! (${Math.round(len)} / สูงสุด ${maxLen})`, (p1.x + p2.x) / 2, (p1.y + p2.y) / 2 - 20, '#e63946');

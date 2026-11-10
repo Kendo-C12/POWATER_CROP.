@@ -1,8 +1,8 @@
-# POWATER CORP. (`v1.0.7.5`) — GDevelop 5 Project Documentation (`CLAUDE.md`)
+# POWATER CORP. (`v1.0.7.6`) — GDevelop 5 Project Documentation (`CLAUDE.md`)
 
 > **Team Green Gang**: Sukrit Limpakanon, Aristt Mahakitsiri, Gantinan Satjariyakul  
 > **Engine**: GDevelop 5 (`POWATER CROPS..json`) + Real PNG Sprite Assets + PixiJS Procedural River/Conduit Rendering  
-> **Version Naming**: `1.x.y.z` (`x` = Major Version, `y` = Small Addition Within Major Version, `z` = Bug Fixes) — Current: **`v1.0.7.5`**
+> **Version Naming**: `1.x.y.z` (`x` = Major Version, `y` = Small Addition Within Major Version, `z` = Bug Fixes) — Current: **`v1.0.7.6`**
 
 ---
 
@@ -49,6 +49,7 @@
 
 ### 🔌 Wiring Rules (`v1.0.6.1`)
 - **Wire length**: up to **`315px`** center-to-center runs at full speed (`globalRules.fastWireLengthPixels`); wires can reach **`790px`** (2.5×, `maxWireLengthPixels`) but every extra `315px` counts as one more series hop (`engine.linkHops`), so long wires carry less. The reach zones always show fixed colours: translucent **green** disc up to `315px` (full speed) and **yellow** ring up to `790px` (slower); dragging past `790px` tints everything **outside** the ring red while green and yellow stay.
+- **Hard mode (`engine.hardMode`, toggle `🔥 โหมดยาก` on the briefing/level screen, HUD shows `🔥HARD`)**: removes the 2.5× long wires in every level — every link must fit the `315px` full-speed reach (`engine.maxWireLength()`). Verified winnable in all 4 cities by the bot (2/2 each, human pace + Eco Filters, 0 complaints).
 - **Eco Filter cooldown**: `5s` of game time between two Eco Filter placements (`globalRules.airFilterCooldownSeconds`); the `FILTER` button shows `⏳ Ns`.
 - **Between levels**: money restarts at each city's `startingBudget`; bought upgrades carry over.
 - **Series slowdown**: the first `2` links from a source run at full flow; each extra link loses **25%** (`chainFreeHops`, `chainFlowLossPerHop`), and a 6th link carries nothing. A supplied house with lost flow keeps filling its unhappy bar (blinking utility badge) and eventually complains — *lose condition #2*. Rome's unlimited aqueducts exempt water.
@@ -134,6 +135,10 @@ All buildings, houses, rivers, HUD bars, toolbar docks, buttons, and status badg
 
 ## 7. Changelog
 
+- **`v1.0.7.6` (2026-11-10)**:
+  - Tokyo: second building set on the right (east) bank — generator `(1150,470)`, pump `(1090,370)`, filter `(950,520)` — and a new fixed layout with 7 of 15 houses on the right side (spacing 105px).
+  - Pollution limit counts every coal plant and every filter site (Tokyo limit 75.4).
+  - Hard mode toggle: no 2.5× wires; bot-verified winnable in every city on the first two tries, so no map changes were needed.
 - **`v1.0.7.5` (2026-11-10)**:
   - City disasters now strike every 1–2 new houses from the level start (previously day/minute based and never seen in a ~2 min level); durations shortened to 8–10s; briefings/cutscenes updated.
   - Fixed: a stale victory screen closed after a restart marked the new level as already cleared, so it could never be won.

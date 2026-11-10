@@ -525,7 +525,11 @@ tokyo_river = {
 tokyo_buildings = [
     { 'name': 'generator', 'x': 172, 'y': 292, 'width': 56, 'height': 56, 'zOrder': 4, 'persistentUuid': 'inst-tokyo-gen', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
     { 'name': 'water_pump', 'x': 282, 'y': 392, 'width': 56, 'height': 56, 'zOrder': 4, 'persistentUuid': 'inst-tokyo-pump', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
-    { 'name': 'waste_filter', 'x': 312, 'y': 252, 'width': 56, 'height': 56, 'zOrder': 4, 'persistentUuid': 'inst-tokyo-filter', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] }
+    { 'name': 'waste_filter', 'x': 312, 'y': 252, 'width': 56, 'height': 56, 'zOrder': 4, 'persistentUuid': 'inst-tokyo-filter', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
+    # Right bank of Tokyo Bay: a second set so houses can spawn there with full-speed (1x) wires
+    { 'name': 'generator', 'x': 1122, 'y': 442, 'width': 56, 'height': 56, 'zOrder': 4, 'persistentUuid': 'inst-tokyo-gen-east', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
+    { 'name': 'water_pump', 'x': 1062, 'y': 342, 'width': 56, 'height': 56, 'zOrder': 4, 'persistentUuid': 'inst-tokyo-pump-east', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },
+    { 'name': 'waste_filter', 'x': 922, 'y': 492, 'width': 56, 'height': 56, 'zOrder': 4, 'persistentUuid': 'inst-tokyo-filter-east', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] }
 ]
 tokyo_houses = [
     { 'name': 'house', 'x': 840, 'y': 100, 'width': 84, 'height': 56, 'zOrder': 3, 'persistentUuid': 'inst-tokyo-h1', 'angle': 0, 'customSize': True, 'layer': '', 'locked': False, 'numberProperties': [], 'stringProperties': [], 'initialVariables': [] },

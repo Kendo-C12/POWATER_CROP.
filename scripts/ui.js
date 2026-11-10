@@ -251,7 +251,7 @@
         } else {
           const rawName = this.game.currentLevel ? (this.game.currentLevel.name || 'Bangkok') : 'POWATER';
           const cleanCity = rawName.replace(/^\d+\.\s*/, '').split(',')[0].toUpperCase();
-          this.txtLogo.text = `${cleanCity} v1.0`;
+          this.txtLogo.text = `${cleanCity} v1.0${this.game.hardMode ? ' 🔥HARD' : ''}`;
         }
       }
       if (this.txtMoney) {
@@ -1460,6 +1460,22 @@
       briefingTxt.position.set(mx + 23, my + 98);
       this.modalTextContainer.addChild(briefingTxt);
 
+      // Hard mode toggle (applies to every level until switched off)
+      const hard = !!(this.game && this.game.hardMode);
+      const hardBtn = { id: 'toggle_hard', x: mx + mw / 2 - 205, y: my + mh - 100, w: 410, h: 36 };
+      this.modalButtons.push(hardBtn);
+      const isHardHover = (mouseX >= hardBtn.x && mouseX <= hardBtn.x + hardBtn.w && mouseY >= hardBtn.y && mouseY <= hardBtn.y + hardBtn.h);
+      this.modalGfx.lineStyle(2, hard ? 0xff5a5f : 0x6c757d, 1.0);
+      this.modalGfx.beginFill(hard ? (isHardHover ? 0xc1121f : 0x9d0208) : (isHardHover ? 0x2b2350 : 0x1d1738), 1.0);
+      this.modalGfx.drawRoundedRect(hardBtn.x, hardBtn.y, hardBtn.w, hardBtn.h, 8);
+      this.modalGfx.endFill();
+      const hardTxt = this.makeText(hard ? '🔥 โหมดยาก: เปิด — ไม่มีสายยาว 2.5 เท่า (ลากได้สูงสุด 315px)' : '🔥 โหมดยาก: ปิด (คลิกเพื่อเปิด — เอาสายยาว 2.5 เท่าออก)', {
+        fontFamily: font, fontSize: 12, fontWeight: 'bold', fill: hard ? 0xffffff : 0xadb5bd
+      });
+      hardTxt.anchor.set(0.5);
+      hardTxt.position.set(hardBtn.x + hardBtn.w / 2, hardBtn.y + hardBtn.h / 2);
+      this.modalTextContainer.addChild(hardTxt);
+
       // Button 1: Start Fast 30s Tutorial
       const tutBtn = { id: 'start_fast_tutorial', x: mx + mw / 2 - 205, y: my + mh - 54, w: 195, h: 40 };
       this.modalButtons.push(tutBtn);
@@ -1905,6 +1921,11 @@
 
           if (btn.id === 'modal_close' || btn.id === 'btn_start' || btn.id === 'btn_ok' || btn.id === 'btn_cont' || btn.id === 'hud_start') {
             this.closeModal();
+            return;
+          }
+
+          if (btn.id === 'toggle_hard') {
+            if (this.game) this.game.hardMode = !this.game.hardMode;
             return;
           }
 
