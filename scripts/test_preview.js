@@ -459,20 +459,22 @@ async function runTest() {
   if (!hardRes.hardRefused || !hardRes.normalOk) throw new Error('Hard mode check failed!');
   await page.evaluate(() => window.POWATER.game.startLevel(0));
 
-  // 8k. Bot demo after the top-bar intro: plays steps 1..9 by itself, then hands a fresh tutorial to the player
+  // 8k. Bot example after the top-bar intro: a demo video per step, moved with back / next, then the player's turn
   const demo = await page.evaluate(() => {
     const g = window.POWATER.game, u = window.POWATER.uiManager;
     g.startTutorial();
-    u.closeModal();
-    g.startTutorialDemo();
-    const seen = new Set();
-    for (let t = 0; t < 40 && g.tutorialDemo; t += 0.1) { g.update(0.1); seen.add(g.tutorialStep); }
-    const r = { seen: [...seen].sort((a, b) => a - b), demoOver: !g.tutorialDemo, step: g.tutorialStep, houses: g.houses.length, modal: u.activeModal };
+    u.showTutorialDemo(0);
+    const keys = [u.modalData.videoKey];
+    u.tutorialDemoGo(-1); const stayFirst = u.modalData.demoStep === 0; // back on the first step does nothing
+    for (let i = 0; i < 8; i++) { u.tutorialDemoGo(1); keys.push(u.modalData.videoKey); }
+    u.tutorialDemoGo(-1); const back = u.modalData.demoStep; u.tutorialDemoGo(1);
+    u.tutorialDemoGo(1); // last step -> start playing
+    const r = { keys, stayFirst, back, modal: u.activeModal, step: g.tutorialStep, houses: g.houses.length };
     g.isTutorialMode = false;
     return r;
   });
-  console.log('8k. Tutorial bot demo:', demo);
-  if (!demo.demoOver || demo.seen.join() !== '1,2,3,4,5,6,7,8,9' || demo.step !== 1 || demo.houses !== 1 || demo.modal) throw new Error('Tutorial bot demo check failed!');
+  console.log('8k. Tutorial bot example (step videos):', JSON.stringify(demo));
+  if (demo.keys.length !== 9 || new Set(demo.keys).size !== 9 || !demo.stayFirst || demo.back !== 7 || demo.modal || demo.step !== 1 || demo.houses !== 1) throw new Error('Tutorial example videos check failed!');
   await page.evaluate(() => window.POWATER.game.startLevel(0));
 
   // 9. City map image drives water; city cutscene (story intro for Bangkok) precedes the briefing

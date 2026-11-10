@@ -325,20 +325,7 @@
       const p0 = this.tutorialSpot(0);
       this.spawnHouse(null, p0.x, p0.y);
       this.addFloatingText('🎓 เริ่มโหมดฝึกสอนด่วน (Fast Scene Tutorial)! ทำตามลูกศรแนะนำได้เลย', CONFIG.CANVAS_WIDTH / 2, 115, '#06d6a0');
-      this.tutorialDemo = false;
       if (!opts.noIntro && global.POWATER.uiManager) global.POWATER.uiManager.showHudIntro(); // explain the top bar first
-    }
-
-    // After the top-bar intro the bot plays the tutorial once (a step every 2.5s), then the player gets a fresh one
-    startTutorialDemo() {
-      this.tutorialDemo = true;
-      this.tutorialDemoTimer = 0;
-      this.addFloatingText('🤖 ดูบอทเล่นให้ดูก่อน แล้วค่อยลองเอง!', CONFIG.CANVAS_WIDTH / 2, 130, '#90e0ef');
-    }
-
-    endTutorialDemo() {
-      this.startTutorial({ noIntro: true });
-      this.addFloatingText('🎮 ตาคุณแล้ว! ลองทำตามทีละขั้น', CONFIG.CANVAS_WIDTH / 2, 130, '#06d6a0');
     }
 
     // Fixed house spots placed in the GDevelop scene ('house_spot' markers, 'order' = spawn sequence) override
@@ -386,14 +373,6 @@
     updateTutorial(dt) {
       if (!this.isTutorialMode || this.tutorialStep <= 0) return;
       this.tutorialStepTimer += dt;
-      if (this.tutorialDemo) {
-        this.tutorialDemoTimer = (this.tutorialDemoTimer || 0) + dt;
-        if (this.tutorialDemoTimer >= 2.5) {
-          this.tutorialDemoTimer = 0;
-          if (this.tutorialStep >= 9) return this.endTutorialDemo(); // shown everything: player's turn
-          this.skipTutorialStep();
-        }
-      }
       const h0 = this.houses[0];
       const h1 = this.tutorialHouse2;
       const h2 = this.tutorialHouse3;

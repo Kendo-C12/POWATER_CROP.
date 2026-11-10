@@ -1,8 +1,8 @@
-# POWATER CORP. (`v1.0.8.2`) — GDevelop 5 Project Documentation (`CLAUDE.md`)
+# POWATER CORP. (`v1.0.8.3`) — GDevelop 5 Project Documentation (`CLAUDE.md`)
 
 > **Team Green Gang**: Sukrit Limpakanon, Aristt Mahakitsiri, Gantinan Satjariyakul  
 > **Engine**: GDevelop 5 (`POWATER CROPS..json`) + Real PNG Sprite Assets + PixiJS Procedural River/Conduit Rendering  
-> **Version Naming**: `1.x.y.z` (`x` = Major Version, `y` = Small Addition Within Major Version, `z` = Bug Fixes) — Current: **`v1.0.8.2`**
+> **Version Naming**: `1.x.y.z` (`x` = Major Version, `y` = Small Addition Within Major Version, `z` = Bug Fixes) — Current: **`v1.0.8.3`**
 
 ---
 
@@ -136,9 +136,11 @@ All buildings, houses, rivers, HUD bars, toolbar docks, buttons, and status badg
 
 ## 7. Changelog
 
+- **`v1.0.8.3` (2026-11-10)**:
+  - The bot example is now a video player like the toolbar demos (`ui.showTutorialDemo`): one looping demo per tutorial step (power, water, sewage, chain a house, delete a wire, series slowdown, repair, Eco Filter, complaints) with `◀ ย้อนกลับ` / `ถัดไป ▶` buttons instead of auto-play; the last step's `🎮 เริ่มเล่นเอง` starts the real tutorial. New demo animations `chain`, `delete_wire`, `chain_slow`.
 - **`v1.0.8.2` (2026-11-10)**:
   - Houses whose utilities flow too slowly (faded, blinking badges) show a label under them: `🐢 ไฟ/น้ำ/น้ำเสีย ไหลไม่พอ`; tutorial step 6 explains it.
-  - Tutorial order: top-bar intro → **bot demo** (`engine.startTutorialDemo`: plays steps 1–9, one every 2.5s, coach bar shows `🤖 บอทสาธิต`, `⏭️ ข้ามตัวอย่าง` skips) → a fresh tutorial for the player.
+  - Tutorial order: top-bar intro → bot example → the player's tutorial.
 - **`v1.0.8.1` (2026-11-10)**:
   - Tutorial points a bouncing red arrow (and glow) at the toolbar button each step uses: POWER/WATER/DRAIN (steps 1-3, and the next missing utility when chaining in 4 & 6), DELETE (5), REPAIR (7), FILTER (8) — `ui.tutorialButtonFor()`.
 - **`v1.0.8.0` (2026-11-10)**:

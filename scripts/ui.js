@@ -371,8 +371,6 @@
             if (global.POWATER.soundManager) global.POWATER.soundManager.playClick();
             if (tb.id === 'tut_auto_step') {
               this.game.skipTutorialStep();
-            } else if (tb.id === 'tut_skip_demo') {
-              this.game.endTutorialDemo();
             } else if (tb.id === 'tut_start_bangkok') {
               this.switchToLevelIndex(0);
             }
@@ -453,7 +451,7 @@
         8: '☢️ 8/9 วิธีแพ้ที่ 1 — มลภาวะ: ค่า ☢️ ด้านบนเต็มขีดจำกัด = Game Over! (โรงไฟฟ้าและน้ำเสียเพิ่มมลภาวะ) วางเครื่องกรองอากาศ [4] เพื่อลด',
         9: '⚠️ 9/9 วิธีแพ้ที่ 2 — ร้องเรียน: บ้านขาดไฟ/น้ำ/ท่อน้ำเสีย หรือพ่วงยาวจนเติมไม่ทัน จะร้องเรียน 1 Strike — ครบ 3 Strike = Game Over'
       };
-      const stepMsg = (this.game.tutorialDemo ? '🤖 บอทสาธิต (ดูก่อน แล้วค่อยลองเอง) — ' : '') + (msgs[step] || '🎉 ฝึกสอนสำเร็จครบ 100%! คลิก [▶] เหนือปุ่มเพื่อดูวิดีโอฟีเจอร์ หรือเริ่มด่าน Bangkok ได้เลย!');
+      const stepMsg = (msgs[step] || '🎉 ฝึกสอนสำเร็จครบ 100%! คลิก [▶] เหนือปุ่มเพื่อดูวิดีโอฟีเจอร์ หรือเริ่มด่าน Bangkok ได้เลย!');
 
       // Point at the HUD pill the lose-condition steps talk about
       const hl = step === 8 ? [660, 6, 172, 32] : (step === 9 ? [1056, 6, 214, 32] : null);
@@ -471,7 +469,7 @@
 
       // Auto-complete current step button (steps 1..9; step 9 is the "got it" confirm)
       if (step >= 1 && step <= 9) {
-        const autoBtn = { id: this.game.tutorialDemo ? 'tut_skip_demo' : 'tut_auto_step', x: barX + barW - 275, y: barY + 6, w: 125, h: 32 };
+        const autoBtn = { id: 'tut_auto_step', x: barX + barW - 275, y: barY + 6, w: 125, h: 32 };
         this.tutorialButtons.push(autoBtn);
         const isHov = (mouseX >= autoBtn.x && mouseX <= autoBtn.x + autoBtn.w && mouseY >= autoBtn.y && mouseY <= autoBtn.y + autoBtn.h);
         g.lineStyle(1.5, 0xffd166, 0.9);
@@ -479,7 +477,7 @@
         g.drawRoundedRect(autoBtn.x, autoBtn.y, autoBtn.w, autoBtn.h, 6);
         g.endFill();
 
-        const autoTxt = this.makeText(this.game.tutorialDemo ? '⏭️ ข้ามตัวอย่าง' : (step === 9 ? '✅ เข้าใจแล้ว' : '⏭️ ทำขั้นตอนนี้ให้'), {
+        const autoTxt = this.makeText(step === 9 ? '✅ เข้าใจแล้ว' : '⏭️ ทำขั้นตอนนี้ให้', {
           fontFamily: font, fontSize: 11, fontWeight: 'bold', fill: isHov ? 0x120d24 : 0xffd166
         }, 'tutorial');
         autoTxt.anchor.set(0.5);
@@ -764,6 +762,37 @@
       this.videoTime = 0.0;
       this.videoPaused = false;
       if (this.modalContainer) this.modalContainer.visible = true;
+    }
+
+    // Bot example of the tutorial: a looping demo video per step, the player moves with back / next
+    showTutorialDemo(i) {
+      const D = [
+        ['power', 'ลากสายไฟ (สีเหลือง) จากโรงไฟฟ้าไปที่บ้าน'],
+        ['water', 'ลากท่อน้ำดี (สีฟ้า) จากปั๊มน้ำริมแม่น้ำไปที่บ้าน (Tab = สลับชนิดสาย)'],
+        ['sewage', 'ลากท่อน้ำเสีย (สีม่วง) จากบ้านไปที่ถังบำบัดริมแม่น้ำ = บ้านสมบูรณ์ +$50'],
+        ['chain', 'บ้านใหม่อยู่ไกลอาคาร: ลากสายพ่วงจากบ้านเดิมไปบ้านใหม่'],
+        ['delete_wire', 'ลบสาย: คลิกที่สาย (หรือคลิกขวา) — อาคารรื้อถอนไม่ได้'],
+        ['chain_slow', 'พ่วงยาวเกินไป ไอคอนจางกะพริบ = ไฟ/น้ำ/น้ำเสียไหลไม่พอ บ้านจะร้องเรียน'],
+        ['repair', 'อาคารเสีย (ประแจแดง): คลิกที่อาคาร หรือกด REPAIR [R] แล้วคลิกเพื่อซ่อม'],
+        ['air_filter', 'วิธีแพ้ที่ 1 — มลพิษเต็มหลอด: วางเครื่องกรองอากาศ [4] เพื่อลด'],
+        ['lose_complaint', 'วิธีแพ้ที่ 2 — ร้องเรียน: บ้านขาดไฟ/น้ำ/น้ำเสียนานเกินไป ครบ 3 Strike = แพ้']
+      ];
+      const k = Math.max(0, Math.min(D.length - 1, i));
+      this.activeModal = 'feature_video';
+      this.modalData = { videoKey: D[k][0], demoStep: k, demoCount: D.length, video: {
+        title: `🤖 ตัวอย่างจากบอท — ขั้นที่ ${k + 1}/${D.length}`,
+        subtitle: 'ดูตัวอย่างทีละขั้น กด ◀ ▶ เพื่อเลื่อน แล้วค่อยลองเล่นเอง',
+        steps: [`${k + 1}. ${D[k][1]}`] } };
+      this.videoTime = 0.0;
+      this.videoPaused = false;
+      if (this.modalContainer) this.modalContainer.visible = true;
+    }
+
+    tutorialDemoGo(delta) {
+      const d = this.modalData || {};
+      const next = d.demoStep + delta;
+      if (next >= d.demoCount) this.closeModal(); // last step done: the player's turn
+      else this.showTutorialDemo(next);
     }
 
     // City cutscene before each city: story/story.txt intro (Bangkok) + per-city dialogue, then the briefing
@@ -1151,6 +1180,25 @@
       stepsTxt.position.set(mx + 45, stepBoxY + 12);
       this.modalTextContainer.addChild(stepsTxt);
 
+      if (this.modalData.demoStep != null) {
+        const k = this.modalData.demoStep, last = k === this.modalData.demoCount - 1;
+        [{ id: 'demo_prev', x: mx + mw / 2 - 210, label: '◀ ย้อนกลับ', on: k > 0, col: 0x48cae4 },
+          { id: 'demo_next', x: mx + mw / 2 + 10, label: last ? '🎮 เริ่มเล่นเอง' : 'ถัดไป ▶', on: true, col: 0x06d6a0 }].forEach(b => {
+          const r = { id: b.id, x: b.x, y: my + mh - 54, w: 200, h: 42 };
+          if (b.on) this.modalButtons.push(r);
+          const hov = b.on && mouseX >= r.x && mouseX <= r.x + r.w && mouseY >= r.y && mouseY <= r.y + r.h;
+          g.lineStyle(2, b.on ? b.col : 0x3d3460, 1.0);
+          g.beginFill(b.on ? (hov ? 0x00b4d8 : b.col) : 0x1d1738, 1.0);
+          g.drawRoundedRect(r.x, r.y, r.w, r.h, 8);
+          g.endFill();
+          const tx = this.makeText(b.label, { fontFamily: font, fontSize: 13, fontWeight: 'bold', fill: b.on ? 0x120d24 : 0x6c757d });
+          tx.anchor.set(0.5);
+          tx.position.set(r.x + r.w / 2, r.y + r.h / 2);
+          this.modalTextContainer.addChild(tx);
+        });
+        return;
+      }
+
       // Bottom Action Button: "Use This Feature Now!"
       const useAct = vInfo.useAction || { type: 'tool', value: 'power', label: '⚡ ใช้งานฟีเจอร์นี้ทันที!' };
       const useBtn = { id: 'vid_use_feature', useAction: useAct, x: mx + mw / 2 - 150, y: my + mh - 54, w: 300, h: 42 };
@@ -1256,6 +1304,46 @@
         }
 
         drawCursor(curEnd.x, curEnd.y, t >= 0.1 && t <= 0.58);
+      }
+      else if (vKey === 'chain' || vKey === 'delete_wire' || vKey === 'chain_slow') {
+        const y = vy + 105;
+        const xs = vKey === 'chain_slow' ? [vx + 70, vx + 200, vx + 330, vx + 460] : [vx + 90, vx + 260, vx + 430];
+        addSprite('Power.png', xs[0], y, 46, 46);
+        xs.slice(1).forEach(x => addSprite('House.png', x, y, 70, 46));
+        const wire = (a, b, alpha = 1) => { g.lineStyle(5, 0xffd166, alpha); g.moveTo(a, y); g.lineTo(b, y); };
+        if (vKey === 'chain') {
+          wire(xs[0] + 26, xs[1] - 34);
+          const from = xs[1] + 34, to = xs[2] - 34;
+          const p = Math.max(0, Math.min(1, (t - 0.25) / 0.35));
+          if (t >= 0.6) wire(from, to);
+          else if (t >= 0.25) { wire(from, from + (to - from) * p, 0.7); drawCursor(from + (to - from) * p, y, true); }
+          else drawCursor(from, y, false);
+          if (t >= 0.6) addSprite('badge_power.png', xs[2], y - 38, 22, 22);
+          addLabel('ลากจากบ้านเดิม ไปบ้านใหม่ (บ้านพ่วงต่อกันได้)', vx + vw / 2, vy + 24, 0xffd166, 12);
+        } else if (vKey === 'delete_wire') {
+          wire(xs[0] + 26, xs[1] - 34);
+          const mid = (xs[1] + xs[2]) / 2;
+          if (t < 0.45) wire(xs[1] + 34, xs[2] - 34);
+          else addLabel('🗑️ ลบสายไฟแล้ว', mid, y - 22, 0x90e0ef, 12);
+          drawCursor(t < 0.3 ? mid - 60 + t * 200 : mid, y, t >= 0.4 && t < 0.5);
+          addLabel('คลิกที่สาย (หรือคลิกขวา) เพื่อลบ', vx + vw / 2, vy + 24, 0xadb5bd, 12);
+        } else {
+          for (let i = 0; i < 3; i++) {
+            wire(xs[i] + 30, xs[i + 1] - 34);
+            const k = (t * (3 - i) * 0.9 + i * 0.2) % 1; // further down the chain = slower pulses
+            g.lineStyle(0);
+            g.beginFill(0xffffff, 0.9);
+            g.drawCircle(xs[i] + 30 + (xs[i + 1] - xs[i] - 64) * k, y, 4);
+            g.endFill();
+          }
+          const blink = 0.35 + 0.35 * Math.abs(Math.sin(t * 20));
+          [['badge_power.png', -14], ['badge_water.png', 14]].forEach(([img, dx]) => {
+            const sp = addSprite(img, xs[3] + dx, y - 38, 22, 22);
+            if (sp) sp.alpha = blink; // faded + blinking = not enough flow
+          });
+          addLabel('🐢 ไฟ/น้ำ ไหลไม่พอ', xs[3], y + 42, 0xffb703, 11);
+          addLabel('ทอดที่ 3 ขึ้นไป ไหลช้าลงทอดละ 25%', vx + vw / 2, vy + 24, 0xffb703, 12);
+        }
       }
       else if (vKey === 'repair') {
         const px = vx + 260, py = vy + 105;
@@ -1965,8 +2053,12 @@
           }
 
           if (btn.id === 'hud_start') {
-            this.closeModal();
-            if (this.game) this.game.startTutorialDemo();
+            this.showTutorialDemo(0); // watch the bot's example step by step, then play
+            return;
+          }
+
+          if (btn.id === 'demo_prev' || btn.id === 'demo_next') {
+            this.tutorialDemoGo(btn.id === 'demo_next' ? 1 : -1);
             return;
           }
 
