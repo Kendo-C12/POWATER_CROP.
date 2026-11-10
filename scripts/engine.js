@@ -1153,11 +1153,9 @@
           const lost = 1 - this.chainFlow(h.hops[t], t);
           if (lost > 0) { h.slowTypes.push(t); worst = Math.max(worst, lost); }
         });
-        // Flood: every utility flows a little slower until the water recedes
-        const flood = this.isFloodActive ? (CONFIG.FLOOD_FLOW_LOSS || 0.15) : 0;
-        if (flood > 0 && (h.hasPower || h.hasWater || h.hasDrainage)) {
+        // Flood: utilities show as slower (blinking badges) until the water recedes, but it never causes complaints
+        if (this.isFloodActive && (h.hasPower || h.hasWater || h.hasDrainage)) {
           ['power', 'water', 'sewage'].forEach(t => { if (!h.slowTypes.includes(t)) h.slowTypes.push(t); });
-          worst = Math.max(worst, flood);
         }
         h.flowDeficit = worst;
       });
